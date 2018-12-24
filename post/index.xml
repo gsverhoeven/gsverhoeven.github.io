@@ -13,12 +13,12 @@
     
     
     <item>
-      <title>My First Post</title>
-      <link>https://gsverhoeven.github.io/post/my-first-post/</link>
-      <pubDate>Mon, 24 Dec 2018 16:54:08 +0100</pubDate>
+      <title>Interaction detection using Random Forest predictions</title>
+      <link>https://gsverhoeven.github.io/post/readme/</link>
+      <pubDate>Sun, 24 Sep 2017 16:54:08 +0100</pubDate>
       
-      <guid>https://gsverhoeven.github.io/post/my-first-post/</guid>
-      <description></description>
+      <guid>https://gsverhoeven.github.io/post/readme/</guid>
+      <description>summary The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions.</description>
     </item>
     
   </channel>
