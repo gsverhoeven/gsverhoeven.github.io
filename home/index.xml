@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Homes on Academic</title>
+    <title>Homes on Gertjan Verhoeven</title>
     <link>https://gsverhoeven.github.io/home/</link>
-    <description>Recent content in Homes on Academic</description>
+    <description>Recent content in Homes on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
@@ -36,7 +36,7 @@
       <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
       
       <guid>https://gsverhoeven.github.io/home/about/</guid>
-      <description>Biography I am a data scientist at the Dutch Healthcare Authority, interested in health policy and statistical methods. I have a background in experimental physics, with a PhD in Biophysics.</description>
+      <description>Biography I am a research scientist at the Dutch Healthcare Authority, working on health policy and statistical methods. I have a background in experimental physics, with a PhD in Biophysics.</description>
     </item>
     
     <item>
