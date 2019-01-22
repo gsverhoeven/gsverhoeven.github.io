@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Gertjan Verhoeven on Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/</link>
+    <link>/</link>
     <description>Recent content in Gertjan Verhoeven on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,99 +12,45 @@
     
     <item>
       <title>BART vs Grf showdown</title>
-      <link>https://gsverhoeven.github.io/post/bart_vs_grf/</link>
-      <pubDate>Wed, 26 Dec 2018 00:00:00 +0100</pubDate>
+      <link>/post/bart_vs_grf/bart-vs-grf/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://gsverhoeven.github.io/post/bart_vs_grf/</guid>
+      <guid>/post/bart_vs_grf/bart-vs-grf/</guid>
       <description>
 
-&lt;p&gt;&lt;img src=&#34;streetfighter.jpg&#34; alt=&#34;Showdown time!&#34; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&#34;load-packages&#34;&gt;Load packages&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# library(devtools)
+&lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Load packages&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
 #devtools::install_github(&amp;quot;vdorie/dbarts&amp;quot;)
 library(dbarts)
 library(ggplot2)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;ggplot2&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(tidyverse)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;tidyverse&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## -- Attaching packages ---------------------------------- tidyverse 1.2.1 --
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## v tibble  1.4.2     v purrr   0.2.4
-## v tidyr   0.8.1     v dplyr   0.7.5
-## v readr   1.1.1     v stringr 1.3.1
-## v tibble  1.4.2     v forcats 0.3.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;tibble&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;tidyr&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;readr&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;purrr&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;dplyr&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;stringr&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;forcats&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## -- Conflicts ------------------------------------- tidyverse_conflicts() --
+library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## -- Attaching packages ------------------------------------------------------------- tidyverse 1.2.1 --&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## v tibble  2.0.1     v purrr   0.2.5
+## v tidyr   0.8.2     v dplyr   0.7.8
+## v readr   1.3.1     v stringr 1.3.1
+## v tibble  2.0.1     v forcats 0.3.0&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## -- Conflicts ---------------------------------------------------------------- tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(grf)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;grf&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;#devtools::install_github(&amp;quot;vdorie/aciccomp/2017&amp;quot;)
+## x dplyr::lag()    masks stats::lag()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(grf)
+#devtools::install_github(&amp;quot;vdorie/aciccomp/2017&amp;quot;)
 library(aciccomp2017)
-library(cowplot)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;cowplot&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
+library(cowplot)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
-## Attaching package: &#39;cowplot&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## The following object is masked from &#39;package:ggplot2&#39;:
+## Attaching package: &amp;#39;cowplot&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following object is masked from &amp;#39;package:ggplot2&amp;#39;:
 ## 
-##     ggsave
-&lt;/code&gt;&lt;/pre&gt;
+##     ggsave&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
 
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
-
-fullrun &amp;lt;- 0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&#34;dataset-1-simulated-dataset-from-friedman-mars-paper&#34;&gt;Dataset 1: Simulated dataset from Friedman MARS paper&lt;/h1&gt;
-
+fullrun &amp;lt;- 0&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-1-simulated-dataset-from-friedman-mars-paper&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 1: Simulated dataset from Friedman MARS paper&lt;/h1&gt;
 &lt;p&gt;This is not a causal problem but a prediction problem.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;## y = f(x) + epsilon , epsilon ~ N(0, sigma)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## y = f(x) + epsilon , epsilon ~ N(0, sigma)
 ## x consists of 10 variables, only first 5 matter
 
 f &amp;lt;- function(x) {
@@ -120,28 +66,22 @@ x  &amp;lt;- matrix(runif(n * 10), n, 10)
 Ey &amp;lt;- f(x)
 y  &amp;lt;- rnorm(n, Ey, sigma)
 
-df &amp;lt;- data.frame(x, y, y_true = Ey)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;fit-bart-model-on-simulated-friedman-data&#34;&gt;fit BART model on simulated Friedman data&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;if(fullrun){
+df &amp;lt;- data.frame(x, y, y_true = Ey)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;fit-bart-model-on-simulated-friedman-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;fit BART model on simulated Friedman data&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
 ## run BART
   set.seed(99)
   bartFit &amp;lt;- bart(x, y)
   saveRDS(bartFit, &amp;quot;s1.rds&amp;quot;)
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s1.rds&amp;quot;)}
 
-plot(bartFit)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-3-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;MCMC or sigma looks ok.&lt;/p&gt;
-
-&lt;h3 id=&#34;compare-bart-fit-to-true-values&#34;&gt;compare BART fit to true values&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df2 &amp;lt;- data.frame(df, 
+&lt;div id=&#34;compare-bart-fit-to-true-values&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;compare BART fit to true values&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df2 &amp;lt;- data.frame(df, 
   ql = apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=0.05),
   qm = apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=.5),
   qu &amp;lt;- apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=0.95)
@@ -151,68 +91,41 @@ bartp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, y
   geom_point() + geom_smooth() +
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)
 
-bartp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-4-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks nice.&lt;/p&gt;
-
-&lt;h2 id=&#34;fit-grf-regression-forest-on-friedman-data&#34;&gt;Fit Grf regression forest on Friedman data&lt;/h2&gt;
-
-&lt;p&gt;From the manual:
-Trains a regression forest that can be used to estimate the conditional mean function mu(x) = E[Y | X = x]&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;if(fullrun){
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-grf-regression-forest-on-friedman-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit Grf regression forest on Friedman data&lt;/h2&gt;
+&lt;p&gt;From the manual: Trains a regression forest that can be used to estimate the conditional mean function mu(x) = E[Y | X = x]&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
   reg.forest = regression_forest(x, y, num.trees = 2000)
   saveRDS(reg.forest, &amp;quot;s00.rds&amp;quot;)
-} else {reg.forest &amp;lt;- readRDS(&amp;quot;s00.rds&amp;quot;)}
-&lt;/code&gt;&lt;/pre&gt;
+} else {reg.forest &amp;lt;- readRDS(&amp;quot;s00.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df3 &amp;lt;- CalcPredictionsGRF(x, reg.forest)
 
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df3 &amp;lt;- CalcPredictionsGRF(x, reg.forest)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: package &#39;bindrcpp&#39; was built under R version 3.4.4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df3 &amp;lt;- data.frame(df3, y)
+df3 &amp;lt;- data.frame(df3, y)
 
 ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
   geom_point() + 
-  geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-6-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;p&gt;This is pretty bad compared to BART. What&amp;rsquo;s wrong here?&lt;/p&gt;
-
-&lt;p&gt;From reference.md:
-&lt;strong&gt;GRF isn&amp;rsquo;t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
-
+  geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This is pretty bad compared to BART. What’s wrong here?&lt;/p&gt;
+&lt;p&gt;From reference.md: &lt;strong&gt;GRF isn’t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
-
 &lt;ul&gt;
-&lt;li&gt;Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.
-
-&lt;ul&gt;
+&lt;li&gt;Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.&lt;/li&gt;
 &lt;li&gt;Skipping the variance estimate computation, by setting ci.group.size to 1 during training, then increasing sample.fraction. Because of how variance estimation is implemented, sample.fraction cannot be greater than 0.5 when it is enabled. If variance estimates are not needed, it may help to disable this computation and use a larger subsample size for training.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty?
-We cannot turn off variance estimate computation, because we want the CI&amp;rsquo;s&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;if(fullrun){
+&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI’s&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
   reg.forest2 = regression_forest(x, y, num.trees = 2000,
                                  honesty = FALSE)
   saveRDS(reg.forest2, &amp;quot;s001.rds&amp;quot;)
-} else {reg.forest2 &amp;lt;- readRDS(&amp;quot;s001.rds&amp;quot;)}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df2 &amp;lt;- CalcPredictionsGRF(x, reg.forest2)
+} else {reg.forest2 &amp;lt;- readRDS(&amp;quot;s001.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df2 &amp;lt;- CalcPredictionsGRF(x, reg.forest2)
 
 df2 &amp;lt;- data.frame(df2, y)
 
@@ -220,115 +133,68 @@ grfp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ym
   geom_point() + geom_smooth() +
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)
 
-grfp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-8-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;p&gt;Ah! better now. But Grf still worse than BART.
-We ran with 2000 trees and turned of honesty.
-Perhaps dataset too small? Maybe check out the sample.fraction parameter?
-Sample.fraction is set by default at 0.5, so only half of data is used to grow tree.
-OR use  tune.parameters = TRUE&lt;/p&gt;
-
-&lt;h2 id=&#34;compare-methods&#34;&gt;Compare methods&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp &amp;lt;- plot_grid(bartp, grfp)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
-## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-9-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;dataset-2-simulated-data-from-acic-2017&#34;&gt;Dataset 2: Simulated data from ACIC 2017&lt;/h1&gt;
-
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ah! better now. But Grf still worse than BART. We ran with 2000 trees and turned of honesty. Perhaps dataset too small? Maybe check out the sample.fraction parameter? Sample.fraction is set by default at 0.5, so only half of data is used to grow tree. OR use tune.parameters = TRUE&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-methods&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare methods&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;
+## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-2-simulated-data-from-acic-2017&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 2: Simulated data from ACIC 2017&lt;/h1&gt;
 &lt;p&gt;This is a bigger dataset, N=4302.&lt;/p&gt;
-
 &lt;ul&gt;
-&lt;li&gt;Treatment effect $\tau$ is a function of covariates x3, x24, x14, x15&lt;/li&gt;
-&lt;li&gt;Probability of treatment $\pi$ is a function of covariates x1, x43, x10.&lt;/li&gt;
+&lt;li&gt;Treatment effect &lt;span class=&#34;math inline&#34;&gt;\(\tau\)&lt;/span&gt; is a function of covariates x3, x24, x14, x15&lt;/li&gt;
+&lt;li&gt;Probability of treatment &lt;span class=&#34;math inline&#34;&gt;\(\pi\)&lt;/span&gt; is a function of covariates x1, x43, x10.&lt;/li&gt;
 &lt;li&gt;Outcome is a function of x43&lt;/li&gt;
 &lt;li&gt;Noise is a function of x21&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;head(input_2017[, c(3,24,14,15)])
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(input_2017[, c(3,24,14,15)])&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##   x_3  x_24 x_14 x_15
 ## 1  20 white    0    2
 ## 2   0 black    0    0
 ## 3   0 white    0    1
 ## 4  10 white    0    0
 ## 5   0 black    0    0
-## 6   1 white    0    0
-&lt;/code&gt;&lt;/pre&gt;
-
+## 6   1 white    0    0&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Check transformed covariates used to create simulated datasets.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# zit hidden in package
-head(aciccomp2017:::transformedData_2017)
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# zit hidden in package
+head(aciccomp2017:::transformedData_2017)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##              x_1   x_3  x_10  x_14  x_15 x_21 x_24       x_43
 ## 2665 -1.18689448  gt_0 leq_0 leq_0  gt_0    J    E -1.0897971
 ## 22   -0.04543705 leq_0 leq_0 leq_0 leq_0    J    B  1.1223750
 ## 2416  0.13675482 leq_0 leq_0 leq_0  gt_0    J    E  0.6136700
 ## 1350 -0.24062700  gt_0 leq_0 leq_0 leq_0    J    E -0.2995632
 ## 3850  1.02054653 leq_0 leq_0 leq_0 leq_0    I    B  0.6136700
-## 4167 -1.18689448  gt_0 leq_0 leq_0 leq_0    K    E -1.5961206
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;So we find that we should not take the functions in Dorie 2018 (debrief.pdf) literately.
-x_3 used to calculate the treatment effect is &lt;strong&gt;derived&lt;/strong&gt; from x_3 in the input data.
-x_24 used to calculate the treatment effect is &lt;strong&gt;derived&lt;/strong&gt; from x_24 in the input data.
-Both have become binary variables.&lt;/p&gt;
-
+## 4167 -1.18689448  gt_0 leq_0 leq_0 leq_0    K    E -1.5961206&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we find that we should not take the functions in Dorie 2018 (debrief.pdf) literately. x_3 used to calculate the treatment effect is &lt;strong&gt;derived&lt;/strong&gt; from x_3 in the input data. x_24 used to calculate the treatment effect is &lt;strong&gt;derived&lt;/strong&gt; from x_24 in the input data. Both have become binary variables.&lt;/p&gt;
 &lt;p&gt;Turns out that this was a feature of the 2016 ACIC and IS mentioned in the debrief.pdf&lt;/p&gt;
-
-&lt;p&gt;We pick the iid, strong signal, low noise, low confounding first.
-Actually from estimated PS (W.hat) it seems that every obs has probability of treatment 50%.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;parameters_2017[21,]
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;p&gt;We pick the iid, strong signal, low noise, low confounding first. Actually from estimated PS (W.hat) it seems that every obs has probability of treatment 50%.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;parameters_2017[21,]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##    errors magnitude noise confounding
-## 21    iid         1     0           0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# easiest?
-&lt;/code&gt;&lt;/pre&gt;
-
+## 21    iid         1     0           0&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# easiest?&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Grab the first replicate.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sim &amp;lt;- dgp_2017(21, 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;fit-bart-to-acic-2017-dataset&#34;&gt;Fit BART to ACIC 2017 dataset&lt;/h2&gt;
-
-&lt;p&gt;Need also counterfactual predictions.
-Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.&lt;/p&gt;
-
-&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more &amp;ldquo;burn in&amp;rdquo; samples.&lt;/p&gt;
-
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sim &amp;lt;- dgp_2017(21, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;fit-bart-to-acic-2017-dataset&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit BART to ACIC 2017 dataset&lt;/h2&gt;
+&lt;p&gt;Need also counterfactual predictions. Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.&lt;/p&gt;
+&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more “burn in” samples.&lt;/p&gt;
 &lt;p&gt;Prepare data for BART, including x.test with treatment reversed:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# combine x and y
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# combine x and y
 y &amp;lt;- sim$y
 x &amp;lt;- model.matrix(~. ,cbind(z = sim$z, input_2017))
 
 # flip z for counterfactual predictions (needed for BART)
-x.test &amp;lt;- model.matrix(~. ,cbind(z = 1 - sim$z, input_2017))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;## run BART
+x.test &amp;lt;- model.matrix(~. ,cbind(z = 1 - sim$z, input_2017))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## run BART
 fullrun &amp;lt;- 0
 if(fullrun){
   set.seed(99)
@@ -337,16 +203,12 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s2.rds&amp;quot;)
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s2.rds&amp;quot;)}
 
-plot(bartFit)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-15-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit&#34;&gt;Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit&lt;/h3&gt;
-
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit&lt;/h3&gt;
 &lt;p&gt;This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(sim, bartFit, &amp;quot;z&amp;quot;)
 
 sim &amp;lt;- sim %&amp;gt;% arrange(alpha)
@@ -356,48 +218,32 @@ bartp &amp;lt;- ggplot(sim, aes(x = 1:nrow(sim), qm))  +
   geom_point() + 
   geom_smooth() + geom_point(aes(y = alpha), col = &amp;quot;red&amp;quot;) + ylim(-2.5, 4.5)
 
-bartp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-16-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks sort of ok, but still weird. Some points it gets REALLY wrong.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;calculate-coverage&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Calculate coverage&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sim &amp;lt;- sim %&amp;gt;% mutate(in_ci = ql &amp;lt; alpha &amp;amp; qu &amp;gt; alpha) 
 
-&lt;h3 id=&#34;calculate-coverage&#34;&gt;Calculate coverage&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sim &amp;lt;- sim %&amp;gt;% mutate(in_ci = ql &amp;lt; alpha &amp;amp; qu &amp;gt; alpha) 
-
-mean(sim$in_ci)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 0.4363087
-&lt;/code&gt;&lt;/pre&gt;
-
+mean(sim$in_ci)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.4363087&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Pretty bad coverage. Look into whats going on here. Here it should be 0.9&lt;/p&gt;
-
 &lt;p&gt;The iid plot for method 2 gives coverage 0.7 (where it should be 0.95)&lt;/p&gt;
-
-&lt;h3 id=&#34;calculate-rmse-of-cate&#34;&gt;Calculate RMSE of CATE&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sqrt(mean((sim$alpha - sim$ite)^2))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 0.1587338
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;/div&gt;
+&lt;div id=&#34;calculate-rmse-of-cate&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Calculate RMSE of CATE&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sqrt(mean((sim$alpha - sim$ite)^2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1587338&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;For All i.i.d. (averaged over 250 replicates averaged over 8 scenarios) method 2 (BART should have RMSE of CATE of 0.35-0.4)&lt;/p&gt;
-
-&lt;h2 id=&#34;fit-grf-to-acic-2017-dataset&#34;&gt;Fit grf to ACIC 2017 dataset&lt;/h2&gt;
-
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-grf-to-acic-2017-dataset&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit grf to ACIC 2017 dataset&lt;/h2&gt;
 &lt;p&gt;need large num.trees for CI.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# prep data for Grf
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# prep data for Grf
 # combine x and y
 sim &amp;lt;- dgp_2017(21, 1)
 
@@ -411,14 +257,12 @@ fullrun &amp;lt;- 0
 if(fullrun){
   grf.fit_alt &amp;lt;- causal_forest(X, Y, W, num.trees = 500)
   saveRDS(grf.fit_alt, &amp;quot;s3.rds&amp;quot;)
-} else{grf.fit_alt &amp;lt;- readRDS(&amp;quot;s3.rds&amp;quot;)}
-&lt;/code&gt;&lt;/pre&gt;
-
+} else{grf.fit_alt &amp;lt;- readRDS(&amp;quot;s3.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It appears that using 4000 trees consumes too much memory (bad_alloc)&lt;/p&gt;
-
-&lt;h2 id=&#34;compare-predictions-vs-true-value&#34;&gt;Compare predictions vs  true value&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(X, grf.fit_alt)
+&lt;/div&gt;
+&lt;div id=&#34;compare-predictions-vs-true-value&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare predictions vs true value&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(X, grf.fit_alt)
 
 df_sep2 &amp;lt;- data.frame(df_sep2, Y, W, TAU = sim$alpha)
 
@@ -428,42 +272,25 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = 1:nrow(df_sep2), y = qm))   +
   geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) + geom_point() + geom_smooth() + 
   geom_point(aes(y = TAU), col = &amp;quot;red&amp;quot;) + ylim(-2.5, 4.5)
 
-grfp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-20-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This works ok now.&lt;/p&gt;
-
-&lt;h2 id=&#34;compare-both-methods&#34;&gt;Compare both methods&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp &amp;lt;- plot_grid(bartp, grfp)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-21-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;dataset-3-simulated-data-used-by-grf-example&#34;&gt;Dataset 3: simulated data used by grf example&lt;/h1&gt;
-
-&lt;p&gt;THis dataset is used in the Grf manual page.
-Size N = 2000. Probability of treatment function of X1.
-Treatment effect function of X1.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Generate data.
+&lt;/div&gt;
+&lt;div id=&#34;compare-both-methods&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare both methods&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-3-simulated-data-used-by-grf-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 3: simulated data used by grf example&lt;/h1&gt;
+&lt;p&gt;THis dataset is used in the Grf manual page. Size N = 2000. Probability of treatment function of X1. Treatment effect function of X1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Generate data.
 set.seed(123)
 n = 2000; p = 10
 X = matrix(rnorm(n*p), n, p)
@@ -474,92 +301,63 @@ W = rbinom(n, 1, 0.4 + 0.2 * (X[,1] &amp;gt; 0))
 Y = pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
 
 # TAU is true treatment effect
-df &amp;lt;- data.frame(X, W, Y, TAU = pmax(X[,1], 0))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;fit-grf&#34;&gt;Fit GRF&lt;/h2&gt;
-
+df &amp;lt;- data.frame(X, W, Y, TAU = pmax(X[,1], 0))&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;fit-grf&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit GRF&lt;/h2&gt;
 &lt;p&gt;Default settings are honesty = TRUE.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Train a causal forest.
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Train a causal forest.
 if(fullrun){
   tau.forest = causal_forest(X, Y, W, num.trees = 2000)
   saveRDS(tau.forest, &amp;quot;s4.rds&amp;quot;)
-} else {tau.forest &amp;lt;- readRDS(&amp;quot;s4.rds&amp;quot;)}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;oob-predictions&#34;&gt;OOB predictions&lt;/h2&gt;
-
+} else {tau.forest &amp;lt;- readRDS(&amp;quot;s4.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;oob-predictions&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;OOB predictions&lt;/h2&gt;
 &lt;p&gt;From the GRF manual:&lt;/p&gt;
-
 &lt;p&gt;Given a test example, the GRF algorithm computes a prediction as follows:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;For each tree, the test example is &#39;pushed down&#39; to determine what leaf it falls in.
+&lt;pre&gt;&lt;code&gt;For each tree, the test example is &amp;#39;pushed down&amp;#39; to determine what leaf it falls in.
 Given this information, we create a list of neighboring training examples, weighted by how many times the example fell in the same leaf as the test example.
-A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through &amp;lsquo;majority voting&amp;rsquo;. It&amp;rsquo;s worth noting that for regression forests, the GRF algorithm described above is identical this &amp;lsquo;ensemble&amp;rsquo; approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Estimate treatment effects for the training data using out-of-bag prediction.
+A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through ‘majority voting’. It’s worth noting that for regression forests, the GRF algorithm described above is identical this ‘ensemble’ approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate treatment effects for the training data using out-of-bag prediction.
 tau.hat.oob = predict(tau.forest)
 
 res &amp;lt;- data.frame(df, pred = tau.hat.oob$predictions)
 
 ggplot(res, aes(x = X1, y = pred)) + geom_point() + geom_smooth() + geom_abline(intercept = 0, slope = 1) +
-  geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-24-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;ate-att&#34;&gt;ATE &amp;amp; ATT&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Estimate the conditional average treatment effect on the full sample (CATE).
-average_treatment_effect(tau.forest, target.sample = &amp;quot;all&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
+  geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ate-att&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;ATE &amp;amp; ATT&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate the conditional average treatment effect on the full sample (CATE).
+average_treatment_effect(tau.forest, target.sample = &amp;quot;all&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##   estimate    std.err 
-## 0.36664140 0.04796884
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;mean(res$TAU)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 0.4138061
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Estimate the conditional average treatment effect on the treated sample (CATT).
-# Here, we don&#39;t expect much difference between the CATE and the CATT, since
+## 0.36664140 0.04796884&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(res$TAU)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.4138061&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate the conditional average treatment effect on the treated sample (CATT).
+# Here, we don&amp;#39;t expect much difference between the CATE and the CATT, since
 # treatment assignment was randomized.
-average_treatment_effect(tau.forest, target.sample = &amp;quot;treated&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
+average_treatment_effect(tau.forest, target.sample = &amp;quot;treated&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##   estimate    std.err 
-## 0.45860274 0.04852209
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;mean(res[res$W == 1,]$TAU)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 0.5010723
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;fit-more-trees-for-ci-s&#34;&gt;Fit more trees for CI&amp;rsquo;s&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Add confidence intervals for heterogeneous treatment effects; growing more
+## 0.45860274 0.04852209&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(res[res$W == 1,]$TAU)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.5010723&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-more-trees-for-cis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit more trees for CI’s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Add confidence intervals for heterogeneous treatment effects; growing more
 # trees is now recommended.
 if(fullrun){
   tau.forest_big = causal_forest(X, Y, W, num.trees = 4000)
   saveRDS(tau.forest_big, &amp;quot;s5.rds&amp;quot;)
-} else {tau.forest_big &amp;lt;- readRDS(&amp;quot;s5.rds&amp;quot;)}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;plot-ci-s&#34;&gt;Plot CI&amp;rsquo;s&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;## PM
+} else {tau.forest_big &amp;lt;- readRDS(&amp;quot;s5.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;plot-cis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Plot CI’s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## PM
 source(&amp;quot;CalcPosteriors.R&amp;quot;)
 df_res &amp;lt;- CalcPredictionsGRF(df, tau.forest_big)
 
@@ -569,17 +367,13 @@ grfp &amp;lt;- ggplot(df_res, aes(x = X1, y = qm)) +
   geom_smooth() + geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) +
    ylim(-1,3.5)
 
-grfp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-28-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;fit-bart-on-this-dataset&#34;&gt;Fit BART on this dataset&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;x.train &amp;lt;- model.matrix(~. ,data.frame(W, X))
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-bart-on-this-dataset&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x.train &amp;lt;- model.matrix(~. ,data.frame(W, X))
 x.test &amp;lt;- model.matrix(~. ,data.frame(W = 1 - W, X))
 y.train &amp;lt;- Y
 
@@ -587,14 +381,12 @@ if(fullrun){
   bartFit &amp;lt;- bart(x.train, y.train, x.test, ntree = 2000, ndpost = 1000, nskip = 100)
   saveRDS(bartFit, &amp;quot;s10.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s10.rds&amp;quot;)}
-plot(bartFit)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-29-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;bart-check-fit-and-ci-s&#34;&gt;BART: Check fit and CI&amp;rsquo;s&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(df, bartFit, treatname = &amp;quot;W&amp;quot;)
 
 
@@ -602,36 +394,24 @@ bartp &amp;lt;- ggplot(sim, aes(x = X1, qm)) + geom_linerange(aes(ymin = ql, yma
   geom_point() + geom_smooth() +
   geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) + ylim(-1,3.5)
 
-bartp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-30-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;compare&#34;&gt;Compare&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp &amp;lt;- plot_grid(bartp, grfp)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-31-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
+## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Here Grf appears more accurate. Mental note: Both W and TAU function of X1.&lt;/p&gt;
-
-&lt;h1 id=&#34;dataset-4-fit-separate-grf-forests-for-y-and-w&#34;&gt;Dataset 4: Fit separate grf forests for Y and W&lt;/h1&gt;
-
-&lt;p&gt;This dataset has a complex propensity of treatment function (Exponential of X1 and X2), as well as hetergeneous treatment effect that is exponential function of X3.
-It has size N=4000.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# In some examples, pre-fitting models for Y and W separately may
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-4-fit-separate-grf-forests-for-y-and-w&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 4: Fit separate grf forests for Y and W&lt;/h1&gt;
+&lt;p&gt;This dataset has a complex propensity of treatment function (Exponential of X1 and X2), as well as hetergeneous treatment effect that is exponential function of X3. It has size N=4000.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# In some examples, pre-fitting models for Y and W separately may
 # be helpful (e.g., if different models use different covariates).
 # In some applications, one may even want to get Y.hat and W.hat
 # using a completely different method (e.g., boosting).
@@ -643,76 +423,61 @@ TAU = 1 / (1 + exp(-X[, 3]))
 W = rbinom(n ,1, 1 / (1 + exp(-X[, 1] - X[, 2])))
 Y = pmax(X[, 2] + X[, 3], 0) + rowMeans(X[, 4:6]) / 2 + W * TAU + rnorm(n)
 
-df_sep4 &amp;lt;- data.frame(X, TAU, W, Y)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;grf-two-step-first-fit-model-for-w-ps&#34;&gt;Grf two-step: First fit model for W (PS)&lt;/h2&gt;
-
-&lt;p&gt;Regression forest to predict W from X.
-This is a propensity score.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;if(fullrun){
+df_sep4 &amp;lt;- data.frame(X, TAU, W, Y)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;grf-two-step-first-fit-model-for-w-ps&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Grf two-step: First fit model for W (PS)&lt;/h2&gt;
+&lt;p&gt;Regression forest to predict W from X. This is a propensity score.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
   forest.W = regression_forest(X, W, tune.parameters = TRUE, num.trees = 2000)
   saveRDS(forest.W, &amp;quot;s6.rds&amp;quot;)
 } else {forest.W &amp;lt;- readRDS(&amp;quot;s6.rds&amp;quot;)}
 
-W.hat = predict(forest.W)$predictions
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;grf-then-fit-model-for-y-selecting-covariates&#34;&gt;Grf:Then Fit model for Y, selecting covariates&lt;/h3&gt;
-
+W.hat = predict(forest.W)$predictions&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;grfthen-fit-model-for-y-selecting-covariates&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf:Then Fit model for Y, selecting covariates&lt;/h3&gt;
 &lt;p&gt;This predict Y from X, ignoring treatment.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;if(fullrun){
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
   forest.Y = regression_forest(X, Y, tune.parameters = TRUE, num.trees = 2000)
   saveRDS(forest.Y, &amp;quot;s7.rds&amp;quot;)
 } else {forest.Y &amp;lt;- readRDS(&amp;quot;s7.rds&amp;quot;)}
 
-Y.hat = predict(forest.Y)$predictions
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;grf-select-variables-that-predict-y&#34;&gt;Grf:Select variables that predict Y.&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;forest.Y.varimp = variable_importance(forest.Y)
+Y.hat = predict(forest.Y)$predictions&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;grfselect-variables-that-predict-y.&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf:Select variables that predict Y.&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;forest.Y.varimp = variable_importance(forest.Y)
 # Note: Forests may have a hard time when trained on very few variables
 # (e.g., ncol(X) = 1, 2, or 3). We recommend not being too aggressive
 # in selection.
-selected.vars = which(forest.Y.varimp / mean(forest.Y.varimp) &amp;gt; 0.2)
-&lt;/code&gt;&lt;/pre&gt;
-
+selected.vars = which(forest.Y.varimp / mean(forest.Y.varimp) &amp;gt; 0.2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This selects five variables of 20. Indeed these are the variables that were used to simulate Y.&lt;/p&gt;
-
-&lt;h3 id=&#34;grf-finally-fit-causal-forest-using-ps-and-selected-covariates&#34;&gt;Grf: Finally, Fit causal forest using PS and selected covariates&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;if(fullrun){
+&lt;/div&gt;
+&lt;div id=&#34;grf-finally-fit-causal-forest-using-ps-and-selected-covariates&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf: Finally, Fit causal forest using PS and selected covariates&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
 tau.forest2 = causal_forest(X[, selected.vars], Y, W,
                            W.hat = W.hat, Y.hat = Y.hat,
                            tune.parameters = TRUE, num.trees = 4000)
   saveRDS(tau.forest2, &amp;quot;s8.rds&amp;quot;)
-} else {tau.forest2 &amp;lt;- readRDS(&amp;quot;s8.rds&amp;quot;)}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;grf-check-fit-and-ci-s&#34;&gt;Grf: Check fit and CI&amp;rsquo;s&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(df_sep4, tau.forest2)
+} else {tau.forest2 &amp;lt;- readRDS(&amp;quot;s8.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;grf-check-fit-and-cis&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf: Check fit and CI’s&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(df_sep4, tau.forest2)
 
 grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
   geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) + geom_point() + 
   geom_smooth() + 
   geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) + ylim(-0.7,2)
 
-grfp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-37-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;
-This looks ok.&lt;/p&gt;
-
-&lt;h2 id=&#34;fit-bart-on-this-dataset-1&#34;&gt;Fit BART on this dataset&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;x.train &amp;lt;- model.matrix(~. ,data.frame(W, X))
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-bart-on-this-dataset-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x.train &amp;lt;- model.matrix(~. ,data.frame(W, X))
 x.test &amp;lt;- model.matrix(~. ,data.frame(W = 1 - W, X))
 y.train &amp;lt;- Y
 
@@ -720,14 +485,12 @@ if(fullrun){
   bartFit &amp;lt;- bart(x.train, y.train, x.test, ntree = 4000)
   saveRDS(bartFit, &amp;quot;s9.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s9.rds&amp;quot;)}
-plot(bartFit)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-38-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;bart-check-fit-and-ci-s-1&#34;&gt;BART: Check fit and CI&amp;rsquo;s&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(df_sep4, bartFit, treatname = &amp;quot;W&amp;quot;)
 
 
@@ -735,69 +498,55 @@ bartp &amp;lt;- ggplot(sim, aes(x = X3, qm)) + geom_linerange(aes(ymin = ql, yma
   geom_point() + geom_smooth() +
   geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) + ylim(-0.7,2)
 
-bartp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-39-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;compare-bart-and-grf&#34;&gt;Compare BART and grf&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp &amp;lt;- plot_grid(bartp, grfp)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;gp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;BART_vs_grf_files/figure-html/unnamed-chunk-40-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-bart-and-grf&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare BART and grf&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
+## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Very similar results. BART appears slightly more accurate, especially for low values of X3.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 </description>
     </item>
     
     <item>
       <title>Interaction detection using Random Forest predictions</title>
-      <link>https://gsverhoeven.github.io/post/interaction_detection/</link>
-      <pubDate>Sun, 24 Sep 2017 16:54:08 +0100</pubDate>
+      <link>/post/interaction_detection/interaction-detection/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://gsverhoeven.github.io/post/interaction_detection/</guid>
-      <description>&lt;p&gt;Comparing the predictions of a Random Forest model with the predictions of an Linear Regression model can inform us in what ways the OLS model can be improved.
-Here we explore the feasibility of this approach by modelling the classic &lt;strong&gt;Boston Housing&lt;/strong&gt; dataset.&lt;/p&gt;
+      <guid>/post/interaction_detection/interaction-detection/</guid>
+      <description>
 
-&lt;p&gt;An OLS with only main variables fails to capture  all non-linearities and interactions between the predictors.
-Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model.
-After this step, the discrepancies between the RF predictions and the OLS predictions should be caused
-by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
 
-&lt;h1 id=&#34;load-packages&#34;&gt;Load packages&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;rm(list=ls())
-library(randomForest)
-library(party)
+&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;summary&lt;/h1&gt;
+&lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Load packages&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+#library(randomForest)
+#library(party)
 library(ranger)
 library(data.table)
 library(ggplot2)
 library(MASS)
 
-rdunif &amp;lt;- function(n,k) sample(1:k, n, replace = T)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&#34;step-1-run-a-rf-on-the-boston-housing-set&#34;&gt;Step 1: Run a RF on the Boston Housing set&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_ranger &amp;lt;- ranger(medv ~ ., data = Boston,
+rdunif &amp;lt;- function(n,k) sample(1:k, n, replace = T)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-1-run-a-rf-on-the-boston-housing-set&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Step 1: Run a RF on the Boston Housing set&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_ranger &amp;lt;- ranger(medv ~ ., data = Boston,
                                   importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
-                                  mtry = 5, replace = TRUE)
-&lt;/code&gt;&lt;/pre&gt;
-
+                                  mtry = 5, replace = TRUE)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Extract the permutation importance measure.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger);
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger);
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
 myres &amp;lt;- data.table(myres)
@@ -805,46 +554,33 @@ setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
 setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
 myres &amp;lt;- myres[, varname := as.factor(varname)]
 myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
-myres &amp;lt;- myres[, i := as.integer(i)]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;ggplot(myres, 
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
-  geom_point() + coord_flip()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-4-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;fit-an-ols-to-the-boston-housing&#34;&gt;Fit an OLS to the Boston Housing&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_glm &amp;lt;- glm(medv ~., data = Boston, 
-              family = &amp;quot;gaussian&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&#34;compare-predictions-of-both-models&#34;&gt;Compare predictions of both models&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_RF &amp;lt;- predict(my_ranger, data = Boston)
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-an-ols-to-the-boston-housing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fit an OLS to the Boston Housing&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm &amp;lt;- glm(medv ~., data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-predictions-of-both-models&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Compare predictions of both models&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger, data = Boston)
 #pred_RF$predictions
 pred_GLM &amp;lt;- predict(my_glm, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
-abline(0, 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-6-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;run-a-rf-on-the-discrepancy&#34;&gt;Run a RF on the discrepancy&lt;/h1&gt;
-
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
 &lt;p&gt;Discrepancy is defined as the difference between the predictions of both models for each observation.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_diff &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
                                   importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
                                   mtry = 5, replace = TRUE)
-my_ranger_diff
-&lt;/code&gt;&lt;/pre&gt;
-
+my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Ranger result
 ## 
 ## Call:
@@ -857,13 +593,11 @@ my_ranger_diff
 ## Mtry:                             5 
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
-## OOB prediction error (MSE):       5.17264 
-## R squared (OOB):                  0.6617633
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;It turns out the RF can &amp;ldquo;explain&amp;rdquo; 67% of these discrepancies.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       5.045991 
+## R squared (OOB):                  0.6702479&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
 myres &amp;lt;- data.table(myres)
@@ -871,23 +605,15 @@ setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
 setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
 myres &amp;lt;- myres[, varname := as.factor(varname)]
 myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
-myres &amp;lt;- myres[, i := as.integer(i)]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;ggplot(myres, 
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
-  geom_point() + coord_flip()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-9-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It turns out that &lt;code&gt;rm&lt;/code&gt; and &lt;code&gt;lstat&lt;/code&gt; are the variables that best predict the discrepancy.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_glm_int &amp;lt;- glm(medv ~. + rm:lstat, data = Boston, 
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int &amp;lt;- glm(medv ~. + rm:lstat, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
-summary(my_glm_int)
-&lt;/code&gt;&lt;/pre&gt;
-
+summary(my_glm_int)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
 ## glm(formula = medv ~ . + rm:lstat, family = &amp;quot;gaussian&amp;quot;, data = Boston)
@@ -914,7 +640,7 @@ summary(my_glm_int)
 ## lstat         1.844883   0.191833   9.617  &amp;lt; 2e-16 ***
 ## rm:lstat     -0.418259   0.032955 -12.692  &amp;lt; 2e-16 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## 
 ## (Dispersion parameter for gaussian family taken to be 16.98987)
 ## 
@@ -922,47 +648,30 @@ summary(my_glm_int)
 ## Residual deviance:  8342  on 491  degrees of freedom
 ## AIC: 2886
 ## 
-## Number of Fisher Scoring iterations: 2
-&lt;/code&gt;&lt;/pre&gt;
-
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The interaction we have added is indeed highly significant.&lt;/p&gt;
-
 &lt;p&gt;Compare approximate out-of-sample prediction accuracy using AIC:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 3027.609
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_int)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 2886.043
-&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 3027.609&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 2886.043&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Indeed, the addition of the interaction greatly increases the prediction accuracy.&lt;/p&gt;
-
-&lt;h1 id=&#34;repeat-this-process&#34;&gt;Repeat this process&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_RF &amp;lt;- predict(my_ranger, data = Boston)
+&lt;/div&gt;
+&lt;div id=&#34;repeat-this-process&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Repeat this process&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger, data = Boston)
 #pred_RF$predictions
 pred_GLM &amp;lt;- predict(my_glm_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
-abline(0, 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-12-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
                                   importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
                                   mtry = 5, replace = TRUE)
-my_ranger_diff2
-&lt;/code&gt;&lt;/pre&gt;
-
+my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Ranger result
 ## 
 ## Call:
@@ -975,11 +684,10 @@ my_ranger_diff2
 ## Mtry:                             5 
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
-## OOB prediction error (MSE):       5.570852 
-## R squared (OOB):                  0.4375935
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       5.45721 
+## R squared (OOB):                  0.4482457&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
 myres &amp;lt;- data.table(myres)
@@ -987,24 +695,15 @@ setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
 setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
 myres &amp;lt;- myres[, varname := as.factor(varname)]
 myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
-myres &amp;lt;- myres[, i := as.integer(i)]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;ggplot(myres, 
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
-  geom_point() + coord_flip()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-15-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;p&gt;Now the variables that best predict the discrepancy are &lt;code&gt;lstat&lt;/code&gt; and &lt;code&gt;dis&lt;/code&gt;.
-Add these two variables as an interaction.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_glm_int2 &amp;lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now the variables that best predict the discrepancy are &lt;code&gt;lstat&lt;/code&gt; and &lt;code&gt;dis&lt;/code&gt;. Add these two variables as an interaction.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int2 &amp;lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
-summary(my_glm_int2)
-&lt;/code&gt;&lt;/pre&gt;
-
+summary(my_glm_int2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
 ## glm(formula = medv ~ . + rm:lstat + lstat:dis, family = &amp;quot;gaussian&amp;quot;, 
@@ -1033,7 +732,7 @@ summary(my_glm_int2)
 ## rm:lstat     -0.466947   0.034897 -13.381  &amp;lt; 2e-16 ***
 ## dis:lstat     0.076716   0.020009   3.834 0.000143 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## 
 ## (Dispersion parameter for gaussian family taken to be 16.52869)
 ## 
@@ -1041,38 +740,22 @@ summary(my_glm_int2)
 ## Residual deviance:  8099.1  on 490  degrees of freedom
 ## AIC: 2873.1
 ## 
-## Number of Fisher Scoring iterations: 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_int2)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 2873.087
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_int)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] 2886.043
-&lt;/code&gt;&lt;/pre&gt;
-
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_int2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 2873.087&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 2886.043&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We conclude that the second interaction also results in significant model improvement.&lt;/p&gt;
-
-&lt;h1 id=&#34;a-more-ambitious-goal-try-and-improve-harrison-rubinfeld-s-model-formula-for-boston-housing&#34;&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld&amp;rsquo;s model formula for Boston housing&lt;/h1&gt;
-
-&lt;p&gt;So far, we assumed that all relationships are linear.
-Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc.
-Let&amp;rsquo;s see if we can improve upon this model equation by applying our method to search for interactions.
-Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# Harrison and Rubinfeld (1978) model
+&lt;/div&gt;
+&lt;div id=&#34;a-more-ambitious-goal-try-and-improve-harrison-rubinfelds-model-formula-for-boston-housing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld’s model formula for Boston housing&lt;/h1&gt;
+&lt;p&gt;So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let’s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Harrison and Rubinfeld (1978) model
 my_glm_hr &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2), data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
 
-summary(my_glm_hr)
-&lt;/code&gt;&lt;/pre&gt;
-
+summary(my_glm_hr)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
 ## glm(formula = log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + 
@@ -1101,7 +784,7 @@ summary(my_glm_hr)
 ## chas         9.180e-02  3.305e-02   2.777 0.005690 ** 
 ## I(nox^2)    -6.566e-01  1.129e-01  -5.815 1.09e-08 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## 
 ## (Dispersion parameter for gaussian family taken to be 0.03299176)
 ## 
@@ -1109,35 +792,24 @@ summary(my_glm_hr)
 ## Residual deviance: 16.199  on 491  degrees of freedom
 ## AIC: -273.48
 ## 
-## Number of Fisher Scoring iterations: 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_ranger_log &amp;lt;- ranger(log(medv) ~ ., data = Boston,
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_ranger_log &amp;lt;- ranger(log(medv) ~ ., data = Boston,
                                   importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
-                                  mtry = 5, replace = TRUE)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_RF &amp;lt;- predict(my_ranger_log, data = Boston)
+                                  mtry = 5, replace = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger_log, data = Boston)
 #pred_RF$predictions
 pred_GLM &amp;lt;- predict(my_glm_hr, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
-abline(0, 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-18-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;p&gt;For low predicted values both models differ in a systematic way.
-This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;For low predicted values both models differ in a systematic way. This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_log_diff &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
                                   importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
                                   mtry = 5, replace = TRUE)
-my_ranger_log_diff
-&lt;/code&gt;&lt;/pre&gt;
-
+my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Ranger result
 ## 
 ## Call:
@@ -1150,13 +822,11 @@ my_ranger_log_diff
 ## Mtry:                             5 
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
-## OOB prediction error (MSE):       0.009100275 
-## R squared (OOB):                  0.5311914
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;ldquo;explained&amp;rdquo; by RF.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       0.008946419 
+## R squared (OOB):                  0.5368337&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
 myres &amp;lt;- data.table(myres)
@@ -1164,25 +834,17 @@ setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
 setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
 myres &amp;lt;- myres[, varname := as.factor(varname)]
 myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
-myres &amp;lt;- myres[, i := as.integer(i)]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;ggplot(myres, 
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
-  geom_point() + coord_flip()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-21-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Add the top 2 vars as an interaction to their model equation.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_glm_hr_int &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
                    lstat:nox, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
-summary(my_glm_hr_int)
-&lt;/code&gt;&lt;/pre&gt;
-
+summary(my_glm_hr_int)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
 ## glm(formula = log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + 
@@ -1213,7 +875,7 @@ summary(my_glm_hr_int)
 ## I(nox^2)    -3.618e-01  1.256e-01  -2.880  0.00415 ** 
 ## lstat:nox   -2.367e-02  4.819e-03  -4.911 1.24e-06 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## 
 ## (Dispersion parameter for gaussian family taken to be 0.03150809)
 ## 
@@ -1221,43 +883,28 @@ summary(my_glm_hr_int)
 ## Residual deviance: 15.439  on 490  degrees of freedom
 ## AIC: -295.79
 ## 
-## Number of Fisher Scoring iterations: 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_hr)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] -273.4788
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_hr_int)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] -295.7931
-&lt;/code&gt;&lt;/pre&gt;
-
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -273.4788&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -295.7931&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This results in a significant improvement!&lt;/p&gt;
-
-&lt;h1 id=&#34;repeat-this-procedure&#34;&gt;Repeat this procedure&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_RF &amp;lt;- predict(my_ranger_log, data = Boston)
+&lt;/div&gt;
+&lt;div id=&#34;repeat-this-procedure&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Repeat this procedure&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger_log, data = Boston)
 #pred_RF$predictions
 pred_GLM &amp;lt;- predict(my_glm_hr_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
-abline(0, 1)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-23-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_log_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
                                   importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
                                   mtry = 5, replace = TRUE)
-my_ranger_log_diff2
-&lt;/code&gt;&lt;/pre&gt;
-
+my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Ranger result
 ## 
 ## Call:
@@ -1270,11 +917,10 @@ my_ranger_log_diff2
 ## Mtry:                             5 
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
-## OOB prediction error (MSE):       0.008703804 
-## R squared (OOB):                  0.5204124
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       0.008731355 
+## R squared (OOB):                  0.5165952&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
 myres &amp;lt;- data.table(myres)
@@ -1282,25 +928,17 @@ setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
 setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
 myres &amp;lt;- myres[, varname := as.factor(varname)]
 myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
-myres &amp;lt;- myres[, i := as.integer(i)]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;ggplot(myres, 
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
-  geom_point() + coord_flip()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;README_files/figure-html/unnamed-chunk-26-1.png&#34; alt=&#34;&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-
-&lt;p&gt;Now we add lstat and  dis as an interaction.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;my_glm_hr_int2 &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now we add lstat and dis as an interaction.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int2 &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
                    lstat:nox + lstat:dis, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
-summary(my_glm_hr_int2)
-&lt;/code&gt;&lt;/pre&gt;
-
+summary(my_glm_hr_int2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
 ## glm(formula = log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + 
@@ -1332,7 +970,7 @@ summary(my_glm_hr_int2)
 ## lstat:nox   -2.729e-02  4.798e-03  -5.689 2.21e-08 ***
 ## lstat:dis    3.906e-03  8.754e-04   4.462 1.01e-05 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## 
 ## (Dispersion parameter for gaussian family taken to be 0.03033711)
 ## 
@@ -1340,58 +978,30 @@ summary(my_glm_hr_int2)
 ## Residual deviance: 14.835  on 489  degrees of freedom
 ## AIC: -313.99
 ## 
-## Number of Fisher Scoring iterations: 2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_hr_int2)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] -313.9904
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;AIC(my_glm_hr_int)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;## [1] -295.7931
-&lt;/code&gt;&lt;/pre&gt;
-
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr_int2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -313.9904&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -295.7931&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And again we find an improvement in model fit.&lt;/p&gt;
-
-&lt;h1 id=&#34;have-these-interactions-already-been-reported-on-in-the-literature&#34;&gt;Have these interactions already been reported on in the literature?&lt;/h1&gt;
-
+&lt;/div&gt;
+&lt;div id=&#34;have-these-interactions-already-been-reported-on-in-the-literature&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Have these interactions already been reported on in the literature?&lt;/h1&gt;
 &lt;p&gt;Tom Minka reports on his website an analysis of interactions in the Boston Housing set:&lt;/p&gt;
-
-&lt;p&gt;(&lt;a href=&#34;http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/&#34; target=&#34;_blank&#34;&gt;http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/&lt;/a&gt;)
-&lt;code&gt;
-&amp;gt; summary(fit3)
-Coefficients:
-                  Estimate Std. Error t value Pr(&amp;gt;|t|)    
-(Intercept)      -227.5485    49.2363  -4.622 4.87e-06 ***
-lstat              50.8553    20.3184   2.503 0.012639 *  
-rm                 38.1245     7.0987   5.371 1.21e-07 ***
-dis               -16.8163     2.9174  -5.764 1.45e-08 ***
-ptratio            14.9592     2.5847   5.788 1.27e-08 ***
-lstat:rm           -6.8143     3.1209  -2.183 0.029475 *  
-lstat:dis           4.8736     1.3940   3.496 0.000514 ***
-lstat:ptratio      -3.3209     1.0345  -3.210 0.001412 ** 
-rm:dis              2.0295     0.4435   4.576 5.99e-06 ***
-rm:ptratio         -1.9911     0.3757  -5.299 1.76e-07 ***
-lstat:rm:dis       -0.5216     0.2242  -2.327 0.020364 *  
-lstat:rm:ptratio    0.3368     0.1588   2.121 0.034423 *  
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Rob mcCulloch, using BART (bayesian additive regression trees) also examines interactions in the Boston Housing data.
-There the co-occurence within trees is used to discover interactions:&lt;/p&gt;
-
+&lt;p&gt;(&lt;a href=&#34;http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/&#34; class=&#34;uri&#34;&gt;http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/&lt;/a&gt;) &lt;code&gt;&amp;gt; summary(fit3) Coefficients:                   Estimate Std. Error t value Pr(&amp;gt;|t|)     (Intercept)      -227.5485    49.2363  -4.622 4.87e-06 *** lstat              50.8553    20.3184   2.503 0.012639 *   rm                 38.1245     7.0987   5.371 1.21e-07 *** dis               -16.8163     2.9174  -5.764 1.45e-08 *** ptratio            14.9592     2.5847   5.788 1.27e-08 *** lstat:rm           -6.8143     3.1209  -2.183 0.029475 *   lstat:dis           4.8736     1.3940   3.496 0.000514 *** lstat:ptratio      -3.3209     1.0345  -3.210 0.001412 **  rm:dis              2.0295     0.4435   4.576 5.99e-06 *** rm:ptratio         -1.9911     0.3757  -5.299 1.76e-07 *** lstat:rm:dis       -0.5216     0.2242  -2.327 0.020364 *   lstat:rm:ptratio    0.3368     0.1588   2.121 0.034423 *&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Rob mcCulloch, using BART (bayesian additive regression trees) also examines interactions in the Boston Housing data. There the co-occurence within trees is used to discover interactions:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;The second, interaction detection, uncovers which pairs of variables interact in analogous fashion by keeping track of the percentage of trees in the sum in which both variables occur.  This exploits the fact that a sum-of-trees model captures an interaction between xi and xj by using them both for splitting rules in the same tree.&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf&#34; class=&#34;uri&#34;&gt;http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;boston_uit_bart_book.png&#34; /&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf&#34; target=&#34;_blank&#34;&gt;http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;boston_uit_bart_book.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h1&gt;
-
-&lt;p&gt;We conclude that this appears a fruitfull approach to at least discovering where a regression model can be improved.&lt;/p&gt;</description>
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;We conclude that this appears a fruitfull approach to at least discovering where a regression model can be improved.&lt;/p&gt;
+&lt;/div&gt;
+</description>
     </item>
     
   </channel>

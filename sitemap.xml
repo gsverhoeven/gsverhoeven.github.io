@@ -4,23 +4,7 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/post/bart_vs_grf/</loc>
-      <lastmod>2018-12-26T00:00:00+01:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://gsverhoeven.github.io/post/interaction_detection/</loc>
-      <lastmod>2017-09-24T16:54:08+01:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://gsverhoeven.github.io/post/</loc>
+      <loc>/post/</loc>
       <lastmod>2017-01-01T00:00:00+01:00</lastmod>
     </url>
     
@@ -28,7 +12,7 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/publication/</loc>
+      <loc>/publication/</loc>
       <lastmod>2017-01-01T00:00:00+01:00</lastmod>
     </url>
     
@@ -36,7 +20,7 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/talk/</loc>
+      <loc>/talk/</loc>
       <lastmod>2017-01-01T00:00:00+01:00</lastmod>
     </url>
     
@@ -44,7 +28,14 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/categories/</loc>
+      <loc>/post/bart_vs_grf/bart-vs-grf/</loc>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/categories/</loc>
       <priority>0</priority>
     </url>
     
@@ -52,7 +43,7 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/</loc>
+      <loc>/</loc>
       <lastmod>2017-10-15T00:00:00+02:00</lastmod>
       <priority>0</priority>
     </url>
@@ -61,8 +52,14 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/tags/interaction-detection/</loc>
-      <lastmod>2017-09-24T16:54:08+01:00</lastmod>
+      <loc>/post/interaction_detection/interaction-detection/</loc>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/publication_types/</loc>
       <priority>0</priority>
     </url>
     
@@ -70,34 +67,7 @@
     
     <url>
     
-      <loc>https://gsverhoeven.github.io/tags/machine-learning/</loc>
-      <lastmod>2017-09-24T16:54:08+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://gsverhoeven.github.io/publication_types/</loc>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://gsverhoeven.github.io/tags/r/</loc>
-      <lastmod>2017-09-24T16:54:08+01:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://gsverhoeven.github.io/tags/</loc>
-      <lastmod>2017-09-24T16:54:08+01:00</lastmod>
+      <loc>/tags/</loc>
       <priority>0</priority>
     </url>
     
