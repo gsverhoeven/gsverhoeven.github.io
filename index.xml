@@ -11,11 +11,52 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>BART vs Grf showdown</title>
-      <link>/post/bart_vs_grf/bart-vs-grf/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <title>Exploring Process Mining in R</title>
+      <link>/post/exploring-process-mining/</link>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/post/bart_vs_grf/bart-vs-grf/</guid>
+      <guid>/post/exploring-process-mining/</guid>
+      <description>
+
+
+&lt;p&gt;In this post, we’ll explore the BupaR suite of Process Mining packages created by Jan Wijffels. After installing all required packages, we can load the whole “bupaverse” by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
+&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(bupaR)
+
+df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;str(df)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Classes &amp;#39;eventlog&amp;#39;, &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;:    5442 obs. of  7 variables:
+##  $ handling         : Factor w/ 7 levels &amp;quot;Blood test&amp;quot;,&amp;quot;Check-out&amp;quot;,..: 5 5 5 5 5 5 5 5 5 5 ...
+##  $ patient          : chr  &amp;quot;1&amp;quot; &amp;quot;2&amp;quot; &amp;quot;3&amp;quot; &amp;quot;4&amp;quot; ...
+##  $ employee         : Factor w/ 7 levels &amp;quot;r1&amp;quot;,&amp;quot;r2&amp;quot;,&amp;quot;r3&amp;quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ handling_id      : chr  &amp;quot;1&amp;quot; &amp;quot;2&amp;quot; &amp;quot;3&amp;quot; &amp;quot;4&amp;quot; ...
+##  $ registration_type: Factor w/ 2 levels &amp;quot;complete&amp;quot;,&amp;quot;start&amp;quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ time             : POSIXct, format: &amp;quot;2017-01-02 11:41:53&amp;quot; &amp;quot;2017-01-02 11:41:53&amp;quot; ...
+##  $ .order           : int  1 2 3 4 5 6 7 8 9 10 ...
+##  - attr(*, &amp;quot;spec&amp;quot;)=
+##   .. cols(
+##   ..   handling = col_character(),
+##   ..   patient = col_integer(),
+##   ..   employee = col_character(),
+##   ..   handling_id = col_integer(),
+##   ..   registration_type = col_character(),
+##   ..   time = col_datetime(format = &amp;quot;&amp;quot;)
+##   .. )
+##  - attr(*, &amp;quot;case_id&amp;quot;)= chr &amp;quot;patient&amp;quot;
+##  - attr(*, &amp;quot;activity_id&amp;quot;)= chr &amp;quot;handling&amp;quot;
+##  - attr(*, &amp;quot;activity_instance_id&amp;quot;)= chr &amp;quot;handling_id&amp;quot;
+##  - attr(*, &amp;quot;lifecycle_id&amp;quot;)= chr &amp;quot;registration_type&amp;quot;
+##  - attr(*, &amp;quot;resource_id&amp;quot;)= chr &amp;quot;employee&amp;quot;
+##  - attr(*, &amp;quot;timestamp&amp;quot;)= chr &amp;quot;time&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>BART vs Causal forests showdown</title>
+      <link>/post/bart_vs_grf/bart-vs-grf-showdown/</link>
+      <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
       <description>
 
 
@@ -516,18 +557,15 @@ bartp&lt;/code&gt;&lt;/pre&gt;
     </item>
     
     <item>
-      <title>Interaction detection using Random Forest predictions</title>
+      <title>Improving a parametric regression model using machine learning</title>
       <link>/post/interaction_detection/interaction-detection/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
       
       <guid>/post/interaction_detection/interaction-detection/</guid>
       <description>
 
 
-&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;summary&lt;/h1&gt;
 &lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
-&lt;/div&gt;
 &lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Load packages&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
@@ -594,8 +632,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.045991 
-## R squared (OOB):                  0.6702479&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.310381 
+## R squared (OOB):                  0.6579774&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -685,8 +723,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.45721 
-## R squared (OOB):                  0.4482457&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.555041 
+## R squared (OOB):                  0.4518728&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -823,8 +861,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008946419 
-## R squared (OOB):                  0.5368337&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009019332 
+## R squared (OOB):                  0.537869&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -918,8 +956,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008731355 
-## R squared (OOB):                  0.5165952&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008684809 
+## R squared (OOB):                  0.523193&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)

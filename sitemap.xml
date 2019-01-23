@@ -4,6 +4,30 @@
     
     <url>
     
+      <loc>/post/exploring-process-mining/</loc>
+      <lastmod>2019-01-23T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/post/bart_vs_grf/bart-vs-grf-showdown/</loc>
+      <lastmod>2018-12-15T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/post/interaction_detection/interaction-detection/</loc>
+      <lastmod>2017-09-01T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/post/</loc>
       <lastmod>2017-01-01T00:00:00+01:00</lastmod>
     </url>
@@ -28,13 +52,6 @@
     
     <url>
     
-      <loc>/post/bart_vs_grf/bart-vs-grf/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>/categories/</loc>
       <priority>0</priority>
     </url>
@@ -52,13 +69,6 @@
     
     <url>
     
-      <loc>/post/interaction_detection/interaction-detection/</loc>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>/publication_types/</loc>
       <priority>0</priority>
     </url>
@@ -67,7 +77,43 @@
     
     <url>
     
+      <loc>/categories/r/</loc>
+      <lastmod>2019-01-23T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/tags/</loc>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/tags/causal-inference-bart-grf/</loc>
+      <lastmod>2018-12-15T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/tags/interaction-detection-random-forest-ranger/</loc>
+      <lastmod>2017-09-01T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/tags/process-mining/</loc>
+      <lastmod>2019-01-23T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     

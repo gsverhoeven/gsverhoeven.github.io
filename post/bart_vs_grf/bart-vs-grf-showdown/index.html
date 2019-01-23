@@ -15,10 +15,10 @@
   
     
   
-  <meta name="description" content="Load packages # library(devtools) #devtools::install_github(&quot;vdorie/dbarts&quot;) library(dbarts) library(ggplot2)  ## Warning: package &#39;ggplot2&#39; was built under R version 3.4.4  library(tidyverse)  ## Warning: package &#39;tidyverse&#39; was built under R version 3.4.4  ## -- Attaching packages ---------------------------------- tidyverse 1.2.1 --  ## v tibble 1.4.2 v purrr 0.2.4 ## v tidyr 0.8.1 v dplyr 0.7.5 ## v readr 1.1.1 v stringr 1.3.1 ## v tibble 1.4.2 v forcats 0.3.0  ## Warning: package &#39;tibble&#39; was built under R version 3.">
+  <meta name="description" content="In this post, we test both `Bayesian Additive Regression Trees (BART)` and `Causal forests (grf)` on four simulated datasets of increasing complexity. May the best method win!">
 
   
-  <link rel="alternate" hreflang="en-us" href="/post/bart_vs_grf/">
+  <link rel="alternate" hreflang="en-us" href="/post/bart_vs_grf/bart-vs-grf-showdown/">
 
   
 
@@ -90,7 +90,7 @@
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="/post/bart_vs_grf/">
+  <link rel="canonical" href="/post/bart_vs_grf/bart-vs-grf-showdown/">
 
   
   
@@ -104,21 +104,21 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="/post/bart_vs_grf/">
-  <meta property="og:title" content="BART vs Grf showdown | Gertjan Verhoeven">
-  <meta property="og:description" content="Load packages # library(devtools) #devtools::install_github(&quot;vdorie/dbarts&quot;) library(dbarts) library(ggplot2)  ## Warning: package &#39;ggplot2&#39; was built under R version 3.4.4  library(tidyverse)  ## Warning: package &#39;tidyverse&#39; was built under R version 3.4.4  ## -- Attaching packages ---------------------------------- tidyverse 1.2.1 --  ## v tibble 1.4.2 v purrr 0.2.4 ## v tidyr 0.8.1 v dplyr 0.7.5 ## v readr 1.1.1 v stringr 1.3.1 ## v tibble 1.4.2 v forcats 0.3.0  ## Warning: package &#39;tibble&#39; was built under R version 3."><meta property="og:image" content="/post/bart_vs_grf/featured.jpg">
+  <meta property="og:url" content="/post/bart_vs_grf/bart-vs-grf-showdown/">
+  <meta property="og:title" content="BART vs Causal forests showdown | Gertjan Verhoeven">
+  <meta property="og:description" content="In this post, we test both `Bayesian Additive Regression Trees (BART)` and `Causal forests (grf)` on four simulated datasets of increasing complexity. May the best method win!"><meta property="og:image" content="/img/headers/actor-adult-ancient-236171.jpg">
   <meta property="og:locale" content="en-us">
   
-  <meta property="article:published_time" content="2018-12-26T00:00:00&#43;01:00">
+  <meta property="article:published_time" content="2018-12-15T00:00:00&#43;00:00">
   
-  <meta property="article:modified_time" content="2018-12-26T00:00:00&#43;01:00">
-  
-
+  <meta property="article:modified_time" content="2018-12-15T00:00:00&#43;00:00">
   
 
   
 
-  <title>BART vs Grf showdown | Gertjan Verhoeven</title>
+  
+
+  <title>BART vs Causal forests showdown | Gertjan Verhoeven</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
@@ -268,6 +268,15 @@
 
 
 
+<div class="article-header">
+  
+  
+  <img src="/img/headers/actor-adult-ancient-236171.jpg" class="article-banner" itemprop="image" alt="">
+  
+
+  
+</div>
+
 
 
 
@@ -277,7 +286,7 @@
   
   
 <div class="article-container pt-3">
-  <h1 itemprop="name">BART vs Grf showdown</h1>
+  <h1 itemprop="name">BART vs Causal forests showdown</h1>
 
   
 
@@ -295,9 +304,9 @@
 
   <span class="article-date">
     
-    <meta content="2018-12-26 00:00:00 &#43;0100 CET" itemprop="datePublished">
-    <time datetime="2018-12-26 00:00:00 &#43;0100 CET" itemprop="dateModified">
-      Dec 26, 2018
+    <meta content="2018-12-15 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+    <time datetime="2018-12-15 00:00:00 &#43;0000 UTC" itemprop="dateModified">
+      Dec 15, 2018
     </time>
   </span>
   <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
@@ -307,13 +316,24 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    14 min read
+    13 min read
   </span>
   
 
   
   
 
+  
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder"></i>
+    
+    <a href="/categories/r/">R</a>
+    
+  </span>
+  
   
 
   
@@ -322,35 +342,35 @@
   <ul class="share">
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=BART%20vs%20Grf%20showdown&amp;url=%2fpost%2fbart_vs_grf%2f"
+         href="https://twitter.com/intent/tweet?text=BART%20vs%20Causal%20forests%20showdown&amp;url=%2fpost%2fbart_vs_grf%2fbart-vs-grf-showdown%2f"
          target="_blank" rel="noopener">
         <i class="fab fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=%2fpost%2fbart_vs_grf%2f"
+         href="https://www.facebook.com/sharer.php?u=%2fpost%2fbart_vs_grf%2fbart-vs-grf-showdown%2f"
          target="_blank" rel="noopener">
         <i class="fab fa-facebook-f"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2fbart_vs_grf%2f&amp;title=BART%20vs%20Grf%20showdown"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2fbart_vs_grf%2fbart-vs-grf-showdown%2f&amp;title=BART%20vs%20Causal%20forests%20showdown"
          target="_blank" rel="noopener">
         <i class="fab fa-linkedin-in"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=%2fpost%2fbart_vs_grf%2f&amp;title=BART%20vs%20Grf%20showdown"
+         href="http://service.weibo.com/share/share.php?url=%2fpost%2fbart_vs_grf%2fbart-vs-grf-showdown%2f&amp;title=BART%20vs%20Causal%20forests%20showdown"
          target="_blank" rel="noopener">
         <i class="fab fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=BART%20vs%20Grf%20showdown&amp;body=%2fpost%2fbart_vs_grf%2f">
+         href="mailto:?subject=BART%20vs%20Causal%20forests%20showdown&amp;body=%2fpost%2fbart_vs_grf%2fbart-vs-grf-showdown%2f">
         <i class="fas fa-envelope"></i>
       </a>
     </li>
@@ -370,8 +390,6 @@
 
 
 
-  
-
 
 
 
@@ -390,93 +408,39 @@
     <div class="article-style" itemprop="articleBody">
       
 
-<p><img src="streetfighter.jpg" alt="Showdown time!" /></p>
 
-<h1 id="load-packages">Load packages</h1>
-
-<pre><code class="language-r"># library(devtools)
+<div id="load-packages" class="section level1">
+<h1>Load packages</h1>
+<pre class="r"><code># library(devtools)
 #devtools::install_github(&quot;vdorie/dbarts&quot;)
 library(dbarts)
 library(ggplot2)
-</code></pre>
-
-<pre><code>## Warning: package 'ggplot2' was built under R version 3.4.4
-</code></pre>
-
-<pre><code class="language-r">library(tidyverse)
-</code></pre>
-
-<pre><code>## Warning: package 'tidyverse' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## -- Attaching packages ---------------------------------- tidyverse 1.2.1 --
-</code></pre>
-
-<pre><code>## v tibble  1.4.2     v purrr   0.2.4
-## v tidyr   0.8.1     v dplyr   0.7.5
-## v readr   1.1.1     v stringr 1.3.1
-## v tibble  1.4.2     v forcats 0.3.0
-</code></pre>
-
-<pre><code>## Warning: package 'tibble' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## Warning: package 'tidyr' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## Warning: package 'readr' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## Warning: package 'purrr' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## Warning: package 'dplyr' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## Warning: package 'stringr' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## Warning: package 'forcats' was built under R version 3.4.4
-</code></pre>
-
-<pre><code>## -- Conflicts ------------------------------------- tidyverse_conflicts() --
+library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v tibble  2.0.1     v purrr   0.2.5
+## v tidyr   0.8.2     v dplyr   0.7.8
+## v readr   1.3.1     v stringr 1.3.1
+## v tibble  2.0.1     v forcats 0.3.0</code></pre>
+<pre><code>## -- Conflicts ---------------------------------------------------------------- tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()
-</code></pre>
-
-<pre><code class="language-r">library(grf)
-</code></pre>
-
-<pre><code>## Warning: package 'grf' was built under R version 3.4.4
-</code></pre>
-
-<pre><code class="language-r">#devtools::install_github(&quot;vdorie/aciccomp/2017&quot;)
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(grf)
+#devtools::install_github(&quot;vdorie/aciccomp/2017&quot;)
 library(aciccomp2017)
-library(cowplot)
-</code></pre>
-
-<pre><code>## Warning: package 'cowplot' was built under R version 3.4.4
-</code></pre>
-
+library(cowplot)</code></pre>
 <pre><code>## 
-## Attaching package: 'cowplot'
-</code></pre>
-
-<pre><code>## The following object is masked from 'package:ggplot2':
+## Attaching package: &#39;cowplot&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
 ## 
-##     ggsave
-</code></pre>
+##     ggsave</code></pre>
+<pre class="r"><code>source(&quot;calcPosteriors.R&quot;)
 
-<pre><code class="language-r">source(&quot;calcPosteriors.R&quot;)
-
-fullrun &lt;- 0
-</code></pre>
-
-<h1 id="dataset-1-simulated-dataset-from-friedman-mars-paper">Dataset 1: Simulated dataset from Friedman MARS paper</h1>
-
+fullrun &lt;- 0</code></pre>
+</div>
+<div id="dataset-1-simulated-dataset-from-friedman-mars-paper" class="section level1">
+<h1>Dataset 1: Simulated dataset from Friedman MARS paper</h1>
 <p>This is not a causal problem but a prediction problem.</p>
-
-<pre><code class="language-r">## y = f(x) + epsilon , epsilon ~ N(0, sigma)
+<pre class="r"><code>## y = f(x) + epsilon , epsilon ~ N(0, sigma)
 ## x consists of 10 variables, only first 5 matter
 
 f &lt;- function(x) {
@@ -492,28 +456,22 @@ x  &lt;- matrix(runif(n * 10), n, 10)
 Ey &lt;- f(x)
 y  &lt;- rnorm(n, Ey, sigma)
 
-df &lt;- data.frame(x, y, y_true = Ey)
-</code></pre>
-
-<h2 id="fit-bart-model-on-simulated-friedman-data">fit BART model on simulated Friedman data</h2>
-
-<pre><code class="language-r">if(fullrun){
+df &lt;- data.frame(x, y, y_true = Ey)</code></pre>
+<div id="fit-bart-model-on-simulated-friedman-data" class="section level2">
+<h2>fit BART model on simulated Friedman data</h2>
+<pre class="r"><code>if(fullrun){
 ## run BART
   set.seed(99)
   bartFit &lt;- bart(x, y)
   saveRDS(bartFit, &quot;s1.rds&quot;)
 } else { bartFit &lt;- readRDS(&quot;s1.rds&quot;)}
 
-plot(bartFit)
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-3-1.png" alt="" /><!-- --></p>
-
+plot(bartFit)</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>MCMC or sigma looks ok.</p>
-
-<h3 id="compare-bart-fit-to-true-values">compare BART fit to true values</h3>
-
-<pre><code class="language-r">df2 &lt;- data.frame(df, 
+<div id="compare-bart-fit-to-true-values" class="section level3">
+<h3>compare BART fit to true values</h3>
+<pre class="r"><code>df2 &lt;- data.frame(df, 
   ql = apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=0.05),
   qm = apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=.5),
   qu &lt;- apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=0.95)
@@ -523,68 +481,41 @@ bartp &lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax 
   geom_point() + geom_smooth() +
   geom_abline(intercept = 0, slope = 1, col = &quot;red&quot;, size = 1)
 
-bartp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-4-1.png" alt="" /><!-- --></p>
-
+bartp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>This looks nice.</p>
-
-<h2 id="fit-grf-regression-forest-on-friedman-data">Fit Grf regression forest on Friedman data</h2>
-
-<p>From the manual:
-Trains a regression forest that can be used to estimate the conditional mean function mu(x) = E[Y | X = x]</p>
-
-<pre><code class="language-r">if(fullrun){
+</div>
+</div>
+<div id="fit-grf-regression-forest-on-friedman-data" class="section level2">
+<h2>Fit Grf regression forest on Friedman data</h2>
+<p>From the manual: Trains a regression forest that can be used to estimate the conditional mean function mu(x) = E[Y | X = x]</p>
+<pre class="r"><code>if(fullrun){
   reg.forest = regression_forest(x, y, num.trees = 2000)
   saveRDS(reg.forest, &quot;s00.rds&quot;)
-} else {reg.forest &lt;- readRDS(&quot;s00.rds&quot;)}
-</code></pre>
+} else {reg.forest &lt;- readRDS(&quot;s00.rds&quot;)}</code></pre>
+<pre class="r"><code>df3 &lt;- CalcPredictionsGRF(x, reg.forest)
 
-<pre><code class="language-r">df3 &lt;- CalcPredictionsGRF(x, reg.forest)
-</code></pre>
-
-<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4
-</code></pre>
-
-<pre><code class="language-r">df3 &lt;- data.frame(df3, y)
+df3 &lt;- data.frame(df3, y)
 
 ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &quot;grey&quot;) +
   geom_point() + 
-  geom_abline(intercept = 0, slope = 1, col = &quot;red&quot;, size = 1)
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-6-1.png" alt="" /><!-- --></p>
-
-<p>This is pretty bad compared to BART. What&rsquo;s wrong here?</p>
-
-<p>From reference.md:
-<strong>GRF isn&rsquo;t working well on a small dataset</strong></p>
-
+  geom_abline(intercept = 0, slope = 1, col = &quot;red&quot;, size = 1)</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>This is pretty bad compared to BART. What’s wrong here?</p>
+<p>From reference.md: <strong>GRF isn’t working well on a small dataset</strong></p>
 <p>If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:</p>
-
 <ul>
-<li>Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.
-
-<ul>
+<li>Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.</li>
 <li>Skipping the variance estimate computation, by setting ci.group.size to 1 during training, then increasing sample.fraction. Because of how variance estimation is implemented, sample.fraction cannot be greater than 0.5 when it is enabled. If variance estimates are not needed, it may help to disable this computation and use a larger subsample size for training.</li>
-</ul></li>
 </ul>
-
-<p>Dataset is pretty small (n=100). Maybe turn of honesty?
-We cannot turn off variance estimate computation, because we want the CI&rsquo;s</p>
-
-<pre><code class="language-r">if(fullrun){
+<p>Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI’s</p>
+<pre class="r"><code>if(fullrun){
   reg.forest2 = regression_forest(x, y, num.trees = 2000,
                                  honesty = FALSE)
   saveRDS(reg.forest2, &quot;s001.rds&quot;)
-} else {reg.forest2 &lt;- readRDS(&quot;s001.rds&quot;)}
-</code></pre>
-
-<pre><code class="language-r">df2 &lt;- CalcPredictionsGRF(x, reg.forest2)
+} else {reg.forest2 &lt;- readRDS(&quot;s001.rds&quot;)}</code></pre>
+<pre class="r"><code>df2 &lt;- CalcPredictionsGRF(x, reg.forest2)
 
 df2 &lt;- data.frame(df2, y)
 
@@ -592,115 +523,68 @@ grfp &lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax =
   geom_point() + geom_smooth() +
   geom_abline(intercept = 0, slope = 1, col = &quot;red&quot;, size = 1)
 
-grfp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-8-1.png" alt="" /><!-- --></p>
-
-<p>Ah! better now. But Grf still worse than BART.
-We ran with 2000 trees and turned of honesty.
-Perhaps dataset too small? Maybe check out the sample.fraction parameter?
-Sample.fraction is set by default at 0.5, so only half of data is used to grow tree.
-OR use  tune.parameters = TRUE</p>
-
-<h2 id="compare-methods">Compare methods</h2>
-
-<pre><code class="language-r">gp &lt;- plot_grid(bartp, grfp)
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-</code></pre>
-
-<pre><code class="language-r">gp 
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-9-1.png" alt="" /><!-- --></p>
-
-<h1 id="dataset-2-simulated-data-from-acic-2017">Dataset 2: Simulated data from ACIC 2017</h1>
-
+grfp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Ah! better now. But Grf still worse than BART. We ran with 2000 trees and turned of honesty. Perhaps dataset too small? Maybe check out the sample.fraction parameter? Sample.fraction is set by default at 0.5, so only half of data is used to grow tree. OR use tune.parameters = TRUE</p>
+</div>
+<div id="compare-methods" class="section level2">
+<h2>Compare methods</h2>
+<pre class="r"><code>gp &lt;- plot_grid(bartp, grfp)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<pre class="r"><code>gp </code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+</div>
+<div id="dataset-2-simulated-data-from-acic-2017" class="section level1">
+<h1>Dataset 2: Simulated data from ACIC 2017</h1>
 <p>This is a bigger dataset, N=4302.</p>
-
 <ul>
-<li>Treatment effect $\tau$ is a function of covariates x3, x24, x14, x15</li>
-<li>Probability of treatment $\pi$ is a function of covariates x1, x43, x10.</li>
+<li>Treatment effect <span class="math inline">\(\tau\)</span> is a function of covariates x3, x24, x14, x15</li>
+<li>Probability of treatment <span class="math inline">\(\pi\)</span> is a function of covariates x1, x43, x10.</li>
 <li>Outcome is a function of x43</li>
 <li>Noise is a function of x21</li>
 </ul>
-
-<pre><code class="language-r">head(input_2017[, c(3,24,14,15)])
-</code></pre>
-
+<pre class="r"><code>head(input_2017[, c(3,24,14,15)])</code></pre>
 <pre><code>##   x_3  x_24 x_14 x_15
 ## 1  20 white    0    2
 ## 2   0 black    0    0
 ## 3   0 white    0    1
 ## 4  10 white    0    0
 ## 5   0 black    0    0
-## 6   1 white    0    0
-</code></pre>
-
+## 6   1 white    0    0</code></pre>
 <p>Check transformed covariates used to create simulated datasets.</p>
-
-<pre><code class="language-r"># zit hidden in package
-head(aciccomp2017:::transformedData_2017)
-</code></pre>
-
+<pre class="r"><code># zit hidden in package
+head(aciccomp2017:::transformedData_2017)</code></pre>
 <pre><code>##              x_1   x_3  x_10  x_14  x_15 x_21 x_24       x_43
 ## 2665 -1.18689448  gt_0 leq_0 leq_0  gt_0    J    E -1.0897971
 ## 22   -0.04543705 leq_0 leq_0 leq_0 leq_0    J    B  1.1223750
 ## 2416  0.13675482 leq_0 leq_0 leq_0  gt_0    J    E  0.6136700
 ## 1350 -0.24062700  gt_0 leq_0 leq_0 leq_0    J    E -0.2995632
 ## 3850  1.02054653 leq_0 leq_0 leq_0 leq_0    I    B  0.6136700
-## 4167 -1.18689448  gt_0 leq_0 leq_0 leq_0    K    E -1.5961206
-</code></pre>
-
-<p>So we find that we should not take the functions in Dorie 2018 (debrief.pdf) literately.
-x_3 used to calculate the treatment effect is <strong>derived</strong> from x_3 in the input data.
-x_24 used to calculate the treatment effect is <strong>derived</strong> from x_24 in the input data.
-Both have become binary variables.</p>
-
+## 4167 -1.18689448  gt_0 leq_0 leq_0 leq_0    K    E -1.5961206</code></pre>
+<p>So we find that we should not take the functions in Dorie 2018 (debrief.pdf) literately. x_3 used to calculate the treatment effect is <strong>derived</strong> from x_3 in the input data. x_24 used to calculate the treatment effect is <strong>derived</strong> from x_24 in the input data. Both have become binary variables.</p>
 <p>Turns out that this was a feature of the 2016 ACIC and IS mentioned in the debrief.pdf</p>
-
-<p>We pick the iid, strong signal, low noise, low confounding first.
-Actually from estimated PS (W.hat) it seems that every obs has probability of treatment 50%.</p>
-
-<pre><code class="language-r">parameters_2017[21,]
-</code></pre>
-
+<p>We pick the iid, strong signal, low noise, low confounding first. Actually from estimated PS (W.hat) it seems that every obs has probability of treatment 50%.</p>
+<pre class="r"><code>parameters_2017[21,]</code></pre>
 <pre><code>##    errors magnitude noise confounding
-## 21    iid         1     0           0
-</code></pre>
-
-<pre><code class="language-r"># easiest?
-</code></pre>
-
+## 21    iid         1     0           0</code></pre>
+<pre class="r"><code># easiest?</code></pre>
 <p>Grab the first replicate.</p>
-
-<pre><code class="language-r">sim &lt;- dgp_2017(21, 1)
-</code></pre>
-
-<h2 id="fit-bart-to-acic-2017-dataset">Fit BART to ACIC 2017 dataset</h2>
-
-<p>Need also counterfactual predictions.
-Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.</p>
-
-<p>From the MCMC draws for sigma we infer that we need to drop more &ldquo;burn in&rdquo; samples.</p>
-
+<pre class="r"><code>sim &lt;- dgp_2017(21, 1)</code></pre>
+<div id="fit-bart-to-acic-2017-dataset" class="section level2">
+<h2>Fit BART to ACIC 2017 dataset</h2>
+<p>Need also counterfactual predictions. Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.</p>
+<p>From the MCMC draws for sigma we infer that we need to drop more “burn in” samples.</p>
 <p>Prepare data for BART, including x.test with treatment reversed:</p>
-
-<pre><code class="language-r"># combine x and y
+<pre class="r"><code># combine x and y
 y &lt;- sim$y
 x &lt;- model.matrix(~. ,cbind(z = sim$z, input_2017))
 
 # flip z for counterfactual predictions (needed for BART)
-x.test &lt;- model.matrix(~. ,cbind(z = 1 - sim$z, input_2017))
-</code></pre>
-
-<pre><code class="language-r">## run BART
+x.test &lt;- model.matrix(~. ,cbind(z = 1 - sim$z, input_2017))</code></pre>
+<pre class="r"><code>## run BART
 fullrun &lt;- 0
 if(fullrun){
   set.seed(99)
@@ -709,16 +593,12 @@ if(fullrun){
   saveRDS(bartFit, &quot;s2.rds&quot;)
 } else { bartFit &lt;- readRDS(&quot;s2.rds&quot;)}
 
-plot(bartFit)
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-15-1.png" alt="" /><!-- --></p>
-
-<h3 id="extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit">Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit</h3>
-
+plot(bartFit)</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<div id="extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit" class="section level3">
+<h3>Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit</h3>
 <p>This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.</p>
-
-<pre><code class="language-r">source(&quot;calcPosteriors.R&quot;)
+<pre class="r"><code>source(&quot;calcPosteriors.R&quot;)
 sim &lt;- CalcPosteriorsBART(sim, bartFit, &quot;z&quot;)
 
 sim &lt;- sim %&gt;% arrange(alpha)
@@ -728,48 +608,32 @@ bartp &lt;- ggplot(sim, aes(x = 1:nrow(sim), qm))  +
   geom_point() + 
   geom_smooth() + geom_point(aes(y = alpha), col = &quot;red&quot;) + ylim(-2.5, 4.5)
 
-bartp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_smooth).
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-16-1.png" alt="" /><!-- --></p>
-
+bartp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_smooth).</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <p>This looks sort of ok, but still weird. Some points it gets REALLY wrong.</p>
+</div>
+<div id="calculate-coverage" class="section level3">
+<h3>Calculate coverage</h3>
+<pre class="r"><code>sim &lt;- sim %&gt;% mutate(in_ci = ql &lt; alpha &amp; qu &gt; alpha) 
 
-<h3 id="calculate-coverage">Calculate coverage</h3>
-
-<pre><code class="language-r">sim &lt;- sim %&gt;% mutate(in_ci = ql &lt; alpha &amp; qu &gt; alpha) 
-
-mean(sim$in_ci)
-</code></pre>
-
-<pre><code>## [1] 0.4363087
-</code></pre>
-
+mean(sim$in_ci)</code></pre>
+<pre><code>## [1] 0.4363087</code></pre>
 <p>Pretty bad coverage. Look into whats going on here. Here it should be 0.9</p>
-
 <p>The iid plot for method 2 gives coverage 0.7 (where it should be 0.95)</p>
-
-<h3 id="calculate-rmse-of-cate">Calculate RMSE of CATE</h3>
-
-<pre><code class="language-r">sqrt(mean((sim$alpha - sim$ite)^2))
-</code></pre>
-
-<pre><code>## [1] 0.1587338
-</code></pre>
-
+</div>
+<div id="calculate-rmse-of-cate" class="section level3">
+<h3>Calculate RMSE of CATE</h3>
+<pre class="r"><code>sqrt(mean((sim$alpha - sim$ite)^2))</code></pre>
+<pre><code>## [1] 0.1587338</code></pre>
 <p>For All i.i.d. (averaged over 250 replicates averaged over 8 scenarios) method 2 (BART should have RMSE of CATE of 0.35-0.4)</p>
-
-<h2 id="fit-grf-to-acic-2017-dataset">Fit grf to ACIC 2017 dataset</h2>
-
+</div>
+</div>
+<div id="fit-grf-to-acic-2017-dataset" class="section level2">
+<h2>Fit grf to ACIC 2017 dataset</h2>
 <p>need large num.trees for CI.</p>
-
-<pre><code class="language-r"># prep data for Grf
+<pre class="r"><code># prep data for Grf
 # combine x and y
 sim &lt;- dgp_2017(21, 1)
 
@@ -783,14 +647,12 @@ fullrun &lt;- 0
 if(fullrun){
   grf.fit_alt &lt;- causal_forest(X, Y, W, num.trees = 500)
   saveRDS(grf.fit_alt, &quot;s3.rds&quot;)
-} else{grf.fit_alt &lt;- readRDS(&quot;s3.rds&quot;)}
-</code></pre>
-
+} else{grf.fit_alt &lt;- readRDS(&quot;s3.rds&quot;)}</code></pre>
 <p>It appears that using 4000 trees consumes too much memory (bad_alloc)</p>
-
-<h2 id="compare-predictions-vs-true-value">Compare predictions vs  true value</h2>
-
-<pre><code class="language-r">df_sep2 &lt;- CalcPredictionsGRF(X, grf.fit_alt)
+</div>
+<div id="compare-predictions-vs-true-value" class="section level2">
+<h2>Compare predictions vs true value</h2>
+<pre class="r"><code>df_sep2 &lt;- CalcPredictionsGRF(X, grf.fit_alt)
 
 df_sep2 &lt;- data.frame(df_sep2, Y, W, TAU = sim$alpha)
 
@@ -800,42 +662,25 @@ grfp &lt;- ggplot(df_sep2, aes(x = 1:nrow(df_sep2), y = qm))   +
   geom_linerange(aes(ymin = ql, ymax = qu), col = &quot;grey&quot;) + geom_point() + geom_smooth() + 
   geom_point(aes(y = TAU), col = &quot;red&quot;) + ylim(-2.5, 4.5)
 
-grfp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-20-1.png" alt="" /><!-- --></p>
-
+grfp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p>This works ok now.</p>
-
-<h2 id="compare-both-methods">Compare both methods</h2>
-
-<pre><code class="language-r">gp &lt;- plot_grid(bartp, grfp)
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_smooth).
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<pre><code class="language-r">gp
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-21-1.png" alt="" /><!-- --></p>
-
-<h1 id="dataset-3-simulated-data-used-by-grf-example">Dataset 3: simulated data used by grf example</h1>
-
-<p>THis dataset is used in the Grf manual page.
-Size N = 2000. Probability of treatment function of X1.
-Treatment effect function of X1.</p>
-
-<pre><code class="language-r"># Generate data.
+</div>
+<div id="compare-both-methods" class="section level2">
+<h2>Compare both methods</h2>
+<pre class="r"><code>gp &lt;- plot_grid(bartp, grfp)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_smooth).</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre class="r"><code>gp</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+</div>
+<div id="dataset-3-simulated-data-used-by-grf-example" class="section level1">
+<h1>Dataset 3: simulated data used by grf example</h1>
+<p>THis dataset is used in the Grf manual page. Size N = 2000. Probability of treatment function of X1. Treatment effect function of X1.</p>
+<pre class="r"><code># Generate data.
 set.seed(123)
 n = 2000; p = 10
 X = matrix(rnorm(n*p), n, p)
@@ -846,92 +691,63 @@ W = rbinom(n, 1, 0.4 + 0.2 * (X[,1] &gt; 0))
 Y = pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
 
 # TAU is true treatment effect
-df &lt;- data.frame(X, W, Y, TAU = pmax(X[,1], 0))
-</code></pre>
-
-<h2 id="fit-grf">Fit GRF</h2>
-
+df &lt;- data.frame(X, W, Y, TAU = pmax(X[,1], 0))</code></pre>
+<div id="fit-grf" class="section level2">
+<h2>Fit GRF</h2>
 <p>Default settings are honesty = TRUE.</p>
-
-<pre><code class="language-r"># Train a causal forest.
+<pre class="r"><code># Train a causal forest.
 if(fullrun){
   tau.forest = causal_forest(X, Y, W, num.trees = 2000)
   saveRDS(tau.forest, &quot;s4.rds&quot;)
-} else {tau.forest &lt;- readRDS(&quot;s4.rds&quot;)}
-</code></pre>
-
-<h2 id="oob-predictions">OOB predictions</h2>
-
+} else {tau.forest &lt;- readRDS(&quot;s4.rds&quot;)}</code></pre>
+</div>
+<div id="oob-predictions" class="section level2">
+<h2>OOB predictions</h2>
 <p>From the GRF manual:</p>
-
 <p>Given a test example, the GRF algorithm computes a prediction as follows:</p>
-
-<pre><code>For each tree, the test example is 'pushed down' to determine what leaf it falls in.
+<pre><code>For each tree, the test example is &#39;pushed down&#39; to determine what leaf it falls in.
 Given this information, we create a list of neighboring training examples, weighted by how many times the example fell in the same leaf as the test example.
-A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.
-</code></pre>
-
-<p>Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through &lsquo;majority voting&rsquo;. It&rsquo;s worth noting that for regression forests, the GRF algorithm described above is identical this &lsquo;ensemble&rsquo; approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.</p>
-
-<pre><code class="language-r"># Estimate treatment effects for the training data using out-of-bag prediction.
+A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.</code></pre>
+<p>Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through ‘majority voting’. It’s worth noting that for regression forests, the GRF algorithm described above is identical this ‘ensemble’ approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.</p>
+<pre class="r"><code># Estimate treatment effects for the training data using out-of-bag prediction.
 tau.hat.oob = predict(tau.forest)
 
 res &lt;- data.frame(df, pred = tau.hat.oob$predictions)
 
 ggplot(res, aes(x = X1, y = pred)) + geom_point() + geom_smooth() + geom_abline(intercept = 0, slope = 1) +
-  geom_line(aes(y = TAU), col = &quot;red&quot;, size = 1)
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-24-1.png" alt="" /><!-- --></p>
-
-<h2 id="ate-att">ATE &amp; ATT</h2>
-
-<pre><code class="language-r"># Estimate the conditional average treatment effect on the full sample (CATE).
-average_treatment_effect(tau.forest, target.sample = &quot;all&quot;)
-</code></pre>
-
+  geom_line(aes(y = TAU), col = &quot;red&quot;, size = 1)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+</div>
+<div id="ate-att" class="section level2">
+<h2>ATE &amp; ATT</h2>
+<pre class="r"><code># Estimate the conditional average treatment effect on the full sample (CATE).
+average_treatment_effect(tau.forest, target.sample = &quot;all&quot;)</code></pre>
 <pre><code>##   estimate    std.err 
-## 0.36664140 0.04796884
-</code></pre>
-
-<pre><code class="language-r">mean(res$TAU)
-</code></pre>
-
-<pre><code>## [1] 0.4138061
-</code></pre>
-
-<pre><code class="language-r"># Estimate the conditional average treatment effect on the treated sample (CATT).
-# Here, we don't expect much difference between the CATE and the CATT, since
+## 0.36664140 0.04796884</code></pre>
+<pre class="r"><code>mean(res$TAU)</code></pre>
+<pre><code>## [1] 0.4138061</code></pre>
+<pre class="r"><code># Estimate the conditional average treatment effect on the treated sample (CATT).
+# Here, we don&#39;t expect much difference between the CATE and the CATT, since
 # treatment assignment was randomized.
-average_treatment_effect(tau.forest, target.sample = &quot;treated&quot;)
-</code></pre>
-
+average_treatment_effect(tau.forest, target.sample = &quot;treated&quot;)</code></pre>
 <pre><code>##   estimate    std.err 
-## 0.45860274 0.04852209
-</code></pre>
-
-<pre><code class="language-r">mean(res[res$W == 1,]$TAU)
-</code></pre>
-
-<pre><code>## [1] 0.5010723
-</code></pre>
-
-<h2 id="fit-more-trees-for-ci-s">Fit more trees for CI&rsquo;s</h2>
-
-<pre><code class="language-r"># Add confidence intervals for heterogeneous treatment effects; growing more
+## 0.45860274 0.04852209</code></pre>
+<pre class="r"><code>mean(res[res$W == 1,]$TAU)</code></pre>
+<pre><code>## [1] 0.5010723</code></pre>
+</div>
+<div id="fit-more-trees-for-cis" class="section level2">
+<h2>Fit more trees for CI’s</h2>
+<pre class="r"><code># Add confidence intervals for heterogeneous treatment effects; growing more
 # trees is now recommended.
 if(fullrun){
   tau.forest_big = causal_forest(X, Y, W, num.trees = 4000)
   saveRDS(tau.forest_big, &quot;s5.rds&quot;)
-} else {tau.forest_big &lt;- readRDS(&quot;s5.rds&quot;)}
-</code></pre>
-
-<h2 id="plot-ci-s">Plot CI&rsquo;s</h2>
-
-<pre><code class="language-r">## PM
+} else {tau.forest_big &lt;- readRDS(&quot;s5.rds&quot;)}</code></pre>
+</div>
+<div id="plot-cis" class="section level2">
+<h2>Plot CI’s</h2>
+<pre class="r"><code>## PM
 source(&quot;CalcPosteriors.R&quot;)
 df_res &lt;- CalcPredictionsGRF(df, tau.forest_big)
 
@@ -941,17 +757,13 @@ grfp &lt;- ggplot(df_res, aes(x = X1, y = qm)) +
   geom_smooth() + geom_line(aes(y = TAU), col = &quot;red&quot;, size = 1) +
    ylim(-1,3.5)
 
-grfp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-28-1.png" alt="" /><!-- --></p>
-
-<h2 id="fit-bart-on-this-dataset">Fit BART on this dataset</h2>
-
-<pre><code class="language-r">x.train &lt;- model.matrix(~. ,data.frame(W, X))
+grfp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="fit-bart-on-this-dataset" class="section level2">
+<h2>Fit BART on this dataset</h2>
+<pre class="r"><code>x.train &lt;- model.matrix(~. ,data.frame(W, X))
 x.test &lt;- model.matrix(~. ,data.frame(W = 1 - W, X))
 y.train &lt;- Y
 
@@ -959,14 +771,12 @@ if(fullrun){
   bartFit &lt;- bart(x.train, y.train, x.test, ntree = 2000, ndpost = 1000, nskip = 100)
   saveRDS(bartFit, &quot;s10.rds&quot;)
 } else {bartFit &lt;- readRDS(&quot;s10.rds&quot;)}
-plot(bartFit)
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-29-1.png" alt="" /><!-- --></p>
-
-<h2 id="bart-check-fit-and-ci-s">BART: Check fit and CI&rsquo;s</h2>
-
-<pre><code class="language-r">source(&quot;calcPosteriors.R&quot;)
+plot(bartFit)</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+</div>
+<div id="bart-check-fit-and-cis" class="section level2">
+<h2>BART: Check fit and CI’s</h2>
+<pre class="r"><code>source(&quot;calcPosteriors.R&quot;)
 sim &lt;- CalcPosteriorsBART(df, bartFit, treatname = &quot;W&quot;)
 
 
@@ -974,36 +784,24 @@ bartp &lt;- ggplot(sim, aes(x = X1, qm)) + geom_linerange(aes(ymin = ql, ymax = 
   geom_point() + geom_smooth() +
   geom_line(aes(y = TAU), col = &quot;red&quot;, size = 1) + ylim(-1,3.5)
 
-bartp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-30-1.png" alt="" /><!-- --></p>
-
-<h2 id="compare">Compare</h2>
-
-<pre><code class="language-r">gp &lt;- plot_grid(bartp, grfp)
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<pre><code class="language-r">gp
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-31-1.png" alt="" /><!-- --></p>
-
+bartp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+<div id="compare" class="section level2">
+<h2>Compare</h2>
+<pre class="r"><code>gp &lt;- plot_grid(bartp, grfp)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;
+## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre class="r"><code>gp</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>Here Grf appears more accurate. Mental note: Both W and TAU function of X1.</p>
-
-<h1 id="dataset-4-fit-separate-grf-forests-for-y-and-w">Dataset 4: Fit separate grf forests for Y and W</h1>
-
-<p>This dataset has a complex propensity of treatment function (Exponential of X1 and X2), as well as hetergeneous treatment effect that is exponential function of X3.
-It has size N=4000.</p>
-
-<pre><code class="language-r"># In some examples, pre-fitting models for Y and W separately may
+</div>
+</div>
+<div id="dataset-4-fit-separate-grf-forests-for-y-and-w" class="section level1">
+<h1>Dataset 4: Fit separate grf forests for Y and W</h1>
+<p>This dataset has a complex propensity of treatment function (Exponential of X1 and X2), as well as hetergeneous treatment effect that is exponential function of X3. It has size N=4000.</p>
+<pre class="r"><code># In some examples, pre-fitting models for Y and W separately may
 # be helpful (e.g., if different models use different covariates).
 # In some applications, one may even want to get Y.hat and W.hat
 # using a completely different method (e.g., boosting).
@@ -1015,76 +813,61 @@ TAU = 1 / (1 + exp(-X[, 3]))
 W = rbinom(n ,1, 1 / (1 + exp(-X[, 1] - X[, 2])))
 Y = pmax(X[, 2] + X[, 3], 0) + rowMeans(X[, 4:6]) / 2 + W * TAU + rnorm(n)
 
-df_sep4 &lt;- data.frame(X, TAU, W, Y)
-</code></pre>
-
-<h2 id="grf-two-step-first-fit-model-for-w-ps">Grf two-step: First fit model for W (PS)</h2>
-
-<p>Regression forest to predict W from X.
-This is a propensity score.</p>
-
-<pre><code class="language-r">if(fullrun){
+df_sep4 &lt;- data.frame(X, TAU, W, Y)</code></pre>
+<div id="grf-two-step-first-fit-model-for-w-ps" class="section level2">
+<h2>Grf two-step: First fit model for W (PS)</h2>
+<p>Regression forest to predict W from X. This is a propensity score.</p>
+<pre class="r"><code>if(fullrun){
   forest.W = regression_forest(X, W, tune.parameters = TRUE, num.trees = 2000)
   saveRDS(forest.W, &quot;s6.rds&quot;)
 } else {forest.W &lt;- readRDS(&quot;s6.rds&quot;)}
 
-W.hat = predict(forest.W)$predictions
-</code></pre>
-
-<h3 id="grf-then-fit-model-for-y-selecting-covariates">Grf:Then Fit model for Y, selecting covariates</h3>
-
+W.hat = predict(forest.W)$predictions</code></pre>
+<div id="grfthen-fit-model-for-y-selecting-covariates" class="section level3">
+<h3>Grf:Then Fit model for Y, selecting covariates</h3>
 <p>This predict Y from X, ignoring treatment.</p>
-
-<pre><code class="language-r">if(fullrun){
+<pre class="r"><code>if(fullrun){
   forest.Y = regression_forest(X, Y, tune.parameters = TRUE, num.trees = 2000)
   saveRDS(forest.Y, &quot;s7.rds&quot;)
 } else {forest.Y &lt;- readRDS(&quot;s7.rds&quot;)}
 
-Y.hat = predict(forest.Y)$predictions
-</code></pre>
-
-<h3 id="grf-select-variables-that-predict-y">Grf:Select variables that predict Y.</h3>
-
-<pre><code class="language-r">forest.Y.varimp = variable_importance(forest.Y)
+Y.hat = predict(forest.Y)$predictions</code></pre>
+</div>
+<div id="grfselect-variables-that-predict-y." class="section level3">
+<h3>Grf:Select variables that predict Y.</h3>
+<pre class="r"><code>forest.Y.varimp = variable_importance(forest.Y)
 # Note: Forests may have a hard time when trained on very few variables
 # (e.g., ncol(X) = 1, 2, or 3). We recommend not being too aggressive
 # in selection.
-selected.vars = which(forest.Y.varimp / mean(forest.Y.varimp) &gt; 0.2)
-</code></pre>
-
+selected.vars = which(forest.Y.varimp / mean(forest.Y.varimp) &gt; 0.2)</code></pre>
 <p>This selects five variables of 20. Indeed these are the variables that were used to simulate Y.</p>
-
-<h3 id="grf-finally-fit-causal-forest-using-ps-and-selected-covariates">Grf: Finally, Fit causal forest using PS and selected covariates</h3>
-
-<pre><code class="language-r">if(fullrun){
+</div>
+<div id="grf-finally-fit-causal-forest-using-ps-and-selected-covariates" class="section level3">
+<h3>Grf: Finally, Fit causal forest using PS and selected covariates</h3>
+<pre class="r"><code>if(fullrun){
 tau.forest2 = causal_forest(X[, selected.vars], Y, W,
                            W.hat = W.hat, Y.hat = Y.hat,
                            tune.parameters = TRUE, num.trees = 4000)
   saveRDS(tau.forest2, &quot;s8.rds&quot;)
-} else {tau.forest2 &lt;- readRDS(&quot;s8.rds&quot;)}
-</code></pre>
-
-<h3 id="grf-check-fit-and-ci-s">Grf: Check fit and CI&rsquo;s</h3>
-
-<pre><code class="language-r">df_sep2 &lt;- CalcPredictionsGRF(df_sep4, tau.forest2)
+} else {tau.forest2 &lt;- readRDS(&quot;s8.rds&quot;)}</code></pre>
+</div>
+<div id="grf-check-fit-and-cis" class="section level3">
+<h3>Grf: Check fit and CI’s</h3>
+<pre class="r"><code>df_sep2 &lt;- CalcPredictionsGRF(df_sep4, tau.forest2)
 
 grfp &lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
   geom_linerange(aes(ymin = ql, ymax = qu), col = &quot;grey&quot;) + geom_point() + 
   geom_smooth() + 
   geom_line(aes(y = TAU), col = &quot;red&quot;, size = 1) + ylim(-0.7,2)
 
-grfp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-37-1.png" alt="" /><!-- -->
-This looks ok.</p>
-
-<h2 id="fit-bart-on-this-dataset-1">Fit BART on this dataset</h2>
-
-<pre><code class="language-r">x.train &lt;- model.matrix(~. ,data.frame(W, X))
+grfp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png" width="672" /> This looks ok.</p>
+</div>
+</div>
+<div id="fit-bart-on-this-dataset-1" class="section level2">
+<h2>Fit BART on this dataset</h2>
+<pre class="r"><code>x.train &lt;- model.matrix(~. ,data.frame(W, X))
 x.test &lt;- model.matrix(~. ,data.frame(W = 1 - W, X))
 y.train &lt;- Y
 
@@ -1092,14 +875,12 @@ if(fullrun){
   bartFit &lt;- bart(x.train, y.train, x.test, ntree = 4000)
   saveRDS(bartFit, &quot;s9.rds&quot;)
 } else {bartFit &lt;- readRDS(&quot;s9.rds&quot;)}
-plot(bartFit)
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-38-1.png" alt="" /><!-- --></p>
-
-<h2 id="bart-check-fit-and-ci-s-1">BART: Check fit and CI&rsquo;s</h2>
-
-<pre><code class="language-r">source(&quot;calcPosteriors.R&quot;)
+plot(bartFit)</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+</div>
+<div id="bart-check-fit-and-cis-1" class="section level2">
+<h2>BART: Check fit and CI’s</h2>
+<pre class="r"><code>source(&quot;calcPosteriors.R&quot;)
 sim &lt;- CalcPosteriorsBART(df_sep4, bartFit, treatname = &quot;W&quot;)
 
 
@@ -1107,34 +888,31 @@ bartp &lt;- ggplot(sim, aes(x = X3, qm)) + geom_linerange(aes(ymin = ql, ymax = 
   geom_point() + geom_smooth() +
   geom_line(aes(y = TAU), col = &quot;red&quot;, size = 1) + ylim(-0.7,2)
 
-bartp
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-39-1.png" alt="" /><!-- --></p>
-
-<h2 id="compare-bart-and-grf">Compare BART and grf</h2>
-
-<pre><code class="language-r">gp &lt;- plot_grid(bartp, grfp)
-</code></pre>
-
-<pre><code>## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = &quot;cs&quot;)'
-</code></pre>
-
-<pre><code class="language-r">gp
-</code></pre>
-
-<p><img src="BART_vs_grf_files/figure-html/unnamed-chunk-40-1.png" alt="" /><!-- --></p>
-
+bartp</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+</div>
+<div id="compare-bart-and-grf" class="section level2">
+<h2>Compare BART and grf</h2>
+<pre class="r"><code>gp &lt;- plot_grid(bartp, grfp)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;
+## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<pre class="r"><code>gp</code></pre>
+<p><img src="/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 <p>Very similar results. BART appears slightly more accurate, especially for low values of X3.</p>
+</div>
+</div>
 
     </div>
 
     
 
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/causal-inference-bart-grf/">causal inference, BART, grf</a>
+  
+</div>
 
 
 

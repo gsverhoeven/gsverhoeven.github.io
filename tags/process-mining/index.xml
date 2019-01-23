@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>process mining on Gertjan Verhoeven</title>
+    <link>/tags/process-mining/</link>
+    <description>Recent content in process mining on Gertjan Verhoeven</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Wed, 23 Jan 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/process-mining/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Exploring Process Mining in R</title>
+      <link>/post/exploring-process-mining/</link>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/exploring-process-mining/</guid>
+      <description>In this post, we’ll explore the BupaR suite of Process Mining packages created by Jan Wijffels. After installing all required packages, we can load the whole “bupaverse” by loading the bupaR package.
+We start with exploring the patients dataset contained in the eventdataR package.
+library(bupaR)df &amp;lt;- eventdataR::patientsstr(df)## Classes &amp;#39;eventlog&amp;#39;, &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;: 5442 obs. of 7 variables:## $ handling : Factor w/ 7 levels &amp;quot;Blood test&amp;quot;,&amp;quot;Check-out&amp;quot;,.</description>
+    </item>
+    
+  </channel>
+</rss>

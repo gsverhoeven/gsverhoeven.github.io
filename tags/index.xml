@@ -11,5 +11,32 @@
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
+    <item>
+      <title>causal inference, BART, grf</title>
+      <link>/tags/causal-inference-bart-grf/</link>
+      <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/causal-inference-bart-grf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>interaction detection, random forest, ranger</title>
+      <link>/tags/interaction-detection-random-forest-ranger/</link>
+      <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/interaction-detection-random-forest-ranger/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>process mining</title>
+      <link>/tags/process-mining/</link>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/process-mining/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>
