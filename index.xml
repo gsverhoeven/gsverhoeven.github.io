@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Gertjan Verhoeven on Gertjan Verhoeven</title>
-    <link>/</link>
+    <link>https://gsverhoeven.github.io/</link>
     <description>Recent content in Gertjan Verhoeven on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,10 +12,10 @@
     
     <item>
       <title>Exploring Process Mining in R</title>
-      <link>/post/exploring-process-mining/</link>
+      <link>https://gsverhoeven.github.io/post/exploring-process-mining/</link>
       <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/post/exploring-process-mining/</guid>
+      <guid>https://gsverhoeven.github.io/post/exploring-process-mining/</guid>
       <description>
 
 
@@ -53,10 +53,10 @@ df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
     
     <item>
       <title>BART vs Causal forests showdown</title>
-      <link>/post/bart_vs_grf/bart-vs-grf-showdown/</link>
+      <link>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
+      <guid>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
       <description>
 
 
@@ -118,7 +118,7 @@ df &amp;lt;- data.frame(x, y, y_true = Ey)&lt;/code&gt;&lt;/pre&gt;
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s1.rds&amp;quot;)}
 
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;MCMC or sigma looks ok.&lt;/p&gt;
 &lt;div id=&#34;compare-bart-fit-to-true-values&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;compare BART fit to true values&lt;/h3&gt;
@@ -134,7 +134,7 @@ bartp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, y
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks nice.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -152,7 +152,7 @@ df3 &amp;lt;- data.frame(df3, y)
 ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
   geom_point() + 
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This is pretty bad compared to BART. What’s wrong here?&lt;/p&gt;
 &lt;p&gt;From reference.md: &lt;strong&gt;GRF isn’t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
@@ -176,7 +176,7 @@ grfp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ym
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Ah! better now. But Grf still worse than BART. We ran with 2000 trees and turned of honesty. Perhaps dataset too small? Maybe check out the sample.fraction parameter? Sample.fraction is set by default at 0.5, so only half of data is used to grow tree. OR use tune.parameters = TRUE&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-methods&#34; class=&#34;section level2&#34;&gt;
@@ -185,7 +185,7 @@ grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dataset-2-simulated-data-from-acic-2017&#34; class=&#34;section level1&#34;&gt;
@@ -245,7 +245,7 @@ if(fullrun){
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s2.rds&amp;quot;)}
 
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;div id=&#34;extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit&lt;/h3&gt;
 &lt;p&gt;This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.&lt;/p&gt;
@@ -262,7 +262,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = 1:nrow(sim), qm))  +
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks sort of ok, but still weird. Some points it gets REALLY wrong.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;calculate-coverage&#34; class=&#34;section level3&#34;&gt;
@@ -315,7 +315,7 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = 1:nrow(df_sep2), y = qm))   +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This works ok now.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-both-methods&#34; class=&#34;section level2&#34;&gt;
@@ -325,7 +325,7 @@ grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dataset-3-simulated-data-used-by-grf-example&#34; class=&#34;section level1&#34;&gt;
@@ -368,7 +368,7 @@ res &amp;lt;- data.frame(df, pred = tau.hat.oob$predictions)
 ggplot(res, aes(x = X1, y = pred)) + geom_point() + geom_smooth() + geom_abline(intercept = 0, slope = 1) +
   geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;ate-att&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;ATE &amp;amp; ATT&lt;/h2&gt;
@@ -410,7 +410,7 @@ grfp &amp;lt;- ggplot(df_res, aes(x = X1, y = qm)) +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-bart-on-this-dataset&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
@@ -423,7 +423,7 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s10.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s10.rds&amp;quot;)}
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
@@ -437,7 +437,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = X1, qm)) + geom_linerange(aes(ymin = ql, yma
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Compare&lt;/h2&gt;
@@ -445,7 +445,7 @@ bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Here Grf appears more accurate. Mental note: Both W and TAU function of X1.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -513,7 +513,7 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-bart-on-this-dataset-1&#34; class=&#34;section level2&#34;&gt;
@@ -527,7 +527,7 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s9.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s9.rds&amp;quot;)}
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
@@ -541,7 +541,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = X3, qm)) + geom_linerange(aes(ymin = ql, yma
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-bart-and-grf&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Compare BART and grf&lt;/h2&gt;
@@ -549,7 +549,7 @@ bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Very similar results. BART appears slightly more accurate, especially for low values of X3.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -558,10 +558,10 @@ bartp&lt;/code&gt;&lt;/pre&gt;
     
     <item>
       <title>Improving a parametric regression model using machine learning</title>
-      <link>/post/interaction_detection/interaction-detection/</link>
+      <link>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</link>
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
       
-      <guid>/post/interaction_detection/interaction-detection/</guid>
+      <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
       <description>
 
 
@@ -596,7 +596,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-an-ols-to-the-boston-housing&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Fit an OLS to the Boston Housing&lt;/h1&gt;
@@ -611,7 +611,7 @@ pred_GLM &amp;lt;- predict(my_glm, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
 &lt;p&gt;Discrepancy is defined as the difference between the predictions of both models for each observation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
@@ -632,8 +632,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.310381 
-## R squared (OOB):                  0.6579774&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.023919 
+## R squared (OOB):                  0.6661671&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -647,7 +647,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It turns out that &lt;code&gt;rm&lt;/code&gt; and &lt;code&gt;lstat&lt;/code&gt; are the variables that best predict the discrepancy.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int &amp;lt;- glm(medv ~. + rm:lstat, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
@@ -703,7 +703,7 @@ pred_GLM &amp;lt;- predict(my_glm_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -723,8 +723,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.555041 
-## R squared (OOB):                  0.4518728&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.445409 
+## R squared (OOB):                  0.4430861&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -737,7 +737,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now the variables that best predict the discrepancy are &lt;code&gt;lstat&lt;/code&gt; and &lt;code&gt;dis&lt;/code&gt;. Add these two variables as an interaction.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int2 &amp;lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
@@ -840,7 +840,7 @@ pred_GLM &amp;lt;- predict(my_glm_hr, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;For low predicted values both models differ in a systematic way. This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
@@ -861,8 +861,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009019332 
-## R squared (OOB):                  0.537869&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009105683 
+## R squared (OOB):                  0.5345414&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -876,7 +876,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Add the top 2 vars as an interaction to their model equation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
@@ -936,7 +936,7 @@ pred_GLM &amp;lt;- predict(my_glm_hr_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_log_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -956,8 +956,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008684809 
-## R squared (OOB):                  0.523193&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.00890021 
+## R squared (OOB):                  0.5112434&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -970,7 +970,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now we add lstat and dis as an interaction.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int2 &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +

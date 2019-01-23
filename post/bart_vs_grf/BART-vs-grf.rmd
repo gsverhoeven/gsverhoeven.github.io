@@ -4,7 +4,7 @@ author: Gertjan Verhoeven
 date: '2018-12-15'
 summary: In this post, we test both `Bayesian Additive Regression Trees (BART)` and `Causal forests (grf)` on four simulated datasets of increasing complexity. May the best method win!
 slug: bart-vs-grf-showdown
-draft: TRUE
+draft: FALSE
 categories:
   - R
 tags:

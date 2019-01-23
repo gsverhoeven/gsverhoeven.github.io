@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>interaction detection, random forest, ranger on Gertjan Verhoeven</title>
-    <link>/tags/interaction-detection-random-forest-ranger/</link>
+    <link>https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/</link>
     <description>Recent content in interaction detection, random forest, ranger on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
     <lastBuildDate>Fri, 01 Sep 2017 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/interaction-detection-random-forest-ranger/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Improving a parametric regression model using machine learning</title>
-      <link>/post/interaction_detection/interaction-detection/</link>
+      <link>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</link>
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
       
-      <guid>/post/interaction_detection/interaction-detection/</guid>
+      <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
       <description>The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions.</description>
     </item>
     
