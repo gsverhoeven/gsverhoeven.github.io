@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Arduino on Gertjan Verhoeven</title>
+    <link>/categories/arduino/</link>
+    <description>Recent content in Arduino on Gertjan Verhoeven</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Tue, 05 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/arduino/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Arduino Weather Station with datalogging</title>
+      <link>/post/arduino-atmospheric-datalogger/</link>
+      <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/arduino-atmospheric-datalogger/</guid>
+      <description>In this post, I show how to create a Arduino-based atmospheric sensor circuit capable of storing large amounts of data on a microSD card.
+Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity.</description>
+    </item>
+    
+  </channel>
+</rss>
