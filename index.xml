@@ -11,6 +11,367 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>The validation set approach in caret</title>
+      <link>/post/validation-set-approach-in-caret/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/validation-set-approach-in-caret/</guid>
+      <description>
+
+
+&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;“An introduction to Statistical Learning”&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
+&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;’s preset methods.&lt;/p&gt;
+&lt;p&gt;But for teaching purposes it would be very nice to have a &lt;code&gt;caret&lt;/code&gt; implementation.&lt;/p&gt;
+&lt;p&gt;This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.&lt;/p&gt;
+&lt;p&gt;We pick the &lt;code&gt;BostonHousing&lt;/code&gt; dataset for our example code.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Boston Housing 
+knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;right&#34;&gt;crim&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;zn&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;indus&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;chas&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;nox&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;rm&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;age&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;dis&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;rad&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;tax&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ptratio&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;black&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;lstat&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;medv&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.00632&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.31&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.538&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.575&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;65.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0900&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;296&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.98&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02731&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.469&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.421&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;78.9&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.9671&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;242&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;21.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02729&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.469&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.185&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;61.1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.9671&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;242&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;392.83&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;34.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.03237&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.998&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;45.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;394.63&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.94&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;33.4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.06905&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.147&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.33&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;36.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02985&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.430&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;58.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;394.12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.21&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;28.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Our model is predicting &lt;code&gt;medv&lt;/code&gt; (Median house value) using predictors &lt;code&gt;indus&lt;/code&gt; and &lt;code&gt;chas&lt;/code&gt; in a multiple linear regression. We split the data in half, 50% for fitting the model, and 50% to use as a validation set.&lt;/p&gt;
+&lt;div id=&#34;stratified-sampling-vs-random-sampling&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Stratified sampling vs random sampling&lt;/h1&gt;
+&lt;p&gt;To check if we understand what &lt;code&gt;caret&lt;/code&gt; does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the &lt;code&gt;caret&lt;/code&gt; approach. As &lt;code&gt;caret&lt;/code&gt; requires a particular format (a named list of sets of train indices) we conform to this standard. However, all &lt;code&gt;caret&lt;/code&gt; partitioning functions seem to perform &lt;strong&gt;stratified random sampling&lt;/strong&gt;. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random &lt;strong&gt;within those groups&lt;/strong&gt; to partitions that have similar distributions for the outcome variable.&lt;/p&gt;
+&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
+&lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
+prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
+
+createRandomDataPartition &amp;lt;- function(y, times, p) {
+  vec &amp;lt;- 1:length(y)
+  n_samples &amp;lt;- round(p * length(y))
+  
+  result &amp;lt;- list()
+  for(t in 1:times){
+    indices &amp;lt;- sample(vec, n_samples, replace = FALSE)
+    result[[t]] &amp;lt;- indices
+    #names(result)[t] &amp;lt;- paste0(&amp;quot;Resample&amp;quot;, t)
+  }
+  names(result) &amp;lt;- prettySeq(result)
+  result
+}
+
+createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Resample1
+## [1] 6 8 4 7 9
+## 
+## $Resample2
+## [1] 3 5 8 2 4&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
+&lt;p&gt;Here is the validation set approach without using caret. We create a single random partition of the data in train and validation set, fit the model on the training data, predict on the validation data, and calculate the RMSE error on the test predictions.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = 1, p = 0.5)
+
+train &amp;lt;- parts$Resample1
+
+# fit ols on train data
+lm.fit &amp;lt;- lm(medv ~ indus + chas , data = Boston[train,])
+
+# predict on held out data
+preds &amp;lt;- predict(lm.fit, newdata = Boston[-train,])
+
+# calculate RMSE validation error
+sqrt(mean((preds - Boston[-train,]$medv)^2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 8.217625&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let’s find out!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-validation-set-approach-in-caret&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The validation set approach in caret&lt;/h1&gt;
+&lt;p&gt;Now we use the &lt;code&gt;caret&lt;/code&gt; package. Regular usage requires two function calls, one to &lt;code&gt;trainControl&lt;/code&gt; to control the resampling behavior, and one to &lt;code&gt;train&lt;/code&gt; to do the actual model fitting and prediction generation.&lt;/p&gt;
+&lt;p&gt;As the validation set approach is not one of the predefined methods, we need to make use of the &lt;code&gt;index&lt;/code&gt; argument to explicitely define the train partitions outside of &lt;code&gt;caret&lt;/code&gt;. It automatically predicts on the records that are not contained in the train partitions.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;index&lt;/code&gt; argument plays well with the &lt;code&gt;createDataPartition&lt;/code&gt; (Stratfied sampling) and &lt;code&gt;createRandomDataPartition&lt;/code&gt; (our own custom function that performs truly random sampling) functions, as these functions both generate partitions in precisely the format that &lt;code&gt;index&lt;/code&gt; wants: lists of training set indices.&lt;/p&gt;
+&lt;p&gt;In the code below, we generate four different 50/50 partitions of the data.&lt;/p&gt;
+&lt;p&gt;We set &lt;code&gt;savePredictions&lt;/code&gt; to &lt;code&gt;TRUE&lt;/code&gt; to be able to verify the calculated metrics such as the test RMSE.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+# create four partitions
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = 4, p = 0.5)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;, 
+                     ## The method doesn&amp;#39;t matter
+                     ## since we are defining the resamples
+                     index= parts, 
+                     ##verboseIter = TRUE, 
+                     ##repeats = 1,
+                     savePredictions = TRUE
+                     ##returnResamp = &amp;quot;final&amp;quot;
+                     ) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can run caret and fit the model four times:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 253, 253, 253, 253 
+## Resampling results:
+## 
+##   RMSE      Rsquared  MAE     
+##   8.140461  0.221556  5.970956
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From the result returned by &lt;code&gt;train&lt;/code&gt; we can verify that it has fitted a model on four different datasets, each of size &lt;code&gt;253&lt;/code&gt;. By default it reports the average test error over the four validation sets. We can also extract the four individual test errors:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# strangely enough, resamples() always wants at least two train() results
+# see also the man page for resamples()
+resamples &amp;lt;- resamples(list(MOD1 = res, 
+                            MOD2 = res))
+
+resamples$values$`MOD1~RMSE`&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 8.217625 7.960800 8.244937 8.138481&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# check that we recover the RMSE reported by train() in the Resampling results
+mean(resamples$values$`MOD1~RMSE`)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 8.140461&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## summary.resamples(object = resamples)
+## 
+## Models: MOD1, MOD2 
+## Number of resamples: 4 
+## 
+## MAE 
+##          Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## MOD1 5.772957 5.949938 6.011035 5.970956 6.032053 6.088796    0
+## MOD2 5.772957 5.949938 6.011035 5.970956 6.032053 6.088796    0
+## 
+## RMSE 
+##        Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## MOD1 7.9608 8.094061 8.178053 8.140461 8.224453 8.244937    0
+## MOD2 7.9608 8.094061 8.178053 8.140461 8.224453 8.244937    0
+## 
+## Rsquared 
+##           Min.   1st Qu.    Median     Mean   3rd Qu.      Max. NA&amp;#39;s
+## MOD1 0.2017943 0.2069602 0.2189169 0.221556 0.2335127 0.2465958    0
+## MOD2 0.2017943 0.2069602 0.2189169 0.221556 0.2335127 0.2465958    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that the RMSE value for the first train/test partition is exactly equal to our own implementation of the validation set approach. Awesome.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;validation-set-approach-stratified-sampling-versus-random-sampling&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Validation set approach: stratified sampling versus random sampling&lt;/h1&gt;
+&lt;p&gt;Since we now know what we are doing, let’s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# simulation settings
+n_repeats &amp;lt;- 3000
+train_fraction &amp;lt;- 0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First we fit the models on the random sampling data partitions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = n_repeats, p = train_fraction)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+rand_sampl_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+rand_sampl_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 405, 405, 405, 405, 405, 405, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   7.872387  0.2755166  5.806044
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next, we fit the models on the stratified sampling data partitions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createDataPartition(Boston$medv, times = n_repeats, p = train_fraction, list = T)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+strat_sampl_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+strat_sampl_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 407, 407, 407, 407, 407, 407, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared  MAE     
+##   7.818498  0.280648  5.759168
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, we merge the two results to compare the distributions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;resamples &amp;lt;- resamples(list(RAND = rand_sampl_res, 
+                          STRAT = strat_sampl_res))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;analyzing-caret-resampling-results&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Analyzing caret resampling results&lt;/h1&gt;
+&lt;p&gt;We now analyse our resampling results. We can use the &lt;code&gt;summary&lt;/code&gt; method on our resamples object:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## summary.resamples(object = resamples)
+## 
+## Models: RAND, STRAT 
+## Number of resamples: 3000 
+## 
+## MAE 
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## RAND  4.100652 5.492730 5.790283 5.806044 6.104647 7.663345    0
+## STRAT 4.438645 5.464873 5.745391 5.759168 6.044985 7.493055    0
+## 
+## RMSE 
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## RAND  5.119472 7.331857 7.857935 7.872387 8.403391 11.17930    0
+## STRAT 5.634478 7.307348 7.815735 7.818498 8.314292 10.43092    0
+## 
+## Rsquared 
+##             Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&amp;#39;s
+## RAND  0.05006335 0.2244762 0.2743783 0.2755166 0.3260239 0.5129500    0
+## STRAT 0.08044329 0.2311793 0.2792260 0.2806480 0.3286326 0.5242075    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can also use the plot function provided by the &lt;code&gt;caret&lt;/code&gt; package. It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean. Note that the confidence intervals here are based on a normal approximation (One sample t-test).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# caret:::ggplot.resamples
+# t.test(resamples$values$`RAND~RMSE`)
+ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;My personal preference is to more directly display both distributions. This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bwplot(resamples, metric = &amp;quot;RMSE&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;
+&lt;p&gt;Based on these results, it seems like stratified sampling is indeed a reasonable default setting for &lt;code&gt;caret&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Arduino Weather Station with datalogging</title>
       <link>/post/arduino-atmospheric-datalogger/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>

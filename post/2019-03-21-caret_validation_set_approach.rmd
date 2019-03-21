@@ -1,0 +1,233 @@
+---
+title: The validation set approach in caret
+author: Gertjan Verhoeven
+date: '2019-03-21'
+summary: In this blog post, we explore how to implement the validation set approach in caret. This is the most basic form of the train/test machine learning concept.
+draft: FALSE
+slug: validation-set-approach-in-caret
+categories:
+  - R
+tags:
+  - R, caret 
+header:
+  image: "headers/balls-blur-close-up-278911.jpg"
+  preview: FALSE
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(caret)
+library(MASS)
+```
+
+In this blog post, we explore how to implement the *validation set approach* in `caret`. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook ["An introduction to Statistical Learning"](http://www-bcf.usc.edu/~gareth/ISL/) uses the validation set approach to introduce resampling methods.
+
+In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of `caret`'s preset methods.
+
+But for teaching purposes it would be very nice to have a `caret` implementation.
+
+This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.
+
+We pick the `BostonHousing` dataset for our example code.
+
+```{r}
+# Boston Housing 
+knitr::kable(head(Boston))
+```
+
+Our model is predicting `medv` (Median house value) using predictors `indus` and `chas` in a multiple linear regression. We split the data in half, 50% for fitting the model, and 50% to use as a validation set. 
+
+# Stratified sampling vs random sampling
+
+To check if we understand what `caret` does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the `caret` approach. As `caret` requires a particular format (a named list of sets of train indices) we conform to this standard. However, all `caret` partitioning functions seem to perform __stratified random sampling__. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random __within those groups__ to partitions that have similar distributions for the outcome variable.
+
+This not desirable for teaching, as it adds more complexity.
+In addition, it would be nice to be able to compare stratified vs. random sampling.
+
+We therefore write a function that generates truly random partitions of the data.
+We let it generate partitions in  the format that `trainControl` likes.
+
+```{r}
+# internal function from caret package, needed to play nice with resamples()
+prettySeq <- function(x) paste("Resample", gsub(" ", "0", format(seq(along = x))), sep = "")
+
+createRandomDataPartition <- function(y, times, p) {
+  vec <- 1:length(y)
+  n_samples <- round(p * length(y))
+  
+  result <- list()
+  for(t in 1:times){
+    indices <- sample(vec, n_samples, replace = FALSE)
+    result[[t]] <- indices
+    #names(result)[t] <- paste0("Resample", t)
+  }
+  names(result) <- prettySeq(result)
+  result
+}
+
+createRandomDataPartition(1:10, times = 2, p = 0.5)
+```
+# The validation set approach without caret
+
+Here is the validation set approach without using caret. We create a single random partition of the data in train and validation set, fit the model on the training data, predict on the validation data, and calculate the RMSE error on the test predictions.
+
+```{r}
+set.seed(1234)
+parts <- createRandomDataPartition(Boston$medv, times = 1, p = 0.5)
+
+train <- parts$Resample1
+
+# fit ols on train data
+lm.fit <- lm(medv ~ indus + chas , data = Boston[train,])
+
+# predict on held out data
+preds <- predict(lm.fit, newdata = Boston[-train,])
+
+# calculate RMSE validation error
+sqrt(mean((preds - Boston[-train,]$medv)^2))
+```
+
+If we feed `caret` the same data partition, we expect *exactly*  the same test error for the held-out data. Let's find out!
+
+# The validation set approach in caret
+
+Now we use the `caret` package.
+Regular usage requires two function calls, one to `trainControl` to control the resampling behavior, and one to `train` to do the actual model fitting and prediction generation.
+
+As the validation set approach is not one of the predefined methods, we need to make use of the `index` argument to explicitely define the train partitions outside of `caret`. It automatically predicts on the records that are not contained in the train partitions.
+
+The `index` argument plays well with the `createDataPartition` (Stratfied sampling) and `createRandomDataPartition` (our own custom function that performs truly random sampling) functions, as these functions both generate partitions in precisely the format that `index` wants: lists of training set indices.
+
+In the code below, we generate four different 50/50 partitions of the data.
+
+We set `savePredictions` to `TRUE` to be able to verify the calculated metrics such as the test RMSE.
+
+```{r}
+set.seed(1234)
+
+# create four partitions
+parts <- createRandomDataPartition(Boston$medv, times = 4, p = 0.5)
+
+ctrl <- trainControl(method = "repeatedcv", 
+                     ## The method doesn't matter
+                     ## since we are defining the resamples
+                     index= parts, 
+                     ##verboseIter = TRUE, 
+                     ##repeats = 1,
+                     savePredictions = TRUE
+                     ##returnResamp = "final"
+                     ) 
+```
+
+Now we can run caret and fit the model four times:
+
+```{r}
+res <- train(medv ~ indus + chas, data = Boston, method = "lm",
+             trControl = ctrl)
+
+res
+```
+
+From the result returned by `train` we can verify that it has fitted a model on four different datasets, each of size `253`. By default it reports the average test error over the four validation sets. We can also extract the four individual test errors:
+
+```{r}
+# strangely enough, resamples() always wants at least two train() results
+# see also the man page for resamples()
+resamples <- resamples(list(MOD1 = res, 
+                            MOD2 = res))
+
+resamples$values$`MOD1~RMSE`
+
+# check that we recover the RMSE reported by train() in the Resampling results
+mean(resamples$values$`MOD1~RMSE`)
+
+summary(resamples)
+```
+
+Note that the RMSE value for the first train/test partition is exactly equal to our own implementation of the validation set approach. Awesome.
+
+# Validation set approach: stratified sampling versus random sampling
+
+Since we now know what we are doing, let's perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.
+
+```{r}
+# simulation settings
+n_repeats <- 3000
+train_fraction <- 0.8
+```
+
+First we fit the models on the random sampling data partitions:
+
+```{r}
+set.seed(1234)
+parts <- createRandomDataPartition(Boston$medv, times = n_repeats, p = train_fraction)
+
+ctrl <- trainControl(method = "repeatedcv",  ## The method doesn't matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+rand_sampl_res <- train(medv ~ indus + chas, data = Boston, method = "lm",
+             trControl = ctrl)
+
+rand_sampl_res
+```
+
+Next, we fit the models on the stratified sampling data partitions:
+
+```{r}
+set.seed(1234)
+parts <- createDataPartition(Boston$medv, times = n_repeats, p = train_fraction, list = T)
+
+ctrl <- trainControl(method = "repeatedcv",  ## The method doesn't matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+strat_sampl_res <- train(medv ~ indus + chas, data = Boston, method = "lm",
+             trControl = ctrl)
+
+strat_sampl_res
+```
+
+Then, we merge the two results to compare the distributions:
+
+```{r}
+resamples <- resamples(list(RAND = rand_sampl_res, 
+                          STRAT = strat_sampl_res))
+```
+
+# Analyzing caret resampling results
+
+We now analyse our resampling results.
+We can use the `summary` method on our resamples object:
+
+```{r}
+summary(resamples)
+```
+
+We can also use the plot function provided by the `caret` package.
+It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean.
+Note that the confidence intervals here are based on a normal approximation (One sample t-test).
+
+```{r}
+# caret:::ggplot.resamples
+# t.test(resamples$values$`RAND~RMSE`)
+ggplot(resamples, metric = "RMSE") 
+```
+
+My personal preference is to more directly display both distributions.
+This is done by `bwplot()` (`caret` does not have ggplot version of this function).
+
+```{r}
+bwplot(resamples, metric = "RMSE")
+```
+
+
+It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.
+
+Based on these results, it seems like stratified sampling is indeed a reasonable default setting for `caret`.
+
+

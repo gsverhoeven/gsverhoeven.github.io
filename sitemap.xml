@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>/post/validation-set-approach-in-caret/</loc>
+      <lastmod>2019-03-21T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/post/arduino-atmospheric-datalogger/</loc>
       <lastmod>2019-03-05T00:00:00+00:00</lastmod>
     </url>
@@ -96,7 +104,16 @@
     <url>
     
       <loc>/categories/r/</loc>
-      <lastmod>2019-01-23T00:00:00+00:00</lastmod>
+      <lastmod>2019-03-21T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/tags/r-caret/</loc>
+      <lastmod>2019-03-21T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -105,6 +122,7 @@
     <url>
     
       <loc>/tags/</loc>
+      <lastmod>2019-03-21T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     

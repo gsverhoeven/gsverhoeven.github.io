@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
-    <lastBuildDate>Wed, 23 Jan 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 21 Mar 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The validation set approach in caret</title>
+      <link>/post/validation-set-approach-in-caret/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/validation-set-approach-in-caret/</guid>
+      <description>In this blog post, we explore how to implement the validation set approach in caret. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook “An introduction to Statistical Learning” uses the validation set approach to introduce resampling methods.
+In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of caret’s preset methods.</description>
+    </item>
     
     <item>
       <title>Exploring Process Mining in R</title>
