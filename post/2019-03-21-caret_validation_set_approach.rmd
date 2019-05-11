@@ -230,4 +230,21 @@ It does seems that stratified sampling paints a slightly more optimistic picture
 
 Based on these results, it seems like stratified sampling is indeed a reasonable default setting for `caret`.
 
+# Update: LGOCV
 
+```{r}
+set.seed(1234)
+
+
+ctrl <- trainControl(method = "LGOCV",  ## The method doesn't matter
+                     repeats = n_repeats,
+                     number = 1,
+                     p = 0.5,
+                     savePredictions = TRUE
+                     ) 
+
+lgocv_res <- train(medv ~ indus + chas, data = Boston, method = "lm",
+             trControl = ctrl)
+
+lgocv_res
+```

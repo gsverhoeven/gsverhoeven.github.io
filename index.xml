@@ -11,6 +11,77 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Designing an introductory course on Causal Inference</title>
+      <link>/post/causal-inference-course/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/causal-inference-course/</guid>
+      <description>
+
+
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;(Short intro) This is me learning causal inference (CI) by self-study together with colleagues using online resources.&lt;/p&gt;
+&lt;p&gt;(Longer intro) A modern data scientist needs to become skilled in at least three topics (I left out visualization):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;(Bayesian) Statistical modeling&lt;/li&gt;
+&lt;li&gt;Machine Learning&lt;/li&gt;
+&lt;li&gt;Causal inference&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For the first two topics, great introductory books exist that&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;focus on learning-by-doing and&lt;/li&gt;
+&lt;li&gt;are low on math and high on simulation / programming in R&lt;/li&gt;
+&lt;li&gt;are fun / well written&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For Bayesian statistical modeling, we have the awesome textbook &lt;a href=&#34;https://xcelab.net/rm/statistical-rethinking/&#34;&gt;“Statistical Rethinking”&lt;/a&gt; by Richard mcElreath.&lt;/p&gt;
+&lt;p&gt;For Machine Learning, we have the (free) book &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;“Introduction to Statistical Learning”&lt;/a&gt; by James, Witten, Hastie &amp;amp; Tibshirani.&lt;/p&gt;
+&lt;p&gt;However, for Causal Inference, such a book does not exist yet AFAIK. Therefore, I tried to piece together a Causal Inference course based on the criteria mentioned above.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;designing-an-introductory-causal-inference-course&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Designing an introductory causal inference course&lt;/h1&gt;
+&lt;p&gt;Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call “Quasi-experimental designs”, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).&lt;/p&gt;
+&lt;p&gt;In the end, I decided to combine the two causal chapters from Gelman &amp;amp; Hill (2007) &lt;a href=&#34;https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/&#34;&gt;(freely available on Gelman’s website)&lt;/a&gt; with the introductory chapter on Causal Graphical Models by Felix Elwert &lt;a href=&#34;https://www.ssc.wisc.edu/~felwert/causality/&#34;&gt;(freely available on Elwert’s website)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The Gelman &amp;amp; Hill chapters already come with a set of exercises. However, for DAGs, i could not find a suitable set of exercises.&lt;/p&gt;
+&lt;p&gt;So I created two R markdown notebooks with exercises in R, that make use of the &lt;a href=&#34;http://dagitty.net/&#34;&gt;DAGitty tool&lt;/a&gt;, created by Johannes Textor and freely available as R package.&lt;/p&gt;
+&lt;p&gt;Some exercises are taken from &lt;a href=&#34;http://bayes.cs.ucla.edu/PRIMER/&#34;&gt;Causal inference in statistics: A Primer&lt;/a&gt; by Pearl, Glymour &amp;amp; Jewell. (I probably should own this book. So I just ordered it :))&lt;/p&gt;
+&lt;p&gt;All materials are available in a &lt;a href=&#34;https://github.com/gsverhoeven/causal_course&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;outline-of-the-course&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Outline of the course&lt;/h1&gt;
+&lt;p&gt;The course has four parts.&lt;/p&gt;
+&lt;div id=&#34;general-introduction&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;General introduction&lt;/h2&gt;
+&lt;p&gt;The course starts with the first causal chapter of Gelman &amp;amp; Hill’s book, “Causal inference using regression on the treatment variable”. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;identification-of-causal-effects-using-dags&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Identification of Causal effects using DAGs&lt;/h2&gt;
+&lt;p&gt;Next we dive into causal identification using the causal diagram approach. For this we use the chapter “Causal Graphical Models” by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;identification-and-estimation-strategies&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Identification and estimation strategies&lt;/h2&gt;
+&lt;p&gt;We then continue with the second causal chapter of Gelman &amp;amp; Hill “Causal inference using more advanced models”. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;varying-treatment-effects-using-machine-learning&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Varying treatment effects using Machine Learning&lt;/h2&gt;
+&lt;p&gt;Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp;amp; mcCullough) and non-bayesian (GRF, Athey &amp;amp; Wager) methods.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;looking-back-so-far&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Looking back so far&lt;/h1&gt;
+&lt;p&gt;The causal diagram / DAG approach is nonparametric and its purpose is to&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make assumptions on the data generating process explicit&lt;/li&gt;
+&lt;li&gt;Formalize identification of causal effects&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thus, it is separate from, and complements statistical estimation. The distinction between identification and estimation is not so explicitly made in the Gelman &amp;amp; Hill chapters, at least this is my impression. It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.&lt;/p&gt;
+&lt;p&gt;After having worked through these materials, I think reading Shalizi’s chapters on Causal Effects would be a smart move. This is part III of his book &lt;a href=&#34;https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/&#34;&gt;“Advanced Data Analysis from an Elementary Point of View”&lt;/a&gt;, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.&lt;/p&gt;
+&lt;p&gt;If you have a question, would like to comment or share ideas feel free to &lt;a href=&#34;https://gsverhoeven.github.io/#contact&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>The validation set approach in caret</title>
       <link>/post/validation-set-approach-in-caret/</link>
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
@@ -169,10 +240,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 6 8 4 7 9
+## [1] 4 2 6 1 5
 ## 
 ## $Resample2
-## [1] 3 5 8 2 4&lt;/code&gt;&lt;/pre&gt;
+## [1]  4 10  5  9  2&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -367,6 +438,37 @@ ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;
 &lt;p&gt;Based on these results, it seems like stratified sampling is indeed a reasonable default setting for &lt;code&gt;caret&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;update-lgocv&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Update: LGOCV&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;LGOCV&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     repeats = n_repeats,
+                     number = 1,
+                     p = 0.5,
+                     savePredictions = TRUE
+                     ) &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `repeats` has no meaning for this resampling method.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lgocv_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+lgocv_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Repeated Train/Test Splits Estimated (1 reps, 50%) 
+## Summary of sample sizes: 254 
+## Resampling results:
+## 
+##   RMSE     Rsquared   MAE     
+##   7.73795  0.2942766  5.606969
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 </description>
     </item>

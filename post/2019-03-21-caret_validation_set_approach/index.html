@@ -18,7 +18,7 @@
   <meta name="description" content="In this blog post, we explore how to implement the validation set approach in caret. This is the most basic form of the train/test machine learning concept.">
 
   
-  <link rel="alternate" hreflang="en-us" href="/post/validation-set-approach-in-caret/">
+  <link rel="alternate" hreflang="en-us" href="/post/2019-03-21-caret_validation_set_approach/">
 
   
 
@@ -90,7 +90,7 @@
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="/post/validation-set-approach-in-caret/">
+  <link rel="canonical" href="/post/2019-03-21-caret_validation_set_approach/">
 
   
   
@@ -104,7 +104,7 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="/post/validation-set-approach-in-caret/">
+  <meta property="og:url" content="/post/2019-03-21-caret_validation_set_approach/">
   <meta property="og:title" content="The validation set approach in caret | Gertjan Verhoeven">
   <meta property="og:description" content="In this blog post, we explore how to implement the validation set approach in caret. This is the most basic form of the train/test machine learning concept."><meta property="og:image" content="/img/headers/balls-blur-close-up-278911.jpg">
   <meta property="og:locale" content="en-us">
@@ -342,35 +342,35 @@
   <ul class="share">
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=The%20validation%20set%20approach%20in%20caret&amp;url=%2fpost%2fvalidation-set-approach-in-caret%2f"
+         href="https://twitter.com/intent/tweet?text=The%20validation%20set%20approach%20in%20caret&amp;url=%2fpost%2f2019-03-21-caret_validation_set_approach%2f"
          target="_blank" rel="noopener">
         <i class="fab fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=%2fpost%2fvalidation-set-approach-in-caret%2f"
+         href="https://www.facebook.com/sharer.php?u=%2fpost%2f2019-03-21-caret_validation_set_approach%2f"
          target="_blank" rel="noopener">
         <i class="fab fa-facebook-f"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2fvalidation-set-approach-in-caret%2f&amp;title=The%20validation%20set%20approach%20in%20caret"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2f2019-03-21-caret_validation_set_approach%2f&amp;title=The%20validation%20set%20approach%20in%20caret"
          target="_blank" rel="noopener">
         <i class="fab fa-linkedin-in"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=%2fpost%2fvalidation-set-approach-in-caret%2f&amp;title=The%20validation%20set%20approach%20in%20caret"
+         href="http://service.weibo.com/share/share.php?url=%2fpost%2f2019-03-21-caret_validation_set_approach%2f&amp;title=The%20validation%20set%20approach%20in%20caret"
          target="_blank" rel="noopener">
         <i class="fab fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=The%20validation%20set%20approach%20in%20caret&amp;body=%2fpost%2fvalidation-set-approach-in-caret%2f">
+         href="mailto:?subject=The%20validation%20set%20approach%20in%20caret&amp;body=%2fpost%2f2019-03-21-caret_validation_set_approach%2f">
         <i class="fas fa-envelope"></i>
       </a>
     </li>
@@ -559,10 +559,10 @@ createRandomDataPartition &lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)</code></pre>
 <pre><code>## $Resample1
-## [1] 4 2 6 1 5
+## [1] 7 6 5 3 4
 ## 
 ## $Resample2
-## [1]  4 10  5  9  2</code></pre>
+## [1]  9  4  1  3 10</code></pre>
 </div>
 <div id="the-validation-set-approach-without-caret" class="section level1">
 <h1>The validation set approach without caret</h1>
@@ -757,37 +757,6 @@ ggplot(resamples, metric = &quot;RMSE&quot;) </code></pre>
 <p><img src="/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p>It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.</p>
 <p>Based on these results, it seems like stratified sampling is indeed a reasonable default setting for <code>caret</code>.</p>
-</div>
-<div id="update-lgocv" class="section level1">
-<h1>Update: LGOCV</h1>
-<pre class="r"><code>set.seed(1234)
-
-
-ctrl &lt;- trainControl(method = &quot;LGOCV&quot;,  ## The method doesn&#39;t matter
-                     repeats = n_repeats,
-                     number = 1,
-                     p = 0.5,
-                     savePredictions = TRUE
-                     ) </code></pre>
-<pre><code>## Warning: `repeats` has no meaning for this resampling method.</code></pre>
-<pre class="r"><code>lgocv_res &lt;- train(medv ~ indus + chas, data = Boston, method = &quot;lm&quot;,
-             trControl = ctrl)
-
-lgocv_res</code></pre>
-<pre><code>## Linear Regression 
-## 
-## 506 samples
-##   2 predictor
-## 
-## No pre-processing
-## Resampling: Repeated Train/Test Splits Estimated (1 reps, 50%) 
-## Summary of sample sizes: 254 
-## Resampling results:
-## 
-##   RMSE     Rsquared   MAE     
-##   7.73795  0.2942766  5.606969
-## 
-## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
 </div>
 
     </div>

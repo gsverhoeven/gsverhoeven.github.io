@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 3.2.0">
+  <meta name="generator" content="Hugo 0.53" />
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+  
+    
+  
+  <meta name="description" content="In this blog post, I describe the introductory course on Causal Inference I pieced together using various materials available online. It combines Pearl&#39;s Causal Graph approach with statistics Gelman/mcElreath style.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/causal-inference-course/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous">
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+  
+
+  
+  <link rel="alternate" href="/index.xml" type="application/rss+xml" title="Gertjan Verhoeven">
+  <link rel="feed" href="/index.xml" type="application/rss+xml" title="Gertjan Verhoeven">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="/post/causal-inference-course/">
+
+  
+  
+  
+  
+    
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="/post/causal-inference-course/">
+  <meta property="og:title" content="Designing an introductory course on Causal Inference | Gertjan Verhoeven">
+  <meta property="og:description" content="In this blog post, I describe the introductory course on Causal Inference I pieced together using various materials available online. It combines Pearl&#39;s Causal Graph approach with statistics Gelman/mcElreath style."><meta property="og:image" content="/img/headers/sharon-mccutcheon-532782-unsplash.jpg">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-05-11T00:00:00&#43;00:00">
+  
+  <meta property="article:modified_time" content="2019-05-11T00:00:00&#43;00:00">
+  
+
+  
+
+  
+
+  <title>Designing an introductory course on Causal Inference | Gertjan Verhoeven</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/sharon-mccutcheon-532782-unsplash.jpg" class="article-banner" itemprop="image" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Designing an introductory course on Causal Inference</h1>
+
+  
+
+  
+    
+
+<div class="article-metadata">
+
+  
+  
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Gertjan Verhoeven">
+  </span>
+  
+
+  <span class="article-date">
+    
+    <meta content="2019-05-11 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+    <time datetime="2019-05-11 00:00:00 &#43;0000 UTC" itemprop="dateModified">
+      May 11, 2019
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Gertjan Verhoeven">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    4 min read
+  </span>
+  
+
+  
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder"></i>
+    
+    <a href="/categories/r/">R</a>
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Designing%20an%20introductory%20course%20on%20Causal%20Inference&amp;url=%2fpost%2fcausal-inference-course%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=%2fpost%2fcausal-inference-course%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=%2fpost%2fcausal-inference-course%2f&amp;title=Designing%20an%20introductory%20course%20on%20Causal%20Inference"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=%2fpost%2fcausal-inference-course%2f&amp;title=Designing%20an%20introductory%20course%20on%20Causal%20Inference"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Designing%20an%20introductory%20course%20on%20Causal%20Inference&amp;body=%2fpost%2fcausal-inference-course%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>(Short intro) This is me learning causal inference (CI) by self-study together with colleagues using online resources.</p>
+<p>(Longer intro) A modern data scientist needs to become skilled in at least three topics (I left out visualization):</p>
+<ul>
+<li>(Bayesian) Statistical modeling</li>
+<li>Machine Learning</li>
+<li>Causal inference</li>
+</ul>
+<p>For the first two topics, great introductory books exist that</p>
+<ul>
+<li>focus on learning-by-doing and</li>
+<li>are low on math and high on simulation / programming in R</li>
+<li>are fun / well written</li>
+</ul>
+<p>For Bayesian statistical modeling, we have the awesome textbook <a href="https://xcelab.net/rm/statistical-rethinking/">“Statistical Rethinking”</a> by Richard mcElreath.</p>
+<p>For Machine Learning, we have the (free) book <a href="http://www-bcf.usc.edu/~gareth/ISL/">“Introduction to Statistical Learning”</a> by James, Witten, Hastie &amp; Tibshirani.</p>
+<p>However, for Causal Inference, such a book does not exist yet AFAIK. Therefore, I tried to piece together a Causal Inference course based on the criteria mentioned above.</p>
+</div>
+<div id="designing-an-introductory-causal-inference-course" class="section level1">
+<h1>Designing an introductory causal inference course</h1>
+<p>Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call “Quasi-experimental designs”, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).</p>
+<p>In the end, I decided to combine the two causal chapters from Gelman &amp; Hill (2007) <a href="https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/">(freely available on Gelman’s website)</a> with the introductory chapter on Causal Graphical Models by Felix Elwert <a href="https://www.ssc.wisc.edu/~felwert/causality/">(freely available on Elwert’s website)</a>.</p>
+<p>The Gelman &amp; Hill chapters already come with a set of exercises. However, for DAGs, i could not find a suitable set of exercises.</p>
+<p>So I created two R markdown notebooks with exercises in R, that make use of the <a href="http://dagitty.net/">DAGitty tool</a>, created by Johannes Textor and freely available as R package.</p>
+<p>Some exercises are taken from <a href="http://bayes.cs.ucla.edu/PRIMER/">Causal inference in statistics: A Primer</a> by Pearl, Glymour &amp; Jewell. (I probably should own this book. So I just ordered it :))</p>
+<p>All materials are available in a <a href="https://github.com/gsverhoeven/causal_course">GitHub repository</a></p>
+</div>
+<div id="outline-of-the-course" class="section level1">
+<h1>Outline of the course</h1>
+<p>The course has four parts.</p>
+<div id="general-introduction" class="section level2">
+<h2>General introduction</h2>
+<p>The course starts with the first causal chapter of Gelman &amp; Hill’s book, “Causal inference using regression on the treatment variable”. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.</p>
+</div>
+<div id="identification-of-causal-effects-using-dags" class="section level2">
+<h2>Identification of Causal effects using DAGs</h2>
+<p>Next we dive into causal identification using the causal diagram approach. For this we use the chapter “Causal Graphical Models” by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.</p>
+</div>
+<div id="identification-and-estimation-strategies" class="section level2">
+<h2>Identification and estimation strategies</h2>
+<p>We then continue with the second causal chapter of Gelman &amp; Hill “Causal inference using more advanced models”. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.</p>
+</div>
+<div id="varying-treatment-effects-using-machine-learning" class="section level2">
+<h2>Varying treatment effects using Machine Learning</h2>
+<p>Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp; mcCullough) and non-bayesian (GRF, Athey &amp; Wager) methods.</p>
+</div>
+</div>
+<div id="looking-back-so-far" class="section level1">
+<h1>Looking back so far</h1>
+<p>The causal diagram / DAG approach is nonparametric and its purpose is to</p>
+<ul>
+<li>Make assumptions on the data generating process explicit</li>
+<li>Formalize identification of causal effects</li>
+</ul>
+<p>Thus, it is separate from, and complements statistical estimation. The distinction between identification and estimation is not so explicitly made in the Gelman &amp; Hill chapters, at least this is my impression. It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.</p>
+<p>After having worked through these materials, I think reading Shalizi’s chapters on Causal Effects would be a smart move. This is part III of his book <a href="https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/">“Advanced Data Analysis from an Elementary Point of View”</a>, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.</p>
+<p>If you have a question, would like to comment or share ideas feel free to <a href="https://gsverhoeven.github.io/#contact">contact me</a>.</p>
+</div>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/r-causal-inference-dag-causal-graph/">R, causal inference, DAG, causal graph</a>
+  
+</div>
+
+
+
+    
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  <img class="portrait mr-3" src="/img/portrait.jpg" itemprop="image" alt="Avatar">
+  
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/">Gertjan Verhoeven</a></h5>
+    <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="/#contact" >
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+          <i class="ai ai-google-scholar"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+          <i class="fab fa-stack-overflow"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2018 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="/js/academic.min.d037ee5294b166a79dec317c58aea9cc.js"></script>
+
+    
+
+  </body>
+</html>
+
