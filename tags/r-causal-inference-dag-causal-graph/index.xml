@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>R, causal inference, DAG, causal graph on Gertjan Verhoeven</title>
-    <link>/tags/r-causal-inference-dag-causal-graph/</link>
+    <link>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</link>
     <description>Recent content in R, causal inference, DAG, causal graph on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
     <lastBuildDate>Sat, 11 May 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/r-causal-inference-dag-causal-graph/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Designing an introductory course on Causal Inference</title>
-      <link>/post/causal-inference-course/</link>
+      <link>https://gsverhoeven.github.io/post/causal-inference-course/</link>
       <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
       
-      <guid>/post/causal-inference-course/</guid>
+      <guid>https://gsverhoeven.github.io/post/causal-inference-course/</guid>
       <description>Introduction(Short intro) This is me learning causal inference (CI) by self-study together with colleagues using online resources.
 (Longer intro) A modern data scientist needs to become skilled in at least three topics (I left out visualization):
 (Bayesian) Statistical modelingMachine LearningCausal inferenceFor the first two topics, great introductory books exist that

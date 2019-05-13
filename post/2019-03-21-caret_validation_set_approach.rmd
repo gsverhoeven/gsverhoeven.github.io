@@ -9,6 +9,7 @@ categories:
   - R
 tags:
   - R, caret 
+baseurl: "https://gsverhoeven.github.io"
 header:
   image: "headers/balls-blur-close-up-278911.jpg"
   preview: FALSE

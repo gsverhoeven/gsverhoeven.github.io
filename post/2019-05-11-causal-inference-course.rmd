@@ -2,6 +2,7 @@
 title: Designing an introductory course on Causal Inference
 author: Gertjan Verhoeven
 date: '2019-05-11'
+baseurl: "https://gsverhoeven.github.io/"
 summary: In this blog post, I describe the introductory course on Causal Inference I pieced together using various materials available online. It combines Pearl's Causal Graph approach with statistics Gelman/mcElreath style.
 draft: FALSE
 slug: causal-inference-course
@@ -10,9 +11,8 @@ categories:
 tags:
   - R, causal inference, DAG, causal graph 
 header:
-  image: "headers/sharon-mccutcheon-532782-unsplash.jpg"
-  preview: FALSE
-
+  image: 'headers/sharon-mccutcheon-532782-unsplash.jpg'
+  caption: ''
 ---
 
 # Introduction

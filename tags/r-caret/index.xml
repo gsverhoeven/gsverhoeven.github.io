@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>R, caret on Gertjan Verhoeven</title>
-    <link>/tags/r-caret/</link>
+    <link>https://gsverhoeven.github.io/tags/r-caret/</link>
     <description>Recent content in R, caret on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
     <lastBuildDate>Thu, 21 Mar 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/r-caret/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://gsverhoeven.github.io/tags/r-caret/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>The validation set approach in caret</title>
-      <link>/post/validation-set-approach-in-caret/</link>
+      <link>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</link>
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>/post/validation-set-approach-in-caret/</guid>
+      <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
       <description>In this blog post, we explore how to implement the validation set approach in caret. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook “An introduction to Statistical Learning” uses the validation set approach to introduce resampling methods.
 In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of caret’s preset methods.</description>
     </item>
