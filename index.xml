@@ -11,6 +11,121 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Exploring Process Mining in R</title>
+      <link>https://gsverhoeven.github.io/post/exploring-process-mining/</link>
+      <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://gsverhoeven.github.io/post/exploring-process-mining/</guid>
+      <description>
+
+
+&lt;p&gt;In this post, we’ll explore the &lt;code&gt;BupaR&lt;/code&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
+&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an “Artifical eventlog about patients”.&lt;/p&gt;
+&lt;div id=&#34;getting-started&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;After installing all required packages, we can load the whole “bupaverse” by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+library(bupaR)
+#library(eventdataR)
+
+df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The data is already in &lt;code&gt;event log&lt;/code&gt; format, let’s check it out.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Number of events:  5442
+## Number of cases:  500
+## Number of traces:  7
+## Number of distinct activities:  7
+## Average trace length:  10.884
+## 
+## Start eventlog:  2017-01-02 11:41:53
+## End eventlog:  2018-05-05 07:16:02&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                   handling      patient          employee 
+##  Blood test           : 474   Length:5442        r1:1000  
+##  Check-out            : 984   Class :character   r2:1000  
+##  Discuss Results      : 990   Mode  :character   r3: 474  
+##  MRI SCAN             : 472                      r4: 472  
+##  Registration         :1000                      r5: 522  
+##  Triage and Assessment:1000                      r6: 990  
+##  X-Ray                : 522                      r7: 984  
+##  handling_id        registration_type      time                    
+##  Length:5442        complete:2721     Min.   :2017-01-02 11:41:53  
+##  Class :character   start   :2721     1st Qu.:2017-05-06 17:15:18  
+##  Mode  :character                     Median :2017-09-08 04:16:50  
+##                                       Mean   :2017-09-02 20:52:34  
+##                                       3rd Qu.:2017-12-22 15:44:11  
+##                                       Max.   :2018-05-05 07:16:02  
+##                                                                    
+##      .order    
+##  Min.   :   1  
+##  1st Qu.:1361  
+##  Median :2722  
+##  Mean   :2722  
+##  3rd Qu.:4082  
+##  Max.   :5442  
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we learn that there are 500 “cases”, i.e. patients. There are 7 different activities.&lt;/p&gt;
+&lt;p&gt;Let’s check out the data for a single patient:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% filter(patient == 1) %&amp;gt;% 
+  arrange(handling_id) #%&amp;gt;% &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Event log consisting of:
+## 12 events
+## 1 traces
+## 1 cases
+## 6 activities
+## 6 activity instances
+## 
+## # A tibble: 12 x 7
+##    handling patient employee handling_id registration_ty~
+##    &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;   &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;       &amp;lt;fct&amp;gt;           
+##  1 Registr~ 1       r1       1           start           
+##  2 Registr~ 1       r1       1           complete        
+##  3 Blood t~ 1       r3       1001        start           
+##  4 Blood t~ 1       r3       1001        complete        
+##  5 MRI SCAN 1       r4       1238        start           
+##  6 MRI SCAN 1       r4       1238        complete        
+##  7 Discuss~ 1       r6       1735        start           
+##  8 Discuss~ 1       r6       1735        complete        
+##  9 Check-o~ 1       r7       2230        start           
+## 10 Check-o~ 1       r7       2230        complete        
+## 11 Triage ~ 1       r2       501         start           
+## 12 Triage ~ 1       r2       501         complete        
+## # ... with 2 more variables: time &amp;lt;dttm&amp;gt;, .order &amp;lt;int&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt; # select(handling, handling_id, registration_type) # does not work&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We learn that each “handling” has a separate start and complete timestamp.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;traces&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Traces&lt;/h1&gt;
+&lt;p&gt;The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.&lt;/p&gt;
+&lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cases that get an X-ray&lt;/li&gt;
+&lt;li&gt;Cases that get a blood test followed by an MRI scan&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-dotted-chart&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The dotted chart&lt;/h1&gt;
+&lt;p&gt;A really powerful visualization in process mining comes in the form of a “dotted chart”. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
+&lt;p&gt;It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The slope of this graphs learns us the rate of new cases, and if this changes over time. Here it appears constant, with 500 cases divided over five quarter years.&lt;/p&gt;
+&lt;p&gt;The second is to align all cases relative to the first event, and sort on duration of the whole sequence of events.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;relative&amp;quot;, sort = &amp;quot;duration&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;A nice pattern emerges, where all cases start with registration, then quickly proceed to triage and assessment, after that, a time varying period of 1-10 days follows where either the blood test + MRI scan, or the X-ray is performed, followed by discussing the results. Finally, check out occurs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;To conclude, the process mining approach to analyze time series event data appears highly promising. The dotted chart is a great addition to my data visualization repertoire, and the process mining folks appear to have at lot more goodies, such as Trace Alignment.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Designing an introductory course on Causal Inference</title>
       <link>https://gsverhoeven.github.io/post/causal-inference-course/</link>
       <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
@@ -240,10 +355,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 7 2 4 5 6
+## [1]  1  7  3  6 10
 ## 
 ## $Resample2
-## [1] 4 6 5 3 9&lt;/code&gt;&lt;/pre&gt;
+## [1] 7 6 8 9 4&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -580,47 +695,6 @@ mdf &amp;lt;- mdf[, value := as.numeric(value)]&lt;/code&gt;&lt;/pre&gt;
     </item>
     
     <item>
-      <title>Exploring Process Mining in R</title>
-      <link>https://gsverhoeven.github.io/post/exploring-process-mining/</link>
-      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://gsverhoeven.github.io/post/exploring-process-mining/</guid>
-      <description>
-
-
-&lt;p&gt;In this post, we’ll explore the BupaR suite of Process Mining packages created by Jan Wijffels. After installing all required packages, we can load the whole “bupaverse” by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
-&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(bupaR)
-
-df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;str(df)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## Classes &amp;#39;eventlog&amp;#39;, &amp;#39;tbl_df&amp;#39;, &amp;#39;tbl&amp;#39; and &amp;#39;data.frame&amp;#39;:    5442 obs. of  7 variables:
-##  $ handling         : Factor w/ 7 levels &amp;quot;Blood test&amp;quot;,&amp;quot;Check-out&amp;quot;,..: 5 5 5 5 5 5 5 5 5 5 ...
-##  $ patient          : chr  &amp;quot;1&amp;quot; &amp;quot;2&amp;quot; &amp;quot;3&amp;quot; &amp;quot;4&amp;quot; ...
-##  $ employee         : Factor w/ 7 levels &amp;quot;r1&amp;quot;,&amp;quot;r2&amp;quot;,&amp;quot;r3&amp;quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ handling_id      : chr  &amp;quot;1&amp;quot; &amp;quot;2&amp;quot; &amp;quot;3&amp;quot; &amp;quot;4&amp;quot; ...
-##  $ registration_type: Factor w/ 2 levels &amp;quot;complete&amp;quot;,&amp;quot;start&amp;quot;: 2 2 2 2 2 2 2 2 2 2 ...
-##  $ time             : POSIXct, format: &amp;quot;2017-01-02 11:41:53&amp;quot; &amp;quot;2017-01-02 11:41:53&amp;quot; ...
-##  $ .order           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  - attr(*, &amp;quot;spec&amp;quot;)=
-##   .. cols(
-##   ..   handling = col_character(),
-##   ..   patient = col_integer(),
-##   ..   employee = col_character(),
-##   ..   handling_id = col_integer(),
-##   ..   registration_type = col_character(),
-##   ..   time = col_datetime(format = &amp;quot;&amp;quot;)
-##   .. )
-##  - attr(*, &amp;quot;case_id&amp;quot;)= chr &amp;quot;patient&amp;quot;
-##  - attr(*, &amp;quot;activity_id&amp;quot;)= chr &amp;quot;handling&amp;quot;
-##  - attr(*, &amp;quot;activity_instance_id&amp;quot;)= chr &amp;quot;handling_id&amp;quot;
-##  - attr(*, &amp;quot;lifecycle_id&amp;quot;)= chr &amp;quot;registration_type&amp;quot;
-##  - attr(*, &amp;quot;resource_id&amp;quot;)= chr &amp;quot;employee&amp;quot;
-##  - attr(*, &amp;quot;timestamp&amp;quot;)= chr &amp;quot;time&amp;quot;&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
       <title>BART vs Causal forests showdown</title>
       <link>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
@@ -636,12 +710,12 @@ df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
 library(dbarts)
 library(ggplot2)
 library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## -- Attaching packages ------------------------------------------------------------- tidyverse 1.2.1 --&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## -- Attaching packages ----------------------------------------------- tidyverse 1.2.1 --&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## v tibble  2.0.1     v purrr   0.2.5
 ## v tidyr   0.8.2     v dplyr   0.7.8
 ## v readr   1.3.1     v stringr 1.3.1
 ## v tibble  2.0.1     v forcats 0.3.0&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## -- Conflicts ---------------------------------------------------------------- tidyverse_conflicts() --
+&lt;pre&gt;&lt;code&gt;## -- Conflicts -------------------------------------------------- tidyverse_conflicts() --
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(grf)
@@ -1201,8 +1275,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.023919 
-## R squared (OOB):                  0.6661671&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.215528 
+## R squared (OOB):                  0.6607762&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1292,8 +1366,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.445409 
-## R squared (OOB):                  0.4430861&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.585358 
+## R squared (OOB):                  0.438492&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1430,8 +1504,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009105683 
-## R squared (OOB):                  0.5345414&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009248139 
+## R squared (OOB):                  0.5271383&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1525,8 +1599,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.00890021 
-## R squared (OOB):                  0.5112434&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008679761 
+## R squared (OOB):                  0.5241287&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)

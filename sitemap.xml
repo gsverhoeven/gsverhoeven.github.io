@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://gsverhoeven.github.io/post/exploring-process-mining/</loc>
+      <lastmod>2019-06-20T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://gsverhoeven.github.io/post/causal-inference-course/</loc>
       <lastmod>2019-05-11T00:00:00+00:00</lastmod>
     </url>
@@ -22,14 +30,6 @@
     
       <loc>https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/</loc>
       <lastmod>2019-03-05T00:00:00+00:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>https://gsverhoeven.github.io/post/exploring-process-mining/</loc>
-      <lastmod>2019-01-23T00:00:00+00:00</lastmod>
     </url>
     
   
@@ -112,7 +112,7 @@
     <url>
     
       <loc>https://gsverhoeven.github.io/categories/r/</loc>
-      <lastmod>2019-05-11T00:00:00+00:00</lastmod>
+      <lastmod>2019-06-20T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -175,7 +175,7 @@
     <url>
     
       <loc>https://gsverhoeven.github.io/tags/process-mining/</loc>
-      <lastmod>2019-01-23T00:00:00+00:00</lastmod>
+      <lastmod>2019-06-20T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
