@@ -19,17 +19,24 @@
       <description>
 
 
-&lt;p&gt;In this post, we’ll explore the &lt;code&gt;BupaR&lt;/code&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
+&lt;p&gt;In this post, we’ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
 &lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an “Artifical eventlog about patients”.&lt;/p&gt;
 &lt;div id=&#34;getting-started&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Getting started&lt;/h1&gt;
 &lt;p&gt;After installing all required packages, we can load the whole “bupaverse” by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
-library(bupaR)
-#library(eventdataR)
+library(bupaR)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case. Here’s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;patients &amp;lt;- eventdataR::patients
 
-df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The data is already in &lt;code&gt;event log&lt;/code&gt; format, let’s check it out.&lt;/p&gt;
+df &amp;lt;- eventlog(patients,
+               case_id = &amp;quot;patient&amp;quot;,
+               activity_id = &amp;quot;handling&amp;quot;,
+               activity_instance_id = &amp;quot;handling_id&amp;quot;,
+               lifecycle_id = &amp;quot;registration_type&amp;quot;,
+               timestamp = &amp;quot;time&amp;quot;,
+               resource_id = &amp;quot;employee&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s check it out.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Number of events:  5442
 ## Number of cases:  500
@@ -98,7 +105,7 @@ df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.&lt;/p&gt;
 &lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Cases that get an X-ray&lt;/li&gt;
 &lt;li&gt;Cases that get a blood test followed by an MRI scan&lt;/li&gt;
@@ -110,12 +117,12 @@ df &amp;lt;- eventdataR::patients&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
   theme_gray()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The slope of this graphs learns us the rate of new cases, and if this changes over time. Here it appears constant, with 500 cases divided over five quarter years.&lt;/p&gt;
 &lt;p&gt;The second is to align all cases relative to the first event, and sort on duration of the whole sequence of events.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;relative&amp;quot;, sort = &amp;quot;duration&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
   theme_gray()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;A nice pattern emerges, where all cases start with registration, then quickly proceed to triage and assessment, after that, a time varying period of 1-10 days follows where either the blood test + MRI scan, or the X-ray is performed, followed by discussing the results. Finally, check out occurs.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
@@ -355,10 +362,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1]  1  7  3  6 10
+## [1] 4 6 2 5 3
 ## 
 ## $Resample2
-## [1] 7 6 8 9 4&lt;/code&gt;&lt;/pre&gt;
+## [1]  3  1 10  7  6&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -1275,8 +1282,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.215528 
-## R squared (OOB):                  0.6607762&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.160014 
+## R squared (OOB):                  0.6648632&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1366,8 +1373,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.585358 
-## R squared (OOB):                  0.438492&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.555925 
+## R squared (OOB):                  0.4420527&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1504,8 +1511,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009248139 
-## R squared (OOB):                  0.5271383&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009069092 
+## R squared (OOB):                  0.5364923&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1599,8 +1606,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008679761 
-## R squared (OOB):                  0.5241287&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008788299 
+## R squared (OOB):                  0.5172485&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)

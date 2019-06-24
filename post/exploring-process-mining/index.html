@@ -409,17 +409,24 @@
       
 
 
-<p>In this post, we’ll explore the <code>BupaR</code> suite of <em>Process Mining</em> packages created by <em>Gert Janssenswillen</em> from Hasselt University.</p>
+<p>In this post, we’ll explore the <a href="https://www.bupar.net">BupaR</a> suite of <em>Process Mining</em> packages created by <em>Gert Janssenswillen</em> from Hasselt University.</p>
 <p>We start with exploring the <code>patients</code> dataset contained in the <code>eventdataR</code> package. According to the documentation, this is an “Artifical eventlog about patients”.</p>
 <div id="getting-started" class="section level1">
 <h1>Getting started</h1>
 <p>After installing all required packages, we can load the whole “bupaverse” by loading the <code>bupaR</code> package.</p>
 <pre class="r"><code>library(ggplot2)
-library(bupaR)
-#library(eventdataR)
+library(bupaR)</code></pre>
+<p>Now, our dataset is already in <code>eventlog</code> format, but typically this not the case. Here’s how to turn a data.frame into an object of class <code>eventlog</code>:</p>
+<pre class="r"><code>patients &lt;- eventdataR::patients
 
-df &lt;- eventdataR::patients</code></pre>
-<p>The data is already in <code>event log</code> format, let’s check it out.</p>
+df &lt;- eventlog(patients,
+               case_id = &quot;patient&quot;,
+               activity_id = &quot;handling&quot;,
+               activity_instance_id = &quot;handling_id&quot;,
+               lifecycle_id = &quot;registration_type&quot;,
+               timestamp = &quot;time&quot;,
+               resource_id = &quot;employee&quot;)</code></pre>
+<p>Let’s check it out.</p>
 <pre class="r"><code>summary(df)</code></pre>
 <pre><code>## Number of events:  5442
 ## Number of cases:  500
@@ -488,7 +495,7 @@ df &lt;- eventdataR::patients</code></pre>
 <p>The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.</p>
 <p>To visualize all traces, we set <code>coverage</code> to 1.0.</p>
 <pre class="r"><code>df %&gt;% trace_explorer(type = &quot;frequent&quot;, coverage = 1.0)</code></pre>
-<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-4-1.png" width="672" /> So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:</p>
+<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png" width="672" /> So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:</p>
 <ul>
 <li>Cases that get an X-ray</li>
 <li>Cases that get a blood test followed by an MRI scan</li>
@@ -500,12 +507,12 @@ df &lt;- eventdataR::patients</code></pre>
 <p>It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.</p>
 <pre class="r"><code>df %&gt;% dotted_chart(x = &quot;absolute&quot;, sort = &quot;start&quot;) + ggtitle(&quot;All cases&quot;) +
   theme_gray()</code></pre>
-<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>The slope of this graphs learns us the rate of new cases, and if this changes over time. Here it appears constant, with 500 cases divided over five quarter years.</p>
 <p>The second is to align all cases relative to the first event, and sort on duration of the whole sequence of events.</p>
 <pre class="r"><code>df %&gt;% dotted_chart(x = &quot;relative&quot;, sort = &quot;duration&quot;) + ggtitle(&quot;All cases&quot;) +
   theme_gray()</code></pre>
-<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>A nice pattern emerges, where all cases start with registration, then quickly proceed to triage and assessment, after that, a time varying period of 1-10 days follows where either the blood test + MRI scan, or the X-ray is performed, followed by discussing the results. Finally, check out occurs.</p>
 </div>
 <div id="conclusion" class="section level1">

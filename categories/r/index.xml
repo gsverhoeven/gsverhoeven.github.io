@@ -21,7 +21,7 @@
       <description>In this post, we’ll explore the BupaR suite of Process Mining packages created by Gert Janssenswillen from Hasselt University.
 We start with exploring the patients dataset contained in the eventdataR package. According to the documentation, this is an “Artifical eventlog about patients”.
 Getting startedAfter installing all required packages, we can load the whole “bupaverse” by loading the bupaR package.
-library(ggplot2)library(bupaR)#library(eventdataR)df &amp;lt;- eventdataR::patientsThe data is already in event log format, let’s check it out.</description>
+library(ggplot2)library(bupaR)Now, our dataset is already in eventlog format, but typically this not the case.</description>
     </item>
     
     <item>
