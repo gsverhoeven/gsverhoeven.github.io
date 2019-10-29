@@ -18,7 +18,7 @@
       <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
       
       <guid>https://gsverhoeven.github.io/post/simulating-fake-data/</guid>
-      <description>This blog post is on simulating fake data. I’m interested in mimicking real datasets as close as possible. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).
+      <description>This blog post is on simulating fake data. I’m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).
 If we want to mimic an existing dataset, it is desirable to
 Make sure that the simulated variables have the proper data type and comparable distribution of values andcorrelations between the variables in the real dataset are taken into account.</description>
     </item>

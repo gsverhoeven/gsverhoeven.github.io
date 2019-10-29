@@ -541,7 +541,11 @@ knitr::kable(head(Boston))</code></pre>
 <p>This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.</p>
 <p>We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that <code>trainControl</code> likes.</p>
 <pre class="r"><code># internal function from caret package, needed to play nice with resamples()
-prettySeq &lt;- function(x) paste(&quot;Resample&quot;, gsub(&quot; &quot;, &quot;0&quot;, format(seq(along = x))), sep = &quot;&quot;)
+prettySeq &lt;- function(x) {
+  paste(&quot;Resample&quot;, 
+        gsub(&quot; &quot;, &quot;0&quot;, format(seq(along = x))), 
+        sep = &quot;&quot;)
+}
 
 createRandomDataPartition &lt;- function(y, times, p) {
   vec &lt;- 1:length(y)
@@ -557,12 +561,13 @@ createRandomDataPartition &lt;- function(y, times, p) {
   result
 }
 
+set.seed(123)
 createRandomDataPartition(1:10, times = 2, p = 0.5)</code></pre>
 <pre><code>## $Resample1
-## [1] 9 8 6 5 3
+## [1] 3 8 4 7 6
 ## 
 ## $Resample2
-## [1]  5  6  9 10  2</code></pre>
+## [1] 1 5 8 4 3</code></pre>
 </div>
 <div id="the-validation-set-approach-without-caret" class="section level1">
 <h1>The validation set approach without caret</h1>

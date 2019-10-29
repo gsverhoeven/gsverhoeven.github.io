@@ -19,7 +19,7 @@
       <description>
 
 
-&lt;p&gt;This blog post is on simulating fake data. I’m interested in mimicking real datasets as close as possible. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
+&lt;p&gt;This blog post is on simulating fake data. I’m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
 &lt;p&gt;If we want to mimic an existing dataset, it is desirable to&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Make sure that the simulated variables have the proper data type and comparable distribution of values and&lt;/li&gt;
@@ -652,7 +652,11 @@ knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
 &lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
-prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
+prettySeq &amp;lt;- function(x) {
+  paste(&amp;quot;Resample&amp;quot;, 
+        gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), 
+        sep = &amp;quot;&amp;quot;)
+}
 
 createRandomDataPartition &amp;lt;- function(y, times, p) {
   vec &amp;lt;- 1:length(y)
@@ -668,12 +672,13 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
   result
 }
 
+set.seed(123)
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 9 8 6 5 3
+## [1] 3 8 4 7 6
 ## 
 ## $Resample2
-## [1]  5  6  9 10  2&lt;/code&gt;&lt;/pre&gt;
+## [1] 1 5 8 4 3&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -1590,8 +1595,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.158399 
-## R squared (OOB):                  0.6646712&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.19323 
+## R squared (OOB):                  0.6628657&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1681,8 +1686,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.701379 
-## R squared (OOB):                  0.4285917&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.667654 
+## R squared (OOB):                  0.4348382&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1819,8 +1824,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009076323 
-## R squared (OOB):                  0.5307318&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008931521 
+## R squared (OOB):                  0.5338301&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1914,8 +1919,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.00869523 
-## R squared (OOB):                  0.5186381&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008554281 
+## R squared (OOB):                  0.5231199&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
