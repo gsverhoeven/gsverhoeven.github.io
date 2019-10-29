@@ -6,7 +6,7 @@
     <description>Recent content in Gertjan Verhoeven on Gertjan Verhoeven</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>&amp;copy; 2018</copyright>
+    <copyright>&amp;copy; 2019</copyright>
     <lastBuildDate>Sun, 15 Oct 2017 00:00:00 +0200</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
@@ -670,10 +670,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 4 7 3 8 1
+## [1] 9 8 6 5 3
 ## 
 ## $Resample2
-## [1] 9 5 6 8 4&lt;/code&gt;&lt;/pre&gt;
+## [1]  5  6  9 10  2&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -1590,8 +1590,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.212413 
-## R squared (OOB):                  0.662961&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.158399 
+## R squared (OOB):                  0.6646712&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1681,8 +1681,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.61304 
-## R squared (OOB):                  0.4375515&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.701379 
+## R squared (OOB):                  0.4285917&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1819,8 +1819,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009077246 
-## R squared (OOB):                  0.5352309&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009076323 
+## R squared (OOB):                  0.5307318&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1914,8 +1914,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008671849 
-## R squared (OOB):                  0.5245297&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.00869523 
+## R squared (OOB):                  0.5186381&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
