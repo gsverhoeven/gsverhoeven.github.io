@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
-    <lastBuildDate>Thu, 20 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://gsverhoeven.github.io/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Simulating Fake Data in R</title>
+      <link>https://gsverhoeven.github.io/post/simulating-fake-data/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://gsverhoeven.github.io/post/simulating-fake-data/</guid>
+      <description>This blog post is on simulating fake data. I’m interested in mimicking real datasets as close as possible. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).
+If we want to mimic an existing dataset, it is desirable to
+Make sure that the simulated variables have the proper data type and comparable distribution of values andcorrelations between the variables in the real dataset are taken into account.</description>
+    </item>
     
     <item>
       <title>Exploring Process Mining in R</title>
@@ -52,7 +63,7 @@ In practice, one likes to use k-fold Cross validation, or Leave-one-out cross va
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
-      <description>Load packages# library(devtools)#devtools::install_github(&amp;quot;vdorie/dbarts&amp;quot;)library(dbarts)library(ggplot2)library(tidyverse)## -- Attaching packages ----------------------------------------------- tidyverse 1.2.1 --## v tibble 2.0.1 v purrr 0.2.5## v tidyr 0.8.2 v dplyr 0.7.8## v readr 1.3.1 v stringr 1.3.1## v tibble 2.0.1 v forcats 0.3.0## -- Conflicts -------------------------------------------------- tidyverse_conflicts() --## x dplyr::filter() masks stats::filter()## x dplyr::lag() masks stats::lag()library(grf)#devtools::install_github(&amp;quot;vdorie/aciccomp/2017&amp;quot;)library(aciccomp2017)library(cowplot)## ## Attaching package: &amp;#39;cowplot&amp;#39;## The following object is masked from &amp;#39;package:ggplot2&amp;#39;:## ## ggsavesource(&amp;quot;calcPosteriors.</description>
+      <description>Load packages# library(devtools)#devtools::install_github(&amp;quot;vdorie/dbarts&amp;quot;)library(dbarts)library(ggplot2)library(tidyverse)## -- Attaching packages ------------------------------------- tidyverse 1.2.1 --## v tibble 2.0.1 v purrr 0.2.5## v tidyr 0.8.2 v dplyr 0.7.8## v readr 1.3.1 v stringr 1.3.1## v tibble 2.0.1 v forcats 0.3.0## -- Conflicts ---------------------------------------- tidyverse_conflicts() --## x dplyr::filter() masks stats::filter()## x dplyr::lag() masks stats::lag()library(grf)#devtools::install_github(&amp;quot;vdorie/aciccomp/2017&amp;quot;)library(aciccomp2017)library(cowplot)## ## Attaching package: &amp;#39;cowplot&amp;#39;## The following object is masked from &amp;#39;package:ggplot2&amp;#39;:## ## ggsavesource(&amp;quot;calcPosteriors.</description>
     </item>
     
     <item>

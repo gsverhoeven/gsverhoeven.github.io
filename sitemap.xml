@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>https://gsverhoeven.github.io/post/simulating-fake-data/</loc>
+      <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>https://gsverhoeven.github.io/post/exploring-process-mining/</loc>
       <lastmod>2019-06-20T00:00:00+00:00</lastmod>
     </url>
@@ -112,7 +120,7 @@
     <url>
     
       <loc>https://gsverhoeven.github.io/categories/r/</loc>
-      <lastmod>2019-06-20T00:00:00+00:00</lastmod>
+      <lastmod>2019-10-26T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -131,6 +139,15 @@
     
       <loc>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</loc>
       <lastmod>2019-05-11T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</loc>
+      <lastmod>2019-10-26T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     

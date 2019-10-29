@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R, fake data, simulation, copula, tetrachoric correlation on Gertjan Verhoeven</title>
+    <link>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</link>
+    <description>Recent content in R, fake data, simulation, copula, tetrachoric correlation on Gertjan Verhoeven</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2018</copyright>
+    <lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Simulating Fake Data in R</title>
+      <link>https://gsverhoeven.github.io/post/simulating-fake-data/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://gsverhoeven.github.io/post/simulating-fake-data/</guid>
+      <description>This blog post is on simulating fake data. I’m interested in mimicking real datasets as close as possible. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).
+If we want to mimic an existing dataset, it is desirable to
+Make sure that the simulated variables have the proper data type and comparable distribution of values andcorrelations between the variables in the real dataset are taken into account.</description>
+    </item>
+    
+  </channel>
+</rss>

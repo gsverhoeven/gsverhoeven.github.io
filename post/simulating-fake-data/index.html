@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 3.2.0">
+  <meta name="generator" content="Hugo 0.53" />
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+  
+    
+  
+  <meta name="description" content="This blog post is on simulating fake data. I&#39;m interested in mimicking real datasets as close as possible. After reviewing several R packages that can simulate data, I picked the [simstudy](https://www.rdatagen.net/page/simstudy/) package as most promising to explore in more detail.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://gsverhoeven.github.io/post/simulating-fake-data/">
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" crossorigin="anonymous">
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono">
+  
+
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+  
+  
+
+  
+  <link rel="alternate" href="https://gsverhoeven.github.io/index.xml" type="application/rss+xml" title="Gertjan Verhoeven">
+  <link rel="feed" href="https://gsverhoeven.github.io/index.xml" type="application/rss+xml" title="Gertjan Verhoeven">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://gsverhoeven.github.io/post/simulating-fake-data/">
+
+  
+  
+  
+  
+    
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="https://gsverhoeven.github.io/post/simulating-fake-data/">
+  <meta property="og:title" content="Simulating Fake Data in R | Gertjan Verhoeven">
+  <meta property="og:description" content="This blog post is on simulating fake data. I&#39;m interested in mimicking real datasets as close as possible. After reviewing several R packages that can simulate data, I picked the [simstudy](https://www.rdatagen.net/page/simstudy/) package as most promising to explore in more detail."><meta property="og:image" content="https://gsverhoeven.github.io/img/headers/bright-chart-data-210607.jpg">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-10-26T00:00:00&#43;00:00">
+  
+  <meta property="article:modified_time" content="2019-10-26T00:00:00&#43;00:00">
+  
+
+  
+
+  
+
+  <title>Simulating Fake Data in R | Gertjan Verhoeven</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/bright-chart-data-210607.jpg" class="article-banner" itemprop="image" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1 itemprop="name">Simulating Fake Data in R</h1>
+
+  
+
+  
+    
+
+<div class="article-metadata">
+
+  
+  
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Gertjan Verhoeven">
+  </span>
+  
+
+  <span class="article-date">
+    
+    <meta content="2019-10-26 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+    <time datetime="2019-10-26 00:00:00 &#43;0000 UTC" itemprop="dateModified">
+      Oct 26, 2019
+    </time>
+  </span>
+  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Gertjan Verhoeven">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    12 min read
+  </span>
+  
+
+  
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder"></i>
+    
+    <a href="/categories/r/">R</a>
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Simulating%20Fake%20Data%20in%20R&amp;url=https%3a%2f%2fgsverhoeven.github.io%2fpost%2fsimulating-fake-data%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fgsverhoeven.github.io%2fpost%2fsimulating-fake-data%2f"
+         target="_blank" rel="noopener">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fgsverhoeven.github.io%2fpost%2fsimulating-fake-data%2f&amp;title=Simulating%20Fake%20Data%20in%20R"
+         target="_blank" rel="noopener">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fgsverhoeven.github.io%2fpost%2fsimulating-fake-data%2f&amp;title=Simulating%20Fake%20Data%20in%20R"
+         target="_blank" rel="noopener">
+        <i class="fab fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Simulating%20Fake%20Data%20in%20R&amp;body=https%3a%2f%2fgsverhoeven.github.io%2fpost%2fsimulating-fake-data%2f">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+
+<p>This blog post is on simulating fake data. I’m interested in mimicking real datasets as close as possible. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).</p>
+<p>If we want to mimic an existing dataset, it is desirable to</p>
+<ul>
+<li>Make sure that the simulated variables have the proper data type and comparable distribution of values and</li>
+<li>correlations between the variables in the real dataset are taken into account.</li>
+</ul>
+<p>In addition, it would be nice if such functionality is available in a standard R package. After reviewing several R packages that can simulate data, I picked the <a href="https://www.rdatagen.net/page/simstudy/">simstudy</a> package as most promising to explore in more detail. <code>simstudy</code> is created by <strong>Keith Goldfeld</strong> from New York University.</p>
+<p>In this blog post, I explain how <code>simstudy</code> is able to generate correlated variables, having either continuous or binary values. Along the way, we learn about fancy statistical slang such as copula’s and tetrachoric correlations. It turns out there is a close connection with psychometrics, which we’ll briefly discuss.</p>
+<p>Let’s start with correlated continuous variables.</p>
+<pre class="r"><code># Loading required packages
+library(simstudy)
+library(data.table)
+library(ggplot2)</code></pre>
+<div id="copulas-simulating-continuous-correlated-variables" class="section level1">
+<h1>Copulas: Simulating continuous correlated variables</h1>
+<p>Copulas are a fancy word for correlated (“coupled”) variables that each have a uniform distribution between 0 and 1.</p>
+<p>Using copulas, we can convert correlated multivariate normal data to data from any known continuous probability distribution, while keeping exactly the same correlation matrix. The normal data is something we can easily simulate, and by choosing appropriate probability distributions, we can approximate the variables in real datasets.</p>
+<p>Ok let’s do it!</p>
+<div id="step-1-correlated-multivariate-normal-data" class="section level2">
+<h2>Step 1: correlated multivariate normal data</h2>
+<p>The workhorse for our simulated data is a function to simulate multivariate normal data. We’ll use the <code>MASS</code> package function <code>mvrnorm()</code>. Other slightly faster (factor 3-4) implementations exist, see e.g. <code>mvnfast</code>.</p>
+<p>The trick is to first generate multivariate normal data with the required correlation structure, with mean 0 and standard deviation 1. This gives us correlated data, where each variable is marginally (by itself) normal distributed.</p>
+<p>Here I simulate two variables, but the same procedure holds for N variables. The Pearson correlation is set at <code>0.7</code>.</p>
+<pre class="r"><code>set.seed(123)
+
+corr &lt;- 0.7
+
+cov.mat &lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &lt;- data.frame(MASS::mvrnorm(n = 1e4, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))</code></pre>
+<p>(The diagonal of <code>1</code> makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)</p>
+<p>Did it work?</p>
+<pre class="r"><code>ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-3-1.png" width="480" /></p>
+<pre class="r"><code>cor(df$X1, df$X2)</code></pre>
+<pre><code>## [1] 0.6985089</code></pre>
+<p>Great!</p>
+</div>
+<div id="step-2-transform-variables-to-uniform-distribution" class="section level2">
+<h2>Step 2: transform variables to uniform distribution</h2>
+<p>Using the normal cumulative distribution function <code>pnorm()</code>, we can transform our normally distributed variables to have a uniform distribution, while keeping the correlation structure intact!!!!</p>
+<pre class="r"><code>df$X1_U &lt;- pnorm(df$X1)
+df$X2_U &lt;- pnorm(df$X2)
+
+ggplot(df, aes(x = X1_U)) + geom_histogram(boundary = 0)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(df, aes(x = X1_U, y = X2_U)) +
+  geom_point(alpha = 0.3)</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png" width="480" /></p>
+<p>And here’s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!</p>
+<pre class="r"><code>cor(df$X1_U, df$X2_U)</code></pre>
+<pre><code>## [1] 0.677868</code></pre>
+</div>
+<div id="step-3-from-uniform-to-any-standard-probability-distribution-we-like" class="section level2">
+<h2>Step 3: from uniform to any standard probability distribution we like</h2>
+<p>Now, if we plug in uniformly distributed data in a <strong>quantile function</strong> of any arbitrary (known) probability distribution, we can make the variables have any distribution we like.</p>
+<p>Let’s pick for example a <strong>Gamma</strong> distribution (Continuous, positive) with shape 4 and rate 1 for X1, and Let’s pick a <strong>Normal</strong> distribution (Continuous, symmetric) with mean 10 and sd 2 for X2.</p>
+<pre class="r"><code>df$X1_GAM &lt;- qgamma(df$X1_U, shape = 4, rate =1)
+df$X2_NORM &lt;- qnorm(df$X2_U, mean = 10, sd = 2)</code></pre>
+<pre class="r"><code>ggplot(df, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &quot;red&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(df, aes(x = X2_NORM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 10, col = &quot;red&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Ok, that worked nicely. But what about their correlation?</p>
+<pre class="r"><code>cor(df$X1_GAM, df$X2_NORM)</code></pre>
+<pre><code>## [1] 0.682233</code></pre>
+<p>Whoa!! They still have (almost) the same correlation we started out with before all our transformation magic.</p>
+</div>
+</div>
+<div id="simstudy-in-action" class="section level1">
+<h1>Simstudy in action</h1>
+<p>Now let’s see how <code>simstudy</code> helps us generating this type of simulated data. Simstudy works with “definition tables” that allow us to specify, for each variable, which distribution and parameters to use, as well as the desired correlations between the variables.</p>
+<p>After specifing a definition table, we can call one of its workhorse functions <code>genCorFlex()</code> to generate the data.</p>
+<p>N.b. Simstudy uses different parameters for the Gamma distribution, compared to R’s <code>rgamma()</code> function. Under water, it uses the <code>gammaGetShapeRate()</code> to transform the “mean” and “variance/ dispersion” to the more conventional “shape” and “rate” parameters.</p>
+<pre class="r"><code>set.seed(123)
+
+corr &lt;- 0.7
+
+corr.mat &lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+# check that gamma parameters correspond to same shape and rate pars as used above
+#simstudy::gammaGetShapeRate(mean = 4, dispersion = 0.25)
+
+
+def &lt;- defData(varname = &quot;X1_GAM&quot;, 
+               formula = 4, variance = 0.25, dist = &quot;gamma&quot;)
+
+def &lt;- defData(def, varname = &quot;X2_NORM&quot;, 
+               formula = 10, variance = 2, dist = &quot;normal&quot;)
+
+
+
+dt &lt;- genCorFlex(1e4, def, corMatrix = corr.mat)
+
+cor(dt[,-&quot;id&quot;])</code></pre>
+<pre><code>##            X1_GAM   X2_NORM
+## X1_GAM  1.0000000 0.6823006
+## X2_NORM 0.6823006 1.0000000</code></pre>
+<pre class="r"><code>ggplot(dt, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &quot;red&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="generate-correlated-binary-variables" class="section level1">
+<h1>Generate correlated binary variables</h1>
+<p>As it turns out, the copula approach does not work for binary variables. Well, it sort of works, but the correlations we get are lower than we actually specify.</p>
+<p>Come to think of it: two binary variables cannot have all the correlations we like. To see why, check this out.</p>
+<div id="feasible-correlations-for-two-binary-variables" class="section level2">
+<h2>Feasible correlations for two binary variables</h2>
+<p>Let’s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.</p>
+<p>To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1’s, and let’s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:</p>
+<pre class="r"><code># maximal correlation
+x1 &lt;- c(0, 0, 0, 0, 1)
+x2 &lt;- c(0, 1, 1, 1, 1)
+
+mean(x1)</code></pre>
+<pre><code>## [1] 0.2</code></pre>
+<pre class="r"><code>mean(x2)</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<pre class="r"><code>cor(x1, x2)</code></pre>
+<pre><code>## [1] 0.25</code></pre>
+<pre class="r"><code># minimal correlation
+x1 &lt;- c(1, 0, 0, 0, 0)
+x2 &lt;- c(0, 1, 1, 1, 1)
+
+cor(x1, x2)</code></pre>
+<pre><code>## [1] -1</code></pre>
+<p>To get these vectors to be maximally correlated, we need to match <code>1</code>’s in <code>x1</code> as much as possible with <code>1</code>s in <code>x2</code>. To get these vectors to be maximally anti-correlated, we need to match <code>1</code>s in <code>x1</code> with as many <code>0</code>s in <code>x2</code>.</p>
+<p>In this example, we conclude that the feasible correlation range is <code>{-1, 0.25}</code>.</p>
+<p>The <code>simstudy</code> package contains a function to check for feasible boundaries, that contains this piece of code:</p>
+<pre class="r"><code>p1 &lt;- 0.2
+p2 &lt;- 0.8
+
+# lowest correlation
+l &lt;- (p1 * p2)/((1 - p1) * (1 - p2))
+
+max(-sqrt(l), -sqrt(1/l))</code></pre>
+<pre><code>## [1] -1</code></pre>
+<pre class="r"><code># highest correlation
+u &lt;- (p1 * (1 - p2))/(p2 * (1 - p1))
+
+min(sqrt(u), sqrt(1/u))</code></pre>
+<pre><code>## [1] 0.25</code></pre>
+<p>This confirms our example above.</p>
+<p>Note that if we want to mimic a real dataset with binary correlated variables, the correlations are a given, and are obviously all feasible because we obtain them from actual data.</p>
+</div>
+<div id="a-model-for-two-correlated-binary-variables" class="section level2">
+<h2>A model for two correlated binary variables</h2>
+<p>Ok let’s suppose we want a two binary vectors <code>B1</code> and <code>B2</code> , with means <code>p1 = 0.2</code> and <code>p2 = 0.8</code> and (feasible) Pearson correlation 0.1.</p>
+<p>How? How?</p>
+<p>The idea is that to get two binary variables to have an exact particular correlation, we imagine an underlying (“latent”) bivariate (2D) normal distribution. This normal distribution has the means fixed to 0, and the standard deviations fixed to 1.</p>
+<p>Why? Because a) we know it very well theoretically and b) we know how to simulate efficiently from such a distribution, using <code>mvrnorm()</code>.</p>
+<p>In this bivariate normal distribution, we draw a quadrant (i.e. two thresholds). The thresholds define transformations to binary variables. Below the threshold, the binary value is 0, above it is 1. We have to pick the thresholds such that the resulting binary variables have the desired mean (i.e. percentage of 1’s).</p>
+<p>This approach reduces the problem to finding the right values of three parameters: multivariate normal correlation, and the two thresholds (above, we already fixed the means and variance to zero and one respectively).</p>
+<p>For now, we’ll just pick some value for the correlation in the bivariate normal, say 0.5, and focus on where to put the threshholds.</p>
+<pre class="r"><code>set.seed(123)
+
+corr &lt;- 0.5
+
+cov.mat &lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &lt;- data.frame(MASS::mvrnorm(n = 10000, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))</code></pre>
+<p>(The diagonal of <code>1</code> makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)</p>
+<pre class="r"><code>ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png" width="480" /></p>
+<p>Ok, where to put the thresholds? That’s simple, we just need to use the <code>quantile distribution function</code> to partition the marginal normal variables into 0 and 1 portions.</p>
+<pre class="r"><code>df$B1 &lt;- ifelse(df$X1 &lt; qnorm(0.2), 1, 0)
+df$B2 &lt;- ifelse(df$X2 &lt; qnorm(0.8), 1, 0)
+
+mean(df$B1)</code></pre>
+<pre><code>## [1] 0.197</code></pre>
+<pre class="r"><code>mean(df$B2)</code></pre>
+<pre><code>## [1] 0.7988</code></pre>
+<p>Let’s check it out visually:</p>
+<pre class="r"><code>ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3) + 
+  geom_vline(xintercept = qnorm(0.2), col = &quot;red&quot;) +
+  geom_hline(yintercept = qnorm(0.8), col = &quot;red&quot;)</code></pre>
+<p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-19-1.png" width="480" /></p>
+<p>Nice.</p>
+<p>Ok, so now what is the correlation for these two binary variables?</p>
+<pre class="r"><code>cor(df$B1, df$B2)</code></pre>
+<pre><code>## [1] 0.1877482</code></pre>
+<p>Ok, so if X1 and X2 have a correlation of 0.5, this results in a correlation of 0.19 between the binary variables B1 and B2.</p>
+<p>But we need B1 and B2 to have a correlation of 0.1!</p>
+<p>At this point, there is only one free parameter left, the correlation of the normally distributed variables <code>X1</code> and <code>X2</code>.</p>
+<p>We could of course manually try to find which correlation we must choose between <code>X1</code> and <code>X2</code> to get the desired correlation of 0.1 in the binary variables. But that would be very unpractical.</p>
+<p>Fortunately, Emrich and Piedmonte (1991) published an iterative method to solve this puzzle. And this method has been implemented in <code>simstudy</code>.</p>
+<pre class="r"><code>simstudy:::.findRhoBin(p1 = 0.2, 
+                       p2 = 0.8, d = 0.1)</code></pre>
+<pre><code>## [1] 0.2218018</code></pre>
+<p>Let’s see if it works:</p>
+<pre class="r"><code>set.seed(1234)
+
+corr &lt;- 0.2218018
+
+cov.mat &lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &lt;- data.frame(MASS::mvrnorm(n = 1e6, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))
+
+df$B1 &lt;- ifelse(df$X1 &lt; qnorm(0.2), 1, 0)
+df$B2 &lt;- ifelse(df$X2 &lt; qnorm(0.8), 1, 0)
+
+cor(df$B1, df$B2)</code></pre>
+<pre><code>## [1] 0.09957392</code></pre>
+<p>Great!</p>
+</div>
+</div>
+<div id="relation-to-psychometrics" class="section level1">
+<h1>Relation to psychometrics</h1>
+<p>So what has psychometrics to do with all this simulation of correlated binary vector stuff?</p>
+<p>Well, psychometrics is all about theorizing about unobserved, latent, imaginary “constructs”, such as <strong>attitude</strong>, <strong>general intelligence</strong> or a <strong>personality trait</strong>. To measure these constructs, questionnaires are used. The questions are called <strong>items</strong>.</p>
+<p>Now imagine a situation where we are interested in a particular construct, say <strong>general intelligence</strong>, and we design two questions to measure (hope to learn more about) the construct. Furthermore, assume that one question is more difficult than the other question. The answers to both questions can either be wrong or right.</p>
+<p>We can model this by assuming that the (imaginary) variable “intelligence” of each respondent is located on a two-dimensional plane, with the distribution of the respondents determined by a bivariate normal distribution. Dividing this plane into four quadrants then gives us the measurable answers (right or wrong) to both questions. Learning the answers to both questions then gives us an approximate location of a respondent on our “intelligence” plane!</p>
+<div id="phi-tetrachoric-correlation-and-the-psych-package" class="section level2">
+<h2>Phi, tetrachoric correlation and the psych package</h2>
+<p>Officially, the Pearson correlation between two binary vectors is called the <a href="https://en.wikipedia.org/wiki/Phi_coefficient">Phi coefficient</a>. This name was actually chosen by Karl Pearson himself.</p>
+<p>The <strong>psych</strong> packages contains a set of convenient functions for calculating Phi coefficients from empirical two by two tables (of two binary vectors), and finding the corresponding Pearson coefficient for the 2d (latent) normal. This coefficient is called the <strong>tetrachoric correlation</strong>. Again a fine archaic slang word for again a basic concept.</p>
+<pre class="r"><code>library(psych)</code></pre>
+<pre><code>## Warning: package &#39;psych&#39; was built under R version 3.5.3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
+<pre class="r"><code># convert simulated binary vectors B1 and B2 to 2x2 table
+twobytwo &lt;- table(df$B1, df$B2)/nrow(df)
+
+phi(twobytwo, digits = 6)</code></pre>
+<pre><code>## [1] 0.099574</code></pre>
+<pre class="r"><code>cor(df$B1, df$B2)</code></pre>
+<pre><code>## [1] 0.09957392</code></pre>
+<pre class="r"><code># both give the same result</code></pre>
+<p>We can use <strong>phi2tetra</strong> to find the tetrachoric correlation that corresponds to the combination of a “Phi coefficient”, i.e. the correlation between the two binary vectors, as well as their marginals. This is a wrapper that builds the two by two frequency table and then calls <code>tetrachoric()</code> . This in turn uses <code>optimize</code> (Maximum Likelihood method?) to find the tetrachoric correlation.</p>
+<pre class="r"><code>phi2tetra(0.1, c(0.2, 0.8))</code></pre>
+<pre><code>## [1] 0.2217801</code></pre>
+<pre class="r"><code># compare with EP method
+simstudy:::.findRhoBin(0.2, 0.8, 0.1)</code></pre>
+<pre><code>## [1] 0.2218018</code></pre>
+<p>Comparing with the Emrich and Piedmonte method, we find that they give identical answers. Great, case closed!</p>
+</div>
+</div>
+<div id="simstudy-in-action-ii" class="section level1">
+<h1>Simstudy in action II</h1>
+<p>Now that we feel confident in our methods and assumptions, let’s see <code>simstudy</code> in action.</p>
+<p>Let’s generate two binary variables, that have marginals of 20% and 80% respectively, and a Pearson correlation coefficient of 0.1.</p>
+<pre class="r"><code>set.seed(123)
+corr &lt;- 0.1
+
+corr.mat &lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+res &lt;- simstudy::genCorGen(10000, nvars = 2, 
+                 params1 = c(0.2, 0.8),
+                 corMatrix = corr.mat,
+                 dist = &quot;binary&quot;, 
+                 method = &quot;ep&quot;, wide = TRUE)
+
+# let&#39;s check the result
+cor(res[, -c(&quot;id&quot;)])</code></pre>
+<pre><code>##            V1         V2
+## V1 1.00000000 0.09682531
+## V2 0.09682531 1.00000000</code></pre>
+<p>Awesome, it worked!</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Recall, my motivation for simulating fake data with particular variable types and correlation structure is to mimic real datasets.</p>
+<p>So are we there yet? Well, we made some progress. We now can handle correlated continuous data, as well as correlated binary data.</p>
+<p>But we need to solve two more problems:</p>
+<ul>
+<li><p>To simulate a particular dataset, we still need to determine for each variable its data type (binary or continuous), and if it’s continuous, what is the most appropriate probability distribution (Normal, Gamma, Log-normal, etc).</p></li>
+<li><p>we haven’t properly solved correlation between dissimilar data types, e.g. a correlation between a continuous and a binary variable.</p></li>
+</ul>
+<p>Judging from the literature (Amatya &amp; Demirtas 2016) and packages such as <code>SimMultiCorrData</code> by Allison Fialkowski, these are both solved, and I only need to learn about them! So, to be continued.</p>
+</div>
+
+    </div>
+
+    
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/r-fake-data-simulation-copula-tetrachoric-correlation/">R, fake data, simulation, copula, tetrachoric correlation</a>
+  
+</div>
+
+
+
+    
+
+
+
+
+
+
+<div class="media author-card" itemscope itemtype="http://schema.org/Person">
+  
+  <img class="portrait mr-3" src="/img/portrait.jpg" itemprop="image" alt="Avatar">
+  
+  <div class="media-body">
+    <h5 class="card-title" itemprop="name"><a href="/">Gertjan Verhoeven</a></h5>
+    <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+    
+    <ul class="network-icon" aria-hidden="true">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="/#contact" >
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+          <i class="ai ai-google-scholar"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+          <i class="fab fa-github"></i>
+        </a>
+      </li>
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+        
+      
+      <li>
+        <a itemprop="sameAs" href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+          <i class="fab fa-stack-overflow"></i>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<div class="container">
+  <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2018 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+</div>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+        
+      
+
+      
+      
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <script src="/js/academic.min.d037ee5294b166a79dec317c58aea9cc.js"></script>
+
+    
+
+  </body>
+</html>
+
