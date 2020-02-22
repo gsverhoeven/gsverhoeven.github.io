@@ -20,7 +20,14 @@ CalcPosteriorsBART <- function(sim, bartFit, treatname = "z"){
 }
 
 CalcPredictionsGRF <- function(X.test, grf.fit){
-  tau.hat <- predict(grf.fit, X.test, estimate.variance = TRUE)
+  
+  # newdata must have the same number of columns as the training matrix.
+  if(is.data.frame(X.test)){
+    sel_vec <- !(colnames(X.test) %in% c("TAU", "W", "Y"))
+  
+  tau.hat <- predict(grf.fit, X.test[, sel_vec], estimate.variance = TRUE)
+  } else { # X.test is een matrix
+    tau.hat <- predict(grf.fit, X.test, estimate.variance = TRUE)}
   
   sigma.hat <- sqrt(tau.hat$variance.estimates)
   

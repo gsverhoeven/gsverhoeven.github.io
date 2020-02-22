@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Gertjan Verhoeven</title>
+    <title>Tags | Gertjan Verhoeven</title>
     <link>https://gsverhoeven.github.io/tags/</link>
-    <description>Recent content in Tags on Gertjan Verhoeven</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <copyright>&amp;copy; 2019</copyright>
-    <lastBuildDate>Thu, 21 Mar 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://gsverhoeven.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="https://gsverhoeven.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <description>Tags</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Tags</title>
+      <link>https://gsverhoeven.github.io/tags/</link>
+    </image>
     
     <item>
-      <title>R, caret</title>
-      <link>https://gsverhoeven.github.io/tags/r-caret/</link>
-      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://gsverhoeven.github.io/tags/r-caret/</guid>
+      <title>R, fake data, simulation, copula, tetrachoric correlation</title>
+      <link>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>process mining</title>
+      <link>https://gsverhoeven.github.io/tags/process-mining/</link>
+      <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/process-mining/</guid>
       <description></description>
     </item>
     
@@ -25,17 +32,15 @@
       <title>R, causal inference, DAG, causal graph</title>
       <link>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</link>
       <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>R, fake data, simulation, copula, tetrachoric correlation</title>
-      <link>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</link>
-      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</guid>
+      <title>R, caret</title>
+      <link>https://gsverhoeven.github.io/tags/r-caret/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/r-caret/</guid>
       <description></description>
     </item>
     
@@ -43,7 +48,6 @@
       <title>arduino</title>
       <link>https://gsverhoeven.github.io/tags/arduino/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://gsverhoeven.github.io/tags/arduino/</guid>
       <description></description>
     </item>
@@ -52,7 +56,6 @@
       <title>causal inference, BART, grf</title>
       <link>https://gsverhoeven.github.io/tags/causal-inference-bart-grf/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
-      
       <guid>https://gsverhoeven.github.io/tags/causal-inference-bart-grf/</guid>
       <description></description>
     </item>
@@ -61,17 +64,7 @@
       <title>interaction detection, random forest, ranger</title>
       <link>https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/</link>
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
-      
       <guid>https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>process mining</title>
-      <link>https://gsverhoeven.github.io/tags/process-mining/</link>
-      <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://gsverhoeven.github.io/tags/process-mining/</guid>
       <description></description>
     </item>
     

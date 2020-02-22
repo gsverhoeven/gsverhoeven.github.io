@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors | Gertjan Verhoeven</title>
+    <link>https://gsverhoeven.github.io/authors/</link>
+      <atom:link href="https://gsverhoeven.github.io/authors/index.xml" rel="self" type="application/rss+xml" />
+    <description>Authors</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Authors</title>
+      <link>https://gsverhoeven.github.io/authors/</link>
+    </image>
+    
+    <item>
+      <title></title>
+      <link>https://gsverhoeven.github.io/authors/admin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/authors/admin/</guid>
+      <description>&lt;p&gt;I am a research scientist at the Dutch Healthcare Authority, working on health policy and statistical methods.
+I have a background in experimental physics, with a PhD in Biophysics.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

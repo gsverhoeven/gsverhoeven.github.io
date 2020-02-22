@@ -32,7 +32,7 @@ library(grf)
 library(aciccomp2017)
 library(cowplot)
 
-source("calcPosteriors.R")
+source("CalcPosteriors.R")
 
 fullrun <- 0
 ```
@@ -232,7 +232,7 @@ x.test <- model.matrix(~. ,cbind(z = 1 - sim$z, input_2017))
 
 ```{r}
 ## run BART
-fullrun <- 0
+#fullrun <- 0
 if(fullrun){
   set.seed(99)
 
@@ -248,7 +248,7 @@ plot(bartFit)
 This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.
 
 ```{r}
-source("calcPosteriors.R")
+#source("calcPosteriors.R")
 sim <- CalcPosteriorsBART(sim, bartFit, "z")
 
 sim <- sim %>% arrange(alpha)
@@ -297,7 +297,7 @@ X <- model.matrix(~. ,input_2017)
 W = sim$z
 
 # Train a causal forest.
-fullrun <- 0
+#fullrun <- 0
 
 if(fullrun){
   grf.fit_alt <- causal_forest(X, Y, W, num.trees = 500)
@@ -423,7 +423,7 @@ if(fullrun){
 
 ```{r}
 ## PM
-source("CalcPosteriors.R")
+#source("CalcPosteriors.R")
 df_res <- CalcPredictionsGRF(df, tau.forest_big)
 
 grfp <- ggplot(df_res, aes(x = X1, y = qm)) + 
@@ -452,7 +452,7 @@ plot(bartFit)
 ## BART: Check fit and CI's
 
 ```{r}
-source("calcPosteriors.R")
+#source("calcPosteriors.R")
 sim <- CalcPosteriorsBART(df, bartFit, treatname = "W")
 
 
@@ -501,7 +501,8 @@ This is a propensity score.
 
 ```{r}
 if(fullrun){
-  forest.W = regression_forest(X, W, tune.parameters = TRUE, num.trees = 2000)
+  forest.W <- regression_forest(X, W, tune.parameters = c("min.node.size", "honesty.prune.leaves"), 
+                               num.trees = 2000)
   saveRDS(forest.W, "s6.rds")
 } else {forest.W <- readRDS("s6.rds")}
 
@@ -514,7 +515,8 @@ This predict Y from X, ignoring treatment.
 
 ```{r}
 if(fullrun){
-  forest.Y = regression_forest(X, Y, tune.parameters = TRUE, num.trees = 2000)
+  forest.Y = regression_forest(X, Y, tune.parameters = c("min.node.size", "honesty.prune.leaves"), 
+                               num.trees = 2000)
   saveRDS(forest.Y, "s7.rds")
 } else {forest.Y <- readRDS("s7.rds")}
 
@@ -540,7 +542,8 @@ This selects five variables of 20. Indeed these are the variables that were used
 if(fullrun){
 tau.forest2 = causal_forest(X[, selected.vars], Y, W,
                            W.hat = W.hat, Y.hat = Y.hat,
-                           tune.parameters = TRUE, num.trees = 4000)
+                           tune.parameters = c("min.node.size", "honesty.prune.leaves"), 
+                           num.trees = 4000)
   saveRDS(tau.forest2, "s8.rds")
 } else {tau.forest2 <- readRDS("s8.rds")}
 ```
@@ -549,7 +552,7 @@ tau.forest2 = causal_forest(X[, selected.vars], Y, W,
 
 
 ```{r}
-df_sep2 <- CalcPredictionsGRF(df_sep4, tau.forest2)
+df_sep2 <- CalcPredictionsGRF(df_sep4[,selected.vars], tau.forest2)
 
 grfp <- ggplot(df_sep2, aes(x = X3, y = qm))   +
   geom_linerange(aes(ymin = ql, ymax = qu), col = "grey") + geom_point() + 
@@ -577,7 +580,7 @@ plot(bartFit)
 ## BART: Check fit and CI's
 
 ```{r}
-source("calcPosteriors.R")
+#source("calcPosteriors.R")
 sim <- CalcPosteriorsBART(df_sep4, bartFit, treatname = "W")
 
 

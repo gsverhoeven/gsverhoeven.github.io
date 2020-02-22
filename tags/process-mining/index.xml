@@ -1,27 +1,149 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>process mining on Gertjan Verhoeven</title>
+    <title>process mining | Gertjan Verhoeven</title>
     <link>https://gsverhoeven.github.io/tags/process-mining/</link>
-    <description>Recent content in process mining on Gertjan Verhoeven</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <copyright>&amp;copy; 2019</copyright>
-    <lastBuildDate>Thu, 20 Jun 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://gsverhoeven.github.io/tags/process-mining/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="https://gsverhoeven.github.io/tags/process-mining/index.xml" rel="self" type="application/rss+xml" />
+    <description>process mining</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Thu, 20 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>process mining</title>
+      <link>https://gsverhoeven.github.io/tags/process-mining/</link>
+    </image>
     
     <item>
       <title>Exploring Process Mining in R</title>
       <link>https://gsverhoeven.github.io/post/exploring-process-mining/</link>
       <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://gsverhoeven.github.io/post/exploring-process-mining/</guid>
-      <description>In this post, we’ll explore the BupaR suite of Process Mining packages created by Gert Janssenswillen from Hasselt University.
-We start with exploring the patients dataset contained in the eventdataR package. According to the documentation, this is an “Artifical eventlog about patients”.
-Getting startedAfter installing all required packages, we can load the whole “bupaverse” by loading the bupaR package.
-library(ggplot2)library(bupaR)Now, our dataset is already in eventlog format, but typically this not the case.</description>
+      <description>
+
+
+&lt;p&gt;In this post, we’ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
+&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an “Artifical eventlog about patients”.&lt;/p&gt;
+&lt;div id=&#34;getting-started&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;After installing all required packages, we can load the whole “bupaverse” by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+library(bupaR)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;xesreadR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;processmonitR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;petrinetR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(processmapR)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case.
+Here’s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;patients &amp;lt;- eventdataR::patients
+
+df &amp;lt;- eventlog(patients,
+               case_id = &amp;quot;patient&amp;quot;,
+               activity_id = &amp;quot;handling&amp;quot;,
+               activity_instance_id = &amp;quot;handling_id&amp;quot;,
+               lifecycle_id = &amp;quot;registration_type&amp;quot;,
+               timestamp = &amp;quot;time&amp;quot;,
+               resource_id = &amp;quot;employee&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s check it out.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Number of events:  5442
+## Number of cases:  500
+## Number of traces:  7
+## Number of distinct activities:  7
+## Average trace length:  10.884
+## 
+## Start eventlog:  2017-01-02 11:41:53
+## End eventlog:  2018-05-05 07:16:02&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                   handling      patient          employee  handling_id       
+##  Blood test           : 474   Length:5442        r1:1000   Length:5442       
+##  Check-out            : 984   Class :character   r2:1000   Class :character  
+##  Discuss Results      : 990   Mode  :character   r3: 474   Mode  :character  
+##  MRI SCAN             : 472                      r4: 472                     
+##  Registration         :1000                      r5: 522                     
+##  Triage and Assessment:1000                      r6: 990                     
+##  X-Ray                : 522                      r7: 984                     
+##  registration_type      time                         .order    
+##  complete:2721     Min.   :2017-01-02 11:41:53   Min.   :   1  
+##  start   :2721     1st Qu.:2017-05-06 17:15:18   1st Qu.:1361  
+##                    Median :2017-09-08 04:16:50   Median :2722  
+##                    Mean   :2017-09-02 20:52:34   Mean   :2722  
+##                    3rd Qu.:2017-12-22 15:44:11   3rd Qu.:4082  
+##                    Max.   :2018-05-05 07:16:02   Max.   :5442  
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we learn that there are 500 “cases”, i.e. patients. There are 7 different activities.&lt;/p&gt;
+&lt;p&gt;Let’s check out the data for a single patient:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% filter(patient == 1) %&amp;gt;% 
+  arrange(handling_id) #%&amp;gt;% &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Log of 12 events consisting of:
+## 1 trace 
+## 1 case 
+## 6 instances of 6 activities 
+## 6 resources 
+## Events occurred from 2017-01-02 11:41:53 until 2017-01-09 19:45:45 
+##  
+## Variables were mapped as follows:
+## Case identifier:     patient 
+## Activity identifier:     handling 
+## Resource identifier:     employee 
+## Activity instance identifier:    handling_id 
+## Timestamp:           time 
+## Lifecycle transition:        registration_type 
+## 
+## # A tibble: 12 x 7
+##    handling patient employee handling_id registration_ty… time               
+##    &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;   &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;       &amp;lt;fct&amp;gt;            &amp;lt;dttm&amp;gt;             
+##  1 Registr… 1       r1       1           start            2017-01-02 11:41:53
+##  2 Registr… 1       r1       1           complete         2017-01-02 12:40:20
+##  3 Blood t… 1       r3       1001        start            2017-01-05 08:59:04
+##  4 Blood t… 1       r3       1001        complete         2017-01-05 14:34:27
+##  5 MRI SCAN 1       r4       1238        start            2017-01-05 21:37:12
+##  6 MRI SCAN 1       r4       1238        complete         2017-01-06 01:54:23
+##  7 Discuss… 1       r6       1735        start            2017-01-07 07:57:49
+##  8 Discuss… 1       r6       1735        complete         2017-01-07 10:18:08
+##  9 Check-o… 1       r7       2230        start            2017-01-09 17:09:43
+## 10 Check-o… 1       r7       2230        complete         2017-01-09 19:45:45
+## 11 Triage … 1       r2       501         start            2017-01-02 12:40:20
+## 12 Triage … 1       r2       501         complete         2017-01-02 22:32:25
+## # … with 1 more variable: .order &amp;lt;int&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt; # select(handling, handling_id, registration_type) # does not work&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We learn that each “handling” has a separate start and complete timestamp.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;traces&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Traces&lt;/h1&gt;
+&lt;p&gt;The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.&lt;/p&gt;
+&lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% processmapR::trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;
+So there are a few traces (0.6%) that do not end with a check-out.
+Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cases that get an X-ray&lt;/li&gt;
+&lt;li&gt;Cases that get a blood test followed by an MRI scan&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-dotted-chart&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The dotted chart&lt;/h1&gt;
+&lt;p&gt;A really powerful visualization in process mining comes in the form of a “dotted chart”. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
+&lt;p&gt;It has two nice use cases.
+The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The slope of this graphs learns us the rate of new cases, and if this changes over time. Here it appears constant, with 500 cases divided over five quarter years.&lt;/p&gt;
+&lt;p&gt;The second is to align all cases relative to the first event, and sort on duration of the whole sequence of events.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;relative&amp;quot;, sort = &amp;quot;duration&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;A nice pattern emerges, where all cases start with registration, then quickly proceed to triage and assessment, after that, a time varying period of 1-10 days follows where either the blood test + MRI scan, or the X-ray is performed, followed by discussing the results. Finally, check out occurs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;To conclude, the process mining approach to analyze time series event data appears highly promising. The dotted chart is a great addition to my data visualization repertoire, and the process mining folks appear to have at lot more goodies, such as Trace Alignment.&lt;/p&gt;
+&lt;/div&gt;
+</description>
     </item>
     
   </channel>

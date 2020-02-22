@@ -52,11 +52,7 @@ We let it generate partitions in  the format that `trainControl` likes.
 
 ```{r}
 # internal function from caret package, needed to play nice with resamples()
-prettySeq <- function(x) {
-  paste("Resample", 
-        gsub(" ", "0", format(seq(along = x))), 
-        sep = "")
-}
+prettySeq <- function(x) paste("Resample", gsub(" ", "0", format(seq(along = x))), sep = "")
 
 createRandomDataPartition <- function(y, times, p) {
   vec <- 1:length(y)
@@ -72,7 +68,6 @@ createRandomDataPartition <- function(y, times, p) {
   result
 }
 
-set.seed(123)
 createRandomDataPartition(1:10, times = 2, p = 0.5)
 ```
 # The validation set approach without caret
