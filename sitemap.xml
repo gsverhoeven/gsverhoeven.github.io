@@ -3,23 +3,38 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</loc>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://gsverhoeven.github.io/categories/</loc>
-    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://gsverhoeven.github.io/</loc>
-    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://gsverhoeven.github.io/post/</loc>
-    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://gsverhoeven.github.io/categories/r/</loc>
-    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/</loc>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/tensorflow-keras-neural-networks/</loc>
+    <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -29,11 +44,6 @@
   
   <url>
     <loc>https://gsverhoeven.github.io/post/simulating-fake-data/</loc>
-    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://gsverhoeven.github.io/tags/</loc>
     <lastmod>2019-10-26T00:00:00+00:00</lastmod>
   </url>
   

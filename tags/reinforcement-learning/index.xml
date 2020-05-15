@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>reinforcement learning | Gertjan Verhoeven</title>
+    <link>/tags/reinforcement-learning/</link>
+      <atom:link href="/tags/reinforcement-learning/index.xml" rel="self" type="application/rss+xml" />
+    <description>reinforcement learning</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Tue, 16 Apr 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>reinforcement learning</title>
+      <link>/tags/reinforcement-learning/</link>
+    </image>
+    
+    <item>
+      <title>Reinforcement learning</title>
+      <link>/post/reinforcement-learning/</link>
+      <pubDate>Tue, 16 Apr 2019 00:00:00 +0000</pubDate>
+      <guid>/post/reinforcement-learning/</guid>
+      <description>
+
+
+&lt;p&gt;So recently I’ve been doing a lot of reading on reinforcement learning and watching David Silver’s Introduction to Reinforcement Learning video series, which by the way are phenomenal and I highly recommend them!&lt;/p&gt;
+&lt;p&gt;Our goal is to use reinforcement learning to play the game Mancala.
+Mancala is a game with perfect information, i.e. there is no information that is private to one of the two players, or unknown to both.&lt;/p&gt;
+&lt;div id=&#34;a-random-agent&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A random agent&lt;/h1&gt;
+&lt;/div&gt;
+&lt;div id=&#34;maximizing-agent&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Maximizing agent&lt;/h1&gt;
+&lt;p&gt;THis agent picks the action that maximizes the current turn.
+This is called an expert agent (i.e. expert system) since it is rule-based.&lt;/p&gt;
+&lt;p&gt;A classic example of a rule-based system is the domain-specific expert system that uses rules to make deductions or choices. For example, an expert system might help a doctor choose the correct diagnosis based on a cluster of symptoms, or select tactical moves to play a game. This approach to AI became feasible in the 1970s.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;q-learning-1992&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Q-learning (1992)&lt;/h1&gt;
+&lt;p&gt;The R package ReinforcementLearning implements the Q-learning algorithm.
+One of the most important breakthroughs in reinforcement learning was the development of an off-policy TD (Temporal difference) control algorithm known as Q-learning (Watkins, 1989).&lt;/p&gt;
+&lt;p&gt;(from the paper of the package):
+As opposed to a model-based approach, Q-learning has no explicit knowledge of either the reward function or the state transition function. Alternatives are, for instance, SARSA or temporal-difference (TD) learning, but these are less common
+in practice nowadays.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;load-training-data-experience-sample&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Load training data (experience sample)&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(&amp;quot;tictactoe&amp;quot;)
+
+# 18% of moves gives reward -1 or 1
+mean(abs(tictactoe$Reward))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1760388&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Define reinforcement learning parameters
+control &amp;lt;- list(alpha = 0.2, gamma = 0.4, epsilon = 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This takes a minute or two. It uses only one core.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Perform reinforcement learning
+model &amp;lt;- ReinforcementLearning(tictactoe, s = &amp;quot;State&amp;quot;, a = &amp;quot;Action&amp;quot;, r = &amp;quot;Reward&amp;quot;, 
+                               s_new = &amp;quot;NextState&amp;quot;, iter = 1, control = control)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Print optimal policy
+#policy(model)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;problems-with-q-learning&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Problems with Q-learning&lt;/h1&gt;
+&lt;p&gt;It works with a table of all state-action combinations.&lt;/p&gt;
+&lt;p&gt;We need NN to learn a continous state-action function representation.&lt;/p&gt;
+&lt;p&gt;This requires a switch towards python.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;deep-q-learning&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Deep Q learning&lt;/h1&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a3c-learning&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A3C learning&lt;/h1&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

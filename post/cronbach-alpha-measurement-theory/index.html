@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Working for the first time with questionnaire data, I felt i needed some basic understanding of measurement theory, and the various approaches regarding reliability and validity of questionnaires.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/cronbach-alpha-measurement-theory/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/cronbach-alpha-measurement-theory/">
+
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="/post/cronbach-alpha-measurement-theory/">
+  <meta property="og:title" content="Open source psychometrics: The IPIP Big Five questionnaire | Gertjan Verhoeven">
+  <meta property="og:description" content="Working for the first time with questionnaire data, I felt i needed some basic understanding of measurement theory, and the various approaches regarding reliability and validity of questionnaires."><meta property="og:image" content="/img/headers/ceiling-clean-clinic-247786.jpg">
+  <meta property="twitter:image" content="/img/headers/ceiling-clean-clinic-247786.jpg"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2019-06-20T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2019-06-20T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/cronbach-alpha-measurement-theory/"
+  },
+  "headline": "Open source psychometrics: The IPIP Big Five questionnaire",
+  
+  "datePublished": "2019-06-20T00:00:00Z",
+  "dateModified": "2019-06-20T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Gertjan Verhoeven"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gertjan Verhoeven",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "Working for the first time with questionnaire data, I felt i needed some basic understanding of measurement theory, and the various approaches regarding reliability and validity of questionnaires."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Open source psychometrics: The IPIP Big Five questionnaire | Gertjan Verhoeven</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/ceiling-clean-clinic-247786.jpg" class="article-banner" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Open source psychometrics: The IPIP Big Five questionnaire</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Jun 20, 2019
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    18 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/categories/r/">R</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+<!-- https://www.personality-project.org/r/book/Chapter7.pdf -->
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>Working for the first time with questionnaire data, I felt i needed some basic understanding of measurement theory, and the various approaches regarding reliability and validity of questionnaires.</p>
+<p>The big five personality traits are the best accepted and most commonly used model of personality in academic psychology. If you take a college course in personality psychology, this is what you will learn about.</p>
+</div>
+<div id="measurement-theories" class="section level1">
+<h1>Measurement Theories</h1>
+<p>Measurement theories concern themselves with the question: What does it mean to “measure” something? What types of measurement exist? And what statistical analysises are appropropriate for different types of measurement? According to a recent paper by Matt Williams, at least four measurement theories exist.
+There also exists a book by <strong>Denny Borsboom</strong> and <strong>Keith Markus</strong>, called “Frontiers of Test Validity Theory: Measurement, Causation, and Meaning”, which contains an extended review of the various measurement theories, and their implications for pyschological measurement. Another book on the same topic is “Measuring the mind” by <strong>Denny Borsboom</strong>. Borsboom has been influenced by <strong>Joel Michell</strong>, who wrote a book in 1995 on the topic, and was reviewed by my hero Cosma Shalizi! <a href="http://bactra.org/reviews/michell-measurement.html" class="uri">http://bactra.org/reviews/michell-measurement.html</a></p>
+<ul>
+<li>Classical test theory (Operationalism, is operationalist, prescribes many items to reduce random error)</li>
+<li>Latent variable theory (where do the scores come from, hypothesis, substantive theory that can be falsified, realist theory of science)</li>
+<li>Representationalism (constructivist / restricted, “the scale” )</li>
+</ul>
+</div>
+<div id="measuring-the-mind" class="section level1">
+<h1>Measuring the mind</h1>
+<p>Difference between measurement theories and scientific theories.
+Scientific theory we can use experiments to make progress.
+Measurement theory we only have “plausible” of “absurd” consequences.
+Conceptual, theory of science.
+CTT defective philosophical foundations.</p>
+</div>
+<div id="representationalism" class="section level1">
+<h1>Representationalism</h1>
+<p>Representationalism is associated with the analysis of Stevens (1946), that resulted in the famous taxonomy of measurement <em>scales</em> (nominal, ordinal, interval, and ratio), and from these scales, what type of statistical analysis is appropriate.</p>
+<p>Williams explains <em>Representationalism</em> with an example, using a well-known scale of <em>Rock hardness</em>, the Mohs scale (<a href="https://en.wikipedia.org/wiki/Mohs_scale_of_mineral_hardness" class="uri">https://en.wikipedia.org/wiki/Mohs_scale_of_mineral_hardness</a>).
+Rocks exist, and we can measure a relationship between them, i.e. whether rocks can scratch each other.
+If a piece of unknown rock can be scratched by diamond, but not by Quartz, it’s hardness must be somewhere inbetween. It is thus a purely ordinal scale.</p>
+<p>So what statistical analyses are appropriate on ordinal data? Stevens reasons that we can change the numbers on a purely ordinal scale without changing the order. We could transform a set of numbers {1,2,3,4} into {1, 5, 20, 396} and the order would still hold. However, some statistical procedures give different answers (i.e. a Pearson correlation), and therefore are not appropriate for an ordinal scale. Another example of an ordinal scale is the Likert scale.</p>
+<p><em>Operationalism</em> avoids assumptions by defining what we have measured by the operation we performed to measure it. So if we use a particular psychometric test, say the “Revised NEO Personality Inventory” (NEO-PI-R), to measure personality of a subject, if we subsequently talk about the subject’s personality, we mean nothing more than the score as measured with the NEO-PI-R.</p>
+<p>This has several consequences that make this measurement theory not very useful. It means that we cannot compare tests, even if they purport to measure the same thing. There is also no concept of measurement error, because there is no underlying “true attribute” to measure with error.</p>
+<p>Then we have the <em>classical theory of measurement</em>. The classical theory of measurement should not be confused with classical test theory (a.k.a. true score theory). CTM is about concatenation, and requires a realist stance on the existence of attributes. This measurement theory also brings us trouble for psychometric tests, because it follows that there must exist some “unit” of personality, that allows us to compare “levels” of personality between subjects.</p>
+<p>From Wikipedia:
+&gt;Psychological attributes, like temperature, are considered to be intensive as no way of concatenating such
+&gt;attributes has been found. But this is not to say that such attributes are not quantifiable. The theory of
+&gt;conjoint measurement provides a theoretical means of doing this.</p>
+<p>PM apgar score.</p>
+</div>
+<div id="latent-variable-theory" class="section level1">
+<h1>Latent variable theory</h1>
+<p>This leaves us with <em>latent variable theory</em>. It appears that this is what all current/modern/standard psychometrics is about. For example, the starting sentence on measurement on the “personality-project.org” website by Prof. William Revelle states:</p>
+<blockquote>
+<p>All scientific theories require measurement of the constructs underlying the field.</p>
+</blockquote>
+<p>My impression: Both Classical Test Theory and Item response theory fall under the umbrella of latent variable theory. They vary in the amount and type of assumptions made.</p>
+<p>Unfortunately, with rare exceptions, we normally are faced with just one test, not two, three or four. How then to estimate the reliability of that one test?</p>
+<p>It has been proposed that α {} can be viewed as the expected correlation of two tests that measure the same construct. By using this definition, it is implicitly assumed that the average correlation of a set of items is an accurate estimate of the average correlation of all items that pertain to a certain construct.</p>
+<p>The term item is used throughout this article, but items could be anything—questions, raters, indicators- for all of which, one might ask, to what extent they “measure the same thing.” Items that are manipulated are commonly referred to as variables.</p>
+</div>
+<div id="revelle" class="section level1">
+<h1>Revelle:</h1>
+<p>Although defined in terms of the correlation of a test with a test just like it, reliability can be estimated by the characteristics of the items <em>within the test</em>. The desire for an easy to use “magic bullet” based upon the <em>domain sampling model</em> has led to a number of solutions for estimating the reliability of a test based upon characteristics of the covariances of the items. All of these estimates are based upon <em>classical test theory</em> and assume that the covariances between items represents true covariance, but that the variances of the items reflect an unknown sum of true and unique variance.</p>
+<p>A <em>tau-equivalent</em> measurement model is a special case of a <em>congeneric</em> measurement model, hereby assuming all factor loadings to be the same.</p>
+<p>The most important difference between CTT and IRT is that in CTT, one uses a common estimate of the measurement precision that is assumed to be equal for all individuals irrespective of their attribute levels. In IRT, however, the measurement precision depends on the latent-attribute value. This can result in differences between CTT and IRT with respect to their conclusions about statistical significance of change.</p>
+<p>Cho 2016: This study proves that various reliability coefficients are generated from measurement
+models nested within the bi-factor measurement model.</p>
+</div>
+<div id="measurement-models" class="section level1">
+<h1>Measurement models</h1>
+<p>Before proceeding with the discussion, let us explain the measurement models used in this study
+starting from unidimensional models (i.e. models that have a single latent variable).</p>
+<ul>
+<li>unidimensional parallel</li>
+<li>tau-equivalent</li>
+<li>congeneric</li>
+</ul>
+<pre class="r"><code>library(ggraph)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code>library(tidygraph)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;tidygraph&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre class="r"><code>param_nodes &lt;- data.frame(name = c(&quot;Item 1&quot;, &quot;Item 2&quot;, &quot;Item 3&quot;, &quot;Intelligence&quot;))
+
+param_nodes$latent &lt;- c(F, F, F, T)
+
+param_nodes$x &lt;- c(0, 0, 0, 1)
+
+param_nodes$y &lt;- c(0, 1, 2, 1)
+
+param_nodes$hjust &lt;- c(1, 1, 1, 0)
+
+param_edges &lt;- data.frame(from = c( 4, 4, 4), 
+                            to = c( 1, 2, 3))
+
+param_graph &lt;- tidygraph::tbl_graph(param_nodes, param_edges)</code></pre>
+<pre class="r"><code>ggraph(param_graph, 
+       layout = &quot;manual&quot;, x = param_nodes$x, y = param_nodes$y) +
+    # Observed Nodes
+    geom_node_point(aes(filter = !latent),
+                    shape = 0, 
+                    size = 3, 
+                    col = &quot;black&quot;) +
+    geom_node_point(aes(filter = latent), 
+                    shape = 1, 
+                    size = 4, 
+                    color = &quot;black&quot;) +
+    # Regression Paths (and text)
+    geom_edge_link(alpha = 1,
+                   linetype = 1, 
+                   angle_calc = &quot;along&quot;,
+                   start_cap = circle(1.5, &#39;mm&#39;),
+                   end_cap = circle(1, &#39;mm&#39;),
+                   arrow = arrow(angle = 45, 
+                                 length = unit(2, &quot;mm&quot;), 
+                                 type = &quot;closed&quot;,
+                                 ends = &quot;last&quot;)
+                   ) +
+    # Node names
+    geom_node_text(aes(label = name, hjust = hjust), size = 3) +
+  ggtitle(&#39;An example&#39;) +
+    theme_graph()</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-2-1.png" width="480" /></p>
+<pre class="r"><code> #theme_graph( plot_margin = margin(6, 6, 6, 6))</code></pre>
+<p>For example, an <em>essentially tau-equivalent model</em> includes a constant, whereas a strictly tau-equivalent model does not. Although the addition of a constant has an effect on the mean, it does not affect the
+variances, covariances or the value of reliability.</p>
+<p>To determine the scale, the variance of the latent variable is set to 1.</p>
+<ul>
+<li>The congeneric model does not have additional constraints.</li>
+<li>The tau-equivalent model is the same as the congeneric model, only with the constraint that all the factor loadings are equal, but allows the error variances to vary from item to item.</li>
+<li>The parallel model is the tau-equivalent model with the constraint that the error variances are all equal.</li>
+</ul>
+</div>
+<div id="cronbachs-alpha" class="section level1">
+<h1>Cronbach’s alpha</h1>
+</div>
+<div id="calculate-cronbachs-alpha-for-subgroup-a" class="section level1">
+<h1>Calculate Cronbach’s Alpha for subgroup A</h1>
+<p><a href="https://rameliaz.github.io/mg-sem-workshop/cho2016.pdf" class="uri">https://rameliaz.github.io/mg-sem-workshop/cho2016.pdf</a></p>
+<p>Classical Test Theory (CTT) considers four or more tests to be congenerically equivalent if all tests may be expressed in terms of one factor and a residual error. (N.b. we need at least four tests to identify all free parameters of the model).</p>
+<ul>
+<li><p>Parallel tests are the special case where (usually two) tests have equal factor loadings.</p></li>
+<li><p>Tau equivalent tests have equal factor loadings but may have unequal errors.</p></li>
+<li><p>Congeneric tests may differ in both factor loading and error variances.</p></li>
+</ul>
+<pre class="r"><code>library(ggplot2)
+library(psych)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
+<pre class="r"><code>set.seed(42) #keep the same starting values
+#four congeneric measures
+
+loadings &lt;- rep(1, 4)
+loadings &lt;- c(0.8, 0.7, 0.6, 0.5)
+
+errors &lt;- c(0.8, 0.7, 0.6, 0.5)
+
+errors &lt;- sqrt(1 - loadings^2)
+errors &lt;- rep(0.1, 4)
+
+r4 &lt;- psych::sim.congeneric(loads = loadings,
+                            err = errors, #A vector of error variances 
+                            low = -3, # values less than low are forced to low (when cat = T)
+                            high = 3, # values greater than high are forced to high
+                            short = FALSE, 
+                            categorical = FALSE,
+                            N = 10000)</code></pre>
+<p>Now we have less noise on the item with the lower factor loadings.
+<span class="math inline">\(\theta\)</span> is the (common) latent variable.</p>
+<pre class="r"><code>my.df &lt;- data.frame(r4$latent, r4$observed)
+
+# Check factor loadings
+fit1 &lt;- lm(V1 ~ theta, data = my.df)
+fit2 &lt;- lm(V2 ~ theta, data = my.df)
+fit3 &lt;- lm(V3 ~ theta, data = my.df)
+fit4 &lt;- lm(V4 ~ theta, data = my.df)
+
+sd(fit1$residuals)</code></pre>
+<pre><code>## [1] 0.1007705</code></pre>
+<pre class="r"><code>sd(fit2$residuals)</code></pre>
+<pre><code>## [1] 0.1013989</code></pre>
+<pre class="r"><code>sd(fit3$residuals)</code></pre>
+<pre><code>## [1] 0.1008644</code></pre>
+<pre class="r"><code>sd(fit4$residuals)</code></pre>
+<pre><code>## [1] 0.09897803</code></pre>
+<pre class="r"><code>errors &lt;- my.df[, colnames(my.df) %in% c(&quot;e1&quot;, &quot;e2&quot;, &quot;e3&quot;, &quot;e4&quot;)]
+
+cor(errors)</code></pre>
+<pre><code>##              e1           e2           e3           e4
+## e1  1.000000000  0.010432462  0.002030510 -0.006050927
+## e2  0.010432462  1.000000000 -0.008618315 -0.027381449
+## e3  0.002030510 -0.008618315  1.000000000 -0.005340683
+## e4 -0.006050927 -0.027381449 -0.005340683  1.000000000</code></pre>
+<pre class="r"><code># errors are uncorrelated with each other
+cov(errors)</code></pre>
+<pre><code>##              e1          e2           e3           e4
+## e1  1.015522554  0.01066020  0.002063898 -0.006035393
+## e2  0.010660197  1.02817565 -0.008814430 -0.027480772
+## e3  0.002063898 -0.00881443  1.017364269 -0.005331801
+## e4 -0.006035393 -0.02748077 -0.005331801  0.979665221</code></pre>
+<pre class="r"><code>var(my.df$e1)</code></pre>
+<pre><code>## [1] 1.015523</code></pre>
+<pre class="r"><code>var(my.df$theta)</code></pre>
+<pre><code>## [1] 1.012307</code></pre>
+<p>Ok, let’s have it. The cronbach alpha.</p>
+<pre class="r"><code># r4 population correlation matrix
+psych::alpha(r4$observed)</code></pre>
+<pre><code>## 
+## Reliability analysis   
+## Call: psych::alpha(x = r4$observed)
+## 
+##   raw_alpha std.alpha G6(smc) average_r S/N     ase    mean   sd median_r
+##       0.98      0.99    0.99      0.97 154 0.00013 -0.0074 0.66     0.97
+## 
+##  lower alpha upper     95% confidence boundaries
+## 0.98 0.98 0.98 
+## 
+##  Reliability if an item is dropped:
+##    raw_alpha std.alpha G6(smc) average_r S/N alpha se   var.r med.r
+## V1      0.98      0.99    0.99      0.97 102  0.00021 1.9e-05  0.97
+## V2      0.97      0.99    0.99      0.97 109  0.00023 3.1e-05  0.97
+## V3      0.98      0.99    0.99      0.98 119  0.00021 3.8e-05  0.97
+## V4      0.99      0.99    0.99      0.98 140  0.00015 9.8e-06  0.98
+## 
+##  Item statistics 
+##        n raw.r std.r r.cor r.drop    mean   sd
+## V1 10000  0.99  0.99  0.99   0.99 -0.0090 0.81
+## V2 10000  0.99  0.99  0.99   0.99 -0.0071 0.71
+## V3 10000  0.99  0.99  0.99   0.98 -0.0070 0.61
+## V4 10000  0.99  0.99  0.98   0.98 -0.0066 0.51</code></pre>
+<p>Check with ground truth:</p>
+<pre class="r"><code># calculate total score
+my.df$sumV &lt;- with(my.df, V1+V2+V3+V4)
+
+my.df$sumE &lt;- with(my.df, e1+e2+e3+e4)
+
+plot(my.df$sumV, my.df$theta)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># raw alpha
+(1-sum(diag(cov(r4$observed)))/var(my.df$sumV))*4/3</code></pre>
+<pre><code>## [1] 0.984329</code></pre>
+<pre class="r"><code>cov(r4$observed)</code></pre>
+<pre><code>##           V1        V2        V3        V4
+## V1 0.6568506 0.5665898 0.4855468 0.4045279
+## V2 0.5665898 0.5065013 0.4252159 0.3541304
+## V3 0.4855468 0.4252159 0.3746968 0.3037033
+## V4 0.4045279 0.3541304 0.3037033 0.2629166</code></pre>
+<p>And why does this measure “reliability” of a test?</p>
+<p>The resulting α coefficient of reliability ranges from 0 to 1 in providing this overall assessment of a measure’s reliability. If all of the scale items are entirely independent from one another (i.e., are not correlated or share no covariance), then α = 0; and, if all of the items have high covariances, then α will approach 1 as the number of items in the scale approaches infinity.</p>
+<p>Cronbach’s α {} assumes that all factor loadings are equal. In reality this is rarely the case, and hence it systematically underestimates the reliability. An alternative to Cronbach’s α {} that does not rely on this assumption is congeneric reliability ( ρ C {<em>{C}} </em>{C})</p>
+</div>
+<div id="two-independent-orthogonal-factors" class="section level1">
+<h1>Two independent (orthogonal) factors</h1>
+<pre class="r"><code># examples of two independent factors that produce reasonable alphas
+#this is a case where alpha is a poor indicator of unidimensionality
+set.seed(123)
+two.f &lt;- data.frame(sim.item(nvar = 8,
+                             nsub = 10000))
+
+with(two.f, plot(V1, V3))</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>#sim.item(nvar = 72, nsub = 500, circum = FALSE, xloading = 0.6, yloading = 0.6, 
+# gloading = 0, xbias = 0, ybias = 0, categorical = FALSE, low = -3, high = 3, 
+# truncate = FALSE, cutpoint = 0)
+
+#specify which items to reverse key by name
+alpha(two.f, keys = c(&quot;V1&quot;,&quot;V2&quot;,&quot;V7&quot;,&quot;V8&quot;))</code></pre>
+<pre><code>## 
+## Reliability analysis   
+## Call: alpha(x = two.f, keys = c(&quot;V1&quot;, &quot;V2&quot;, &quot;V7&quot;, &quot;V8&quot;))
+## 
+##   raw_alpha std.alpha G6(smc) average_r S/N    ase  mean   sd median_r
+##        0.6       0.6    0.63      0.16 1.5 0.0062 0.053 0.51    0.017
+## 
+##  lower alpha upper     95% confidence boundaries
+## 0.58 0.6 0.61 
+## 
+##  Reliability if an item is dropped:
+##     raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
+## V1-      0.56      0.56    0.59      0.15 1.3   0.0068 0.032 0.019
+## V2-      0.57      0.57    0.59      0.16 1.3   0.0068 0.031 0.019
+## V3       0.56      0.56    0.59      0.16 1.3   0.0068 0.032 0.019
+## V4       0.56      0.56    0.59      0.16 1.3   0.0068 0.033 0.014
+## V5       0.56      0.56    0.59      0.15 1.3   0.0068 0.033 0.013
+## V6       0.56      0.56    0.59      0.16 1.3   0.0068 0.032 0.019
+## V7-      0.56      0.56    0.59      0.15 1.3   0.0068 0.033 0.014
+## V8-      0.57      0.57    0.60      0.16 1.3   0.0067 0.032 0.019
+## 
+##  Item statistics 
+##         n raw.r std.r r.cor r.drop    mean   sd
+## V1- 10000  0.52  0.52  0.42   0.31  0.1112 1.00
+## V2- 10000  0.51  0.50  0.40   0.29  0.0949 1.00
+## V3  10000  0.51  0.51  0.40   0.29  0.0048 1.01
+## V4  10000  0.51  0.51  0.40   0.30 -0.0029 0.99
+## V5  10000  0.52  0.52  0.41   0.30  0.0104 1.00
+## V6  10000  0.51  0.51  0.41   0.30  0.0143 1.00
+## V7- 10000  0.51  0.52  0.41   0.30  0.1067 0.99
+## V8- 10000  0.50  0.50  0.38   0.28  0.0837 1.01</code></pre>
+</div>
+<div id="intermezzo-scientific-progress-vs-proprietary-instruments" class="section level1">
+<h1>Intermezzo: Scientific progress vs proprietary instruments</h1>
+<p>Something that always puzzled me is that psychometric research often makes use of non-free measurement instruments (questionnaires), with access controlled by test publishers. How can science progress optimally when such barriers to reproducibility exist? It appears I am not alone in this viewpoint.</p>
+<p>Exactly because of this reason, the <em>International Personality Item Pool</em> was created.</p>
+<p>From <a href="https://ipip.ori.org/newRationale.htm" class="uri">https://ipip.ori.org/newRationale.htm</a>:</p>
+<blockquote>
+<p>On the other hand, most broad-bandwidth personality inventories (like the MMPI, CPI, 16PF, and NEO-PI) are &gt; proprietary instruments, whose items are copyrighted by the test authors. As a consequence, the
+instruments cannot be used freely by other scientists, who thus cannot contribute to their further
+development and refinement. Indeed, broad-bandwidth inventories are rarely revised. At most, after many
+decades of commercial use, some of the most dated items might be changed and/or new norms established. For
+many inventories, nothing is ever done at all.</p>
+</blockquote>
+<p>And from Goldberg 2006:</p>
+<blockquote>
+<p>In regard to personality-trait measurement however, Goldberg (1999a) attributed the seeming lack of
+progress in part to the policies and practices of commercial inventory publishers who could regard certain
+scientific activities as detrimental to their pecuniary interests (an issue also raised by Eber,2005).
+There are at least four kinds of scientific activities that are disallowed or discouraged by test
+publishers […]</p>
+</blockquote>
+</div>
+<div id="application-big-five-personality-tests" class="section level1">
+<h1>Application: Big Five personality tests</h1>
+<p>We use a Big Five personality traits dataset. It has 50 items and was developed by Goldberg (1992).</p>
+<p><a href="https://ipip.ori.org/newBigFive5broadTable.htm" class="uri">https://ipip.ori.org/newBigFive5broadTable.htm</a></p>
+<p>The documentation provides the following information:</p>
+<blockquote>
+<p>This data was collected (c. 2012) through an interactive online personality test. Participants were
+informed that their responses would be recorded and used for research at the begining of the test and
+asked to confirm their consent at the end of the test.</p>
+</blockquote>
+<p>The following items were rated on a five point scale where 1=Disagree, 3=Neutral, 5=Agree (0=missed). All were presented on one page in the order E1, N2, A1, C1, O1, E2……</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ tibble  2.1.3     ✓ dplyr   0.8.4
+## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.4.0
+## ✓ purrr   0.3.3</code></pre>
+<pre><code>## ── Conflicts ─────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x psych::%+%()    masks ggplot2::%+%()
+## x psych::alpha()  masks ggplot2::alpha()
+## x dplyr::filter() masks tidygraph::filter(), stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(data.table)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     between, first, last</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     transpose</code></pre>
+<pre class="r"><code>library(psych)</code></pre>
+</div>
+<div id="read-data" class="section level1">
+<h1>Read data</h1>
+<pre class="r"><code>big5 &lt;- read.csv(&quot;BIG5/data.csv&quot;, sep = &quot;\t&quot;)
+
+big5 &lt;- big5[, c(8:ncol(big5))]
+
+big5$id &lt;- 1:nrow(big5)
+
+big5 &lt;- data.table(big5)
+
+mbig5 &lt;- melt(big5, id.vars = &quot;id&quot;)
+
+mbig5 &lt;- mbig5[, factor_label := substr(variable, 1, 1)]</code></pre>
+</div>
+<div id="make-some-plots" class="section level1">
+<h1>Make some plots</h1>
+<p>Let us plot the variation for each separate item.</p>
+<pre class="r"><code>ggplot(mbig5, aes(x = variable, y = value, col = factor_label)) +
+  geom_boxplot() + coord_flip()</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Lets sort them by value.</p>
+<pre class="r"><code>ggplot(mbig5, aes(x = reorder(variable, value), y = value, col = factor_label)) +
+  geom_boxplot() + coord_flip()</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="make-network-plot-of-all-correlations" class="section level1">
+<h1>Make network plot of ALL correlations</h1>
+<p>Output a network plot of a correlation data frame in which variables that are more highly correlated appear closer together and are joined by stronger paths. Paths are also colored by their sign (blue for positive and red for negative). The proximity of the points are determined using multidimensional clustering.
+It uses the <code>cmdscale</code> function. Multidimensional scaling takes a set of dissimilarities and returns a set of points such that the distances between the points are approximately equal to the dissimilarities. This function follows the analysis of Mardia (1978), and returns the best-fitting 2-dimensional representation.</p>
+<pre class="r"><code>library(corrr)
+
+rdf &lt;- correlate(big5[, -c(&quot;id&quot;)],  method = &quot;spearman&quot;)</code></pre>
+<pre><code>## 
+## Correlation method: &#39;spearman&#39;
+## Missing treated using: &#39;pairwise.complete.obs&#39;</code></pre>
+<pre class="r"><code>corrr::network_plot(rdf, curved = FALSE, min_cor = 0.3)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Note that we do NOT calculate a partial correlation plot, i.e. the correlation between two items after “controlling” for all the other items.</p>
+<p>Surprisingly, “factor alpha” (N, A and C) and “factor beta” (E and O) are not visible here.</p>
+</div>
+<div id="plot-a-few-individual-correlations" class="section level1">
+<h1>Plot a few individual correlations</h1>
+<p>lets pick two questions from “Agreeableness”. These are close together, so highly correlated.</p>
+<p>A4 I sympathize with others’ feelings.
+A6 I have a soft heart.</p>
+<pre class="r"><code>ggplot(big5, aes(x = A4, y = A6)) + geom_jitter(alpha = 0.1)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>A1 I feel little concern for others.
+A3 I insult people.</p>
+<p>These are questions to which the answer other than 1 are socially undesirable.
+We would expect most answers to lie at (1,1). Indeed this is the case.</p>
+<pre class="r"><code>ggplot(big5, aes(x = A1, y = A3)) + geom_jitter(alpha = 0.1)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Let ’ s move on to Extraversion.</p>
+<ul>
+<li>E1 I am the life of the party.</li>
+<li>E2 I don’t talk a lot.</li>
+</ul>
+<pre class="r"><code>ggplot(big5, aes(x = E1, y = E2)) + geom_jitter(alpha = 0.1)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>E9 I don’t mind being the center of attention.
+E10 I am quiet around strangers.</p>
+<p>If you are quiet around strangers, it is difficult to imagine someone liking to be the center of attention.
+If you are NOT quiet around strangers, it is still possible to not liking to be the center of attention.</p>
+<p>Interestingly, it is the other way around. So if you are very quiet around strangers, you can still like to be the center of attention!
+But if you are not quiet around strangers (so you are very talkative) you have a high probability of wanting to be at the center of attention.</p>
+<pre class="r"><code>ggplot(big5, aes(x = E9, y = E10)) + geom_jitter(alpha = 0.1)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>These two questions appear highly correlated, although they “belong” to different latent factors.</p>
+<p>E10 I am quiet around strangers.
+N10 I often feel blue.</p>
+<pre class="r"><code>ggplot(big5, aes(x = E10, y = N10)) + geom_jitter(alpha = 0.1)</code></pre>
+<p><img src="/post/2020-04-01-big_five_blog_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>Ok that makes sense. If you often feel blue, you are very likely to be quiet around strangers.
+However, if you do not often feel blue, you can still have widly varying attitudes towards talking to strangers. So it makes sense here that N10 provides a lower bound for E10.</p>
+</div>
+<div id="calculate-cronbachs-alpha-for-the-five-factors" class="section level1">
+<h1>Calculate Cronbach’s alpha for the five factors</h1>
+<pre class="r"><code>factor_labels &lt;- unique(mbig5$factor_label)
+
+c_alphas &lt;- c()
+i &lt;- 1
+
+for(l in factor_labels){
+  sub_big &lt;- mbig5[factor_label == l]
+  
+  sub_big &lt;- dcast(sub_big, id ~ variable, value.var = &quot;value&quot;)
+  sub_big$id &lt;- NULL
+  
+  tmp &lt;- psych::alpha(sub_big, check.keys = T)
+  c_alphas[i] &lt;- tmp[[1]]$raw_alpha
+  i &lt;- i + 1
+}</code></pre>
+<pre><code>## Warning in psych::alpha(sub_big, check.keys = T): Some items were negatively correlated with total scale and were automatically reversed.
+##  This is indicated by a negative sign for the variable name.
+
+## Warning in psych::alpha(sub_big, check.keys = T): Some items were negatively correlated with total scale and were automatically reversed.
+##  This is indicated by a negative sign for the variable name.
+
+## Warning in psych::alpha(sub_big, check.keys = T): Some items were negatively correlated with total scale and were automatically reversed.
+##  This is indicated by a negative sign for the variable name.
+
+## Warning in psych::alpha(sub_big, check.keys = T): Some items were negatively correlated with total scale and were automatically reversed.
+##  This is indicated by a negative sign for the variable name.
+
+## Warning in psych::alpha(sub_big, check.keys = T): Some items were negatively correlated with total scale and were automatically reversed.
+##  This is indicated by a negative sign for the variable name.</code></pre>
+<pre class="r"><code>res &lt;- data.frame(factor_labels, raw_alpha = c_alphas)
+
+res</code></pre>
+<pre><code>##   factor_labels raw_alpha
+## 1             E 0.8921807
+## 2             N 0.8691398
+## 3             A 0.8318745
+## 4             C 0.8126381
+## 5             O 0.7938856</code></pre>
+<p>Here we have summed (after reversing) all scores per label.</p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ul>
+<li><p>International Personality Item Pool: A Scientific Collaboratory for the Development of Advanced Measures of Personality Traits and Other Individual Differences (<a href="http://ipip.ori.org/" class="uri">http://ipip.ori.org/</a>). Internet Web Site.</p></li>
+<li><p>Goldberg, L. R. (1992). The development of markers for the Big-Five factor structure. Psychological Assessment, 4, 26-42.</p></li>
+<li><p>Goldberg, L. R. (1999). A broad-bandwidth, public domain, personality inventory measuring the lower-level facets of several five-factor models. In I. Mervielde, I. Deary, F. De Fruyt, &amp; F. Ostendorf (Eds.), Personality Psychology in Europe, Vol. 7 (pp. 7-28). Tilburg, The Netherlands: Tilburg University Press.</p></li>
+<li><p>Goldberg, L. R., Johnson, J. A., Eber, H. W., Hogan, R., Ashton, M. C., Cloninger, C. R., &amp; Gough, H. C. (2006). The International Personality Item Pool and the future of public-domain personality measures. Journal of Research in Personality, 40, 84-96.</p></li>
+<li><p>Johnson 2014, Measuring thirty facets of the Five Factor Model with a 120-item public domain inventory: Development of the IPIP-NEO-120 <a href="http://www.personal.psu.edu/faculty/j/5/j5j/papers/JRP2014.pdf" class="uri">http://www.personal.psu.edu/faculty/j/5/j5j/papers/JRP2014.pdf</a></p></li>
+<li><p>Cho, E (2016). “Making Reliability Reliable”. Organizational Research Methods. 19 (4): 651–682</p></li>
+</ul>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/cronbachs-alpha-validity/">cronbach&#39;s alpha, validity</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/cronbach-alpha-measurement-theory/&amp;text=Open%20source%20psychometrics:%20The%20IPIP%20Big%20Five%20questionnaire" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/cronbach-alpha-measurement-theory/&amp;t=Open%20source%20psychometrics:%20The%20IPIP%20Big%20Five%20questionnaire" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Open%20source%20psychometrics:%20The%20IPIP%20Big%20Five%20questionnaire&amp;body=/post/cronbach-alpha-measurement-theory/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/cronbach-alpha-measurement-theory/&amp;title=Open%20source%20psychometrics:%20The%20IPIP%20Big%20Five%20questionnaire" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Open%20source%20psychometrics:%20The%20IPIP%20Big%20Five%20questionnaire%20/post/cronbach-alpha-measurement-theory/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/cronbach-alpha-measurement-theory/&amp;title=Open%20source%20psychometrics:%20The%20IPIP%20Big%20Five%20questionnaire" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hudb6f5a71508eb5317c72df2dc43608d9_19467_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
+      <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+        <i class="ai ai-google-scholar"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-stack-overflow"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/cronbach-alpha-measurement-theory/">Cronbach&#39;s alpha and its models</a></li>
+      
+      <li><a href="/post/cronbach-alpha-measurement-theory/">Measurement theories in psychometrics</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.3/mermaid.min.js" integrity="" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.a0d331bcd05dbe8b31e244f796710f08.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+  <p class="powered-by">
+    
+      <a href="/privacy/">Privacy Policy</a>
+    
+    
+       &middot; 
+      <a href="/terms/">Terms</a>
+    
+  </p>
+  
+
+  <p class="powered-by">
+    © 2019, 2020 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

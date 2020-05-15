@@ -5,12 +5,20 @@
     <link>https://gsverhoeven.github.io/tags/</link>
       <atom:link href="https://gsverhoeven.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
       <link>https://gsverhoeven.github.io/tags/</link>
     </image>
+    
+    <item>
+      <title>tensorflow, keras, neural networks</title>
+      <link>https://gsverhoeven.github.io/tags/tensorflow-keras-neural-networks/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/tensorflow-keras-neural-networks/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>R, fake data, simulation, copula, tetrachoric correlation</title>
