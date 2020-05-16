@@ -233,7 +233,7 @@
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
   <meta property="og:url" content="https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/">
-  <meta property="og:title" content="Building Tensorflow 2.2 on an old PC | Gertjan Verhoeven">
+  <meta property="og:title" content="Building TensorFlow 2.2 on an old PC | Gertjan Verhoeven">
   <meta property="og:description" content="With the commoditization of deep learning in the form of Keras, I felt it was about time that I jumped on the Deep Learning bandwagon."><meta property="og:image" content="https://gsverhoeven.github.io/img/headers/monolith.png">
   <meta property="twitter:image" content="https://gsverhoeven.github.io/img/headers/monolith.png"><meta property="og:locale" content="en-us">
   
@@ -268,7 +268,7 @@
     "@type": "WebPage",
     "@id": "https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/"
   },
-  "headline": "Building Tensorflow 2.2 on an old PC",
+  "headline": "Building TensorFlow 2.2 on an old PC",
   
   "datePublished": "2020-05-15T00:00:00Z",
   "dateModified": "2020-05-15T00:00:00Z",
@@ -304,7 +304,7 @@
 
 
 
-  <title>Building Tensorflow 2.2 on an old PC | Gertjan Verhoeven</title>
+  <title>Building TensorFlow 2.2 on an old PC | Gertjan Verhoeven</title>
 
 </head>
 
@@ -519,7 +519,7 @@
   
   
 <div class="article-container pt-3">
-  <h1>Building Tensorflow 2.2 on an old PC</h1>
+  <h1>Building TensorFlow 2.2 on an old PC</h1>
 
   
 
@@ -601,28 +601,27 @@ Linux fits nicely into this philosophy, because it can be adapted to run on real
 I do like to keep up with new tech developments.
 And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.</p>
 <p>And the nice thing about lagging behind: The choice for deep learning is now extremely simple.
-I need <a href="https://keras.io/">“Keras”</a> with <a href="https://www.tensorflow.org/">“Tensorflow”</a> as a computational backend.</p>
+I need <a href="https://keras.io/">Keras</a> with <a href="https://www.tensorflow.org/">TensorFlow</a> as a computational backend.
+Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.</p>
 </div>
 <div id="tensorflow-and-avx" class="section level1">
-<h1>Tensorflow and AVX</h1>
-<p>Then I ran into a problem: Tensorflow is all about FAST computation.
+<h1>TensorFlow and AVX</h1>
+<p>Then I ran into a problem: TensorFlow is all about FAST computation.
 And therefore it tries to exploit all hardware features that speed up computation.
-One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">“AVX”</a>.
-As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile Tensorflow myself.</p>
-<p>But come to think of it: What better rite of passage into the Deep Learning AI age is to compile Tensorflow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)</p>
+One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX</a>.
+As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.</p>
+<p>But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)</p>
 </div>
 <div id="building-tensorflow-on-a-really-old-computer" class="section level1">
-<h1>Building Tensorflow on a really old computer</h1>
-<p>I followed the tutorial from Tensorflow to build from source on a Linux system (Ubuntu 18.04 LTS).
-(<a href="https://www.tensorflow.org/install/source" class="uri">https://www.tensorflow.org/install/source</a>)
-Therefore, these notes are most useful to other Linux users, and my future self of course.</p>
+<h1>Building TensorFlow on a really old computer</h1>
+<p>I followed the <a href="https://www.tensorflow.org/install/source">tutorial from TensorFlow</a> to build from source on a Linux system (Ubuntu 18.04 LTS). Therefore, these notes are most useful to other Linux users, and my future self of course.</p>
 <p>Roughly this consisted of:</p>
 <ul>
 <li>Creating a virtual environment for Python 3.6.9</li>
 <li>Checking my GCC version (7.5.0, which is greater than 7.3 that is used for the official TF packages)</li>
-<li>Install <a href="https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu">“Bazel”</a> (Google’s Make program), version 3.1</li>
-<li>Clone the Tensorflow <a href="https://github.com/tensorflow/tensorflow">“repository from GitHub”</a></li>
-<li>Checkout the latest official TensorFlow release (v2.2)</li>
+<li>Install <a href="https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu">Bazel</a> (Google’s Make program), version 3.1</li>
+<li>Clone the <a href="https://github.com/tensorflow/tensorflow">TensorFlow repository</a> from GitHub</li>
+<li>Git checkout the latest official TensorFlow release (v2.2)</li>
 </ul>
 <p>Then came the hard part, the final step:</p>
 <ul>
@@ -641,7 +640,7 @@ Now as it turns out, according to <code>htop</code> memory consumption went up t
 <p>The final step was to turn the compiled TensorFlow into a Python Wheel package ready to install using <code>pip</code>.</p>
 <pre class="bash"><code>./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 # creates a &#39;wheel&#39; file called tensorflow-2.2.0-cp36-cp36m-linux_x86_64.whl</code></pre>
-<p>To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the <a href="https://www.tensorflow.org/tutorials/keras/classification">“Fashion MNIST classification with Keras”</a> example flawlessly.</p>
+<p>To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the <a href="https://www.tensorflow.org/tutorials/keras/classification">Fashion MNIST classification with Keras</a> example flawlessly.</p>
 <p>And even on my ancient PC performance was quite good, training the model took around 1 minute.
 So, after glorious succes in Python, it was time to move on to R.</p>
 </div>
@@ -750,8 +749,8 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 <h1>Check model performance on the test set</h1>
 <pre class="r"><code>model %&gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)</code></pre>
-<pre><code>##      loss  accuracy 
-## 0.0819801 0.9739000</code></pre>
+<pre><code>##       loss   accuracy 
+## 0.08402114 0.97450000</code></pre>
 <p>Our model achieved ~98% accuracy on the test set.</p>
 <p>Awesome.</p>
 </div>
@@ -766,7 +765,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/tensorflow-keras-neural-networks/">tensorflow, keras, neural networks</a>
+  <a class="badge badge-light" href="/tags/tensorflow-keras-neural-networks-deep-learning/">tensorflow, keras, neural networks, deep learning</a>
   
 </div>
 
@@ -783,7 +782,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;text=Building%20Tensorflow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;text=Building%20TensorFlow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -796,7 +795,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;t=Building%20Tensorflow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;t=Building%20TensorFlow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -809,7 +808,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       
       
       <li>
-        <a href="mailto:?subject=Building%20Tensorflow%202.2%20on%20an%20old%20PC&amp;body=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Building%20TensorFlow%202.2%20on%20an%20old%20PC&amp;body=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -822,7 +821,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;title=Building%20Tensorflow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;title=Building%20TensorFlow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -835,7 +834,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Building%20Tensorflow%202.2%20on%20an%20old%20PC%20https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Building%20TensorFlow%202.2%20on%20an%20old%20PC%20https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -848,7 +847,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;title=Building%20Tensorflow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/&amp;title=Building%20TensorFlow%202.2%20on%20an%20old%20PC" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>

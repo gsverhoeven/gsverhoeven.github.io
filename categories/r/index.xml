@@ -13,7 +13,7 @@
     </image>
     
     <item>
-      <title>Building Tensorflow 2.2 on an old PC</title>
+      <title>Building TensorFlow 2.2 on an old PC</title>
       <link>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</link>
       <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</guid>
@@ -31,28 +31,27 @@ Linux fits nicely into this philosophy, because it can be adapted to run on real
 I do like to keep up with new tech developments.
 And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
 &lt;p&gt;And the nice thing about lagging behind: The choice for deep learning is now extremely simple.
-I need &lt;a href=&#34;https://keras.io/&#34;&gt;“Keras”&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;“Tensorflow”&lt;/a&gt; as a computational backend.&lt;/p&gt;
+I need &lt;a href=&#34;https://keras.io/&#34;&gt;Keras&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;TensorFlow&lt;/a&gt; as a computational backend.
+Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;tensorflow-and-avx&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Tensorflow and AVX&lt;/h1&gt;
-&lt;p&gt;Then I ran into a problem: Tensorflow is all about FAST computation.
+&lt;h1&gt;TensorFlow and AVX&lt;/h1&gt;
+&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation.
 And therefore it tries to exploit all hardware features that speed up computation.
-One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;“AVX”&lt;/a&gt;.
-As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile Tensorflow myself.&lt;/p&gt;
-&lt;p&gt;But come to think of it: What better rite of passage into the Deep Learning AI age is to compile Tensorflow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)&lt;/p&gt;
+One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;.
+As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
+&lt;p&gt;But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;building-tensorflow-on-a-really-old-computer&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Building Tensorflow on a really old computer&lt;/h1&gt;
-&lt;p&gt;I followed the tutorial from Tensorflow to build from source on a Linux system (Ubuntu 18.04 LTS).
-(&lt;a href=&#34;https://www.tensorflow.org/install/source&#34; class=&#34;uri&#34;&gt;https://www.tensorflow.org/install/source&lt;/a&gt;)
-Therefore, these notes are most useful to other Linux users, and my future self of course.&lt;/p&gt;
+&lt;h1&gt;Building TensorFlow on a really old computer&lt;/h1&gt;
+&lt;p&gt;I followed the &lt;a href=&#34;https://www.tensorflow.org/install/source&#34;&gt;tutorial from TensorFlow&lt;/a&gt; to build from source on a Linux system (Ubuntu 18.04 LTS). Therefore, these notes are most useful to other Linux users, and my future self of course.&lt;/p&gt;
 &lt;p&gt;Roughly this consisted of:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Creating a virtual environment for Python 3.6.9&lt;/li&gt;
 &lt;li&gt;Checking my GCC version (7.5.0, which is greater than 7.3 that is used for the official TF packages)&lt;/li&gt;
-&lt;li&gt;Install &lt;a href=&#34;https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu&#34;&gt;“Bazel”&lt;/a&gt; (Google’s Make program), version 3.1&lt;/li&gt;
-&lt;li&gt;Clone the Tensorflow &lt;a href=&#34;https://github.com/tensorflow/tensorflow&#34;&gt;“repository from GitHub”&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Checkout the latest official TensorFlow release (v2.2)&lt;/li&gt;
+&lt;li&gt;Install &lt;a href=&#34;https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu&#34;&gt;Bazel&lt;/a&gt; (Google’s Make program), version 3.1&lt;/li&gt;
+&lt;li&gt;Clone the &lt;a href=&#34;https://github.com/tensorflow/tensorflow&#34;&gt;TensorFlow repository&lt;/a&gt; from GitHub&lt;/li&gt;
+&lt;li&gt;Git checkout the latest official TensorFlow release (v2.2)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Then came the hard part, the final step:&lt;/p&gt;
 &lt;ul&gt;
@@ -71,7 +70,7 @@ Now as it turns out, according to &lt;code&gt;htop&lt;/code&gt; memory consumpti
 &lt;p&gt;The final step was to turn the compiled TensorFlow into a Python Wheel package ready to install using &lt;code&gt;pip&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 # creates a &amp;#39;wheel&amp;#39; file called tensorflow-2.2.0-cp36-cp36m-linux_x86_64.whl&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the &lt;a href=&#34;https://www.tensorflow.org/tutorials/keras/classification&#34;&gt;“Fashion MNIST classification with Keras”&lt;/a&gt; example flawlessly.&lt;/p&gt;
+&lt;p&gt;To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the &lt;a href=&#34;https://www.tensorflow.org/tutorials/keras/classification&#34;&gt;Fashion MNIST classification with Keras&lt;/a&gt; example flawlessly.&lt;/p&gt;
 &lt;p&gt;And even on my ancient PC performance was quite good, training the model took around 1 minute.
 So, after glorious succes in Python, it was time to move on to R.&lt;/p&gt;
 &lt;/div&gt;
@@ -180,8 +179,8 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;h1&gt;Check model performance on the test set&lt;/h1&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##      loss  accuracy 
-## 0.0819801 0.9739000&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       loss   accuracy 
+## 0.08402114 0.97450000&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;
@@ -877,10 +876,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1]  4  8 10  1  7
+## [1]  9  1  7  2 10
 ## 
 ## $Resample2
-## [1] 9 5 1 8 6&lt;/code&gt;&lt;/pre&gt;
+## [1]  3  5  1  8 10&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -1718,8 +1717,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.214471 
-## R squared (OOB):                  0.6611658&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.243949 
+## R squared (OOB):                  0.659956&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1809,8 +1808,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.611253 
-## R squared (OOB):                  0.4373335&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.514541 
+## R squared (OOB):                  0.4460942&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1952,8 +1951,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.00908581 
-## R squared (OOB):                  0.5371518&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009044664 
+## R squared (OOB):                  0.5385485&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -2047,8 +2046,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008813555 
-## R squared (OOB):                  0.5189206&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008926369 
+## R squared (OOB):                  0.5127509&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
