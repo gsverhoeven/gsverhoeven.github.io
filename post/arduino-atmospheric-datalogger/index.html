@@ -591,8 +591,7 @@
 
 
 <p>In this post, I show how to create a Arduino-based atmospheric sensor circuit capable of storing large amounts of data on a microSD card.</p>
-<p>Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. <a href="https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger" class="uri">https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger</a>). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card.
-So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!</p>
+<p>Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. <a href="https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger" class="uri">https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger</a>). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!</p>
 <div id="components" class="section level1">
 <h1>Components</h1>
 <p>After some research I ordered:</p>
@@ -606,7 +605,10 @@ So i made one myself. Working with SD cards has the advantage of having a huge s
 <div id="circuit-programming" class="section level1">
 <h1>Circuit &amp; Programming</h1>
 <p>The breadboard layout (created using <a href="http://fritzing.org">Fritzing</a>) is shown below:</p>
-<p><img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/fritzing_datalogger_bb.png" /></p>
+<div class="figure">
+<img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/fritzing_datalogger_bb.png" />
+
+</div>
 <p>At first i was using the Arduino 5V pin (with Arduino connected to USB at the front of my Desktop PC, these USB ports might have lower current) to power both the SD card and the Level converter. Separately they would work fine, but together in one circuit the SD card gave erratic results. I guessed that current consumption was too high, and during testing I used the 5V charger as power supply for the SD card. During actual usage I used the 5V charger to power both the SD card AND the Arduino Nano, which worked nicely.</p>
 <p>Coding was simple, i just combined the example code and libraries for a SPI SD card and for a BME-280 I2C sensor. I put the code on <a href="https://github.com/gsverhoeven/datalogger_bme280">GitHub</a> anyway as a reference.</p>
 </div>
@@ -659,8 +661,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
   facet_grid(~ trace_name) + geom_smooth(size = 1)</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
 <p><img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>The basement, which is the lowest, has the highest pressure.
-But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let’s move on to the temperature!</p>
+<p>The basement, which is the lowest, has the highest pressure. But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let’s move on to the temperature!</p>
 </div>
 <div id="temperature" class="section level2">
 <h2>Temperature</h2>
@@ -669,8 +670,7 @@ But the difference between living room (ground floor) and the two rooms at the f
            color = variable, group = variable)) +
   geom_point() + facet_grid(~ trace_name)</code></pre>
 <p><img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>Here, it appears that the sequence of the rooms can explain the slowly changing patterns of temperature. We started out in the Living room at 21C (The thermostat was set at 20C at that time). Then towards the cold basement.
-It appears that temperature needed some time to equilibrate, possibly because the breadboard was placed on an elevated plastic box, insulating it from below. In the bedroom it was placed on the (cold) floor, and it was already cold from the basement. Then in the bathroom, the final location, it went up, probably due to the floor being heated to keep the bathroom at 18C.</p>
+<p>Here, it appears that the sequence of the rooms can explain the slowly changing patterns of temperature. We started out in the Living room at 21C (The thermostat was set at 20C at that time). Then towards the cold basement. It appears that temperature needed some time to equilibrate, possibly because the breadboard was placed on an elevated plastic box, insulating it from below. In the bedroom it was placed on the (cold) floor, and it was already cold from the basement. Then in the bathroom, the final location, it went up, probably due to the floor being heated to keep the bathroom at 18C.</p>
 </div>
 <div id="relative-humidity" class="section level2">
 <h2>Relative Humidity</h2>
@@ -680,12 +680,10 @@ It appears that temperature needed some time to equilibrate, possibly because th
            group = variable)) +
   geom_point() + facet_grid(~ trace_name)</code></pre>
 <p><img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p>Here we see that the living room is at a agreeable 45% RH.
-The basement has a higher RH percentage, expected because it’s colder.</p>
+<p>Here we see that the living room is at a agreeable 45% RH. The basement has a higher RH percentage, expected because it’s colder.</p>
 <p>According to Wikipedia:</p>
 <p><strong>Humans can be comfortable within a wide range of humidities depending on the temperature—from 30% to 70%[14]—but ideally between 50%[15] and 60%.[16] Very low humidity can create discomfort, respiratory problems, and aggravate allergies in some individuals.</strong></p>
-<p>The bedroom is also at a nice humidity level of 55% RH.
-The bathroom floor was being heated, and this unsurprisingly reduces the local RH to below 40%.</p>
+<p>The bedroom is also at a nice humidity level of 55% RH. The bathroom floor was being heated, and this unsurprisingly reduces the local RH to below 40%.</p>
 </div>
 </div>
 <div id="conclusion" class="section level1">

@@ -623,8 +623,7 @@ cov.mat &lt;- matrix(c(1, corr,
 df &lt;- data.frame(MASS::mvrnorm(n = 1e4, 
                                mu = c(0, 0), 
                                Sigma = cov.mat))</code></pre>
-<p>(The diagonal of <code>1</code> makes sure the variables have SD of 1.
-The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)</p>
+<p>(The diagonal of <code>1</code> makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)</p>
 <p>Did it work?</p>
 <pre class="r"><code>ggplot(df, aes(x = X1, y = X2)) +
   geom_point(alpha = 0.3)</code></pre>
@@ -709,13 +708,11 @@ cor(dt[,-&quot;id&quot;])</code></pre>
 </div>
 <div id="generate-correlated-binary-variables" class="section level1">
 <h1>Generate correlated binary variables</h1>
-<p>As it turns out, the copula approach does not work for binary variables.
-Well, it sort of works, but the correlations we get are lower than we actually specify.</p>
+<p>As it turns out, the copula approach does not work for binary variables. Well, it sort of works, but the correlations we get are lower than we actually specify.</p>
 <p>Come to think of it: two binary variables cannot have all the correlations we like. To see why, check this out.</p>
 <div id="feasible-correlations-for-two-binary-variables" class="section level2">
 <h2>Feasible correlations for two binary variables</h2>
-<p>Let’s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise.
-This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.</p>
+<p>Let’s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.</p>
 <p>To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1’s, and let’s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:</p>
 <pre class="r"><code># maximal correlation
 x1 &lt;- c(0, 0, 0, 0, 1)
@@ -771,8 +768,7 @@ cov.mat &lt;- matrix(c(1, corr,
 df &lt;- data.frame(MASS::mvrnorm(n = 10000, 
                                mu = c(0, 0), 
                                Sigma = cov.mat))</code></pre>
-<p>(The diagonal of <code>1</code> makes sure the variables have SD of 1.
-The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)</p>
+<p>(The diagonal of <code>1</code> makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)</p>
 <pre class="r"><code>ggplot(df, aes(x = X1, y = X2)) +
   geom_point(alpha = 0.3)</code></pre>
 <p><img src="/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png" width="480" /></p>
@@ -797,8 +793,7 @@ mean(df$B1)</code></pre>
 <p>Ok, so if X1 and X2 have a correlation of 0.5, this results in a correlation of 0.19 between the binary variables B1 and B2.</p>
 <p>But we need B1 and B2 to have a correlation of 0.1!</p>
 <p>At this point, there is only one free parameter left, the correlation of the normally distributed variables <code>X1</code> and <code>X2</code>.</p>
-<p>We could of course manually try to find which correlation we must choose between <code>X1</code> and <code>X2</code> to get the desired correlation of 0.1 in the binary variables.
-But that would be very unpractical.</p>
+<p>We could of course manually try to find which correlation we must choose between <code>X1</code> and <code>X2</code> to get the desired correlation of 0.1 in the binary variables. But that would be very unpractical.</p>
 <p>Fortunately, Emrich and Piedmonte (1991) published an iterative method to solve this puzzle. And this method has been implemented in <code>simstudy</code>.</p>
 <pre class="r"><code>simstudy:::.findRhoBin(p1 = 0.2, 
                        p2 = 0.8, d = 0.1)</code></pre>

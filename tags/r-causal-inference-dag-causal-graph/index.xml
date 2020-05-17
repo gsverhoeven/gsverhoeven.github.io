@@ -23,8 +23,7 @@
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;(Short intro) This is me learning causal inference (CI) by self-study together with colleagues using online resources.&lt;/p&gt;
-&lt;p&gt;(Longer intro)
-A modern data scientist needs to become skilled in at least three topics (I left out visualization):&lt;/p&gt;
+&lt;p&gt;(Longer intro) A modern data scientist needs to become skilled in at least three topics (I left out visualization):&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;(Bayesian) Statistical modeling&lt;/li&gt;
 &lt;li&gt;Machine Learning&lt;/li&gt;
@@ -43,12 +42,9 @@ A modern data scientist needs to become skilled in at least three topics (I left
 &lt;div id=&#34;designing-an-introductory-causal-inference-course&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Designing an introductory causal inference course&lt;/h1&gt;
 &lt;p&gt;Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call “Quasi-experimental designs”, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).&lt;/p&gt;
-&lt;p&gt;In the end, I decided to combine the two causal chapters from Gelman &amp;amp; Hill (2007) &lt;a href=&#34;https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/&#34;&gt;(freely available on Gelman’s website)&lt;/a&gt;
-with the introductory chapter on Causal Graphical Models by Felix Elwert &lt;a href=&#34;https://www.ssc.wisc.edu/~felwert/causality/&#34;&gt;(freely available on Elwert’s website)&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;The Gelman &amp;amp; Hill chapters already come with a set of exercises.
-However, for DAGs, i could not find a suitable set of exercises.&lt;/p&gt;
-&lt;p&gt;So I created two R markdown notebooks with exercises in R,
-that make use of the &lt;a href=&#34;http://dagitty.net/&#34;&gt;DAGitty tool&lt;/a&gt;, created by Johannes Textor and freely available as R package.&lt;/p&gt;
+&lt;p&gt;In the end, I decided to combine the two causal chapters from Gelman &amp;amp; Hill (2007) &lt;a href=&#34;https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/&#34;&gt;(freely available on Gelman’s website)&lt;/a&gt; with the introductory chapter on Causal Graphical Models by Felix Elwert &lt;a href=&#34;https://www.ssc.wisc.edu/~felwert/causality/&#34;&gt;(freely available on Elwert’s website)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The Gelman &amp;amp; Hill chapters already come with a set of exercises. However, for DAGs, i could not find a suitable set of exercises.&lt;/p&gt;
+&lt;p&gt;So I created two R markdown notebooks with exercises in R, that make use of the &lt;a href=&#34;http://dagitty.net/&#34;&gt;DAGitty tool&lt;/a&gt;, created by Johannes Textor and freely available as R package.&lt;/p&gt;
 &lt;p&gt;Some exercises are taken from &lt;a href=&#34;http://bayes.cs.ucla.edu/PRIMER/&#34;&gt;Causal inference in statistics: A Primer&lt;/a&gt; by Pearl, Glymour &amp;amp; Jewell. (I probably should own this book. So I just ordered it :))&lt;/p&gt;
 &lt;p&gt;All materials are available in a &lt;a href=&#34;https://github.com/gsverhoeven/causal_course&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
@@ -57,22 +53,15 @@ that make use of the &lt;a href=&#34;http://dagitty.net/&#34;&gt;DAGitty tool&lt
 &lt;p&gt;The course has four parts.&lt;/p&gt;
 &lt;div id=&#34;general-introduction&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;General introduction&lt;/h2&gt;
-&lt;p&gt;The course starts with the first causal chapter of Gelman &amp;amp; Hill’s book, “Causal inference using regression on the
-treatment variable”. This creates a first complete experience with identifying and estimating causal effects.
-However, there are no causal diagrams, which is unfortunate.&lt;/p&gt;
+&lt;p&gt;The course starts with the first causal chapter of Gelman &amp;amp; Hill’s book, “Causal inference using regression on the treatment variable”. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;identification-of-causal-effects-using-dags&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Identification of Causal effects using DAGs&lt;/h2&gt;
-&lt;p&gt;Next we dive into causal identification using the causal diagram approach.
-For this we use the chapter “Causal Graphical Models” by Felix Elwert.
-Two R markdown Notebooks with exercises using Dagitty complete this part.&lt;/p&gt;
+&lt;p&gt;Next we dive into causal identification using the causal diagram approach. For this we use the chapter “Causal Graphical Models” by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;identification-and-estimation-strategies&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Identification and estimation strategies&lt;/h2&gt;
-&lt;p&gt;We then continue with the second causal chapter of Gelman &amp;amp; Hill “Causal inference using more advanced
-models”. This covers matching, regression discontinuity design, and instrumental variables.
-This material is combined with a paper by Scheiner et al, that contains DAGs for these methods.
-In our study group DAGs greatly facilitated discussion of the various designs.&lt;/p&gt;
+&lt;p&gt;We then continue with the second causal chapter of Gelman &amp;amp; Hill “Causal inference using more advanced models”. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;varying-treatment-effects-using-machine-learning&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Varying treatment effects using Machine Learning&lt;/h2&gt;
@@ -86,11 +75,8 @@ In our study group DAGs greatly facilitated discussion of the various designs.&l
 &lt;li&gt;Make assumptions on the data generating process explicit&lt;/li&gt;
 &lt;li&gt;Formalize identification of causal effects&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Thus, it is separate from, and complements statistical estimation.
-The distinction between identification and estimation is not so explicitly made in the Gelman &amp;amp; Hill chapters, at least this is my impression.
-It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.&lt;/p&gt;
-&lt;p&gt;After having worked through these materials, I think reading Shalizi’s chapters on Causal Effects would be a smart move.
-This is part III of his book &lt;a href=&#34;https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/&#34;&gt;“Advanced Data Analysis from an Elementary Point of View”&lt;/a&gt;, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.&lt;/p&gt;
+&lt;p&gt;Thus, it is separate from, and complements statistical estimation. The distinction between identification and estimation is not so explicitly made in the Gelman &amp;amp; Hill chapters, at least this is my impression. It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.&lt;/p&gt;
+&lt;p&gt;After having worked through these materials, I think reading Shalizi’s chapters on Causal Effects would be a smart move. This is part III of his book &lt;a href=&#34;https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/&#34;&gt;“Advanced Data Analysis from an Elementary Point of View”&lt;/a&gt;, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.&lt;/p&gt;
 &lt;p&gt;If you have a question, would like to comment or share ideas feel free to &lt;a href=&#34;https://gsverhoeven.github.io/#contact&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 </description>

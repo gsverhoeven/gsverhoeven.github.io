@@ -149,10 +149,8 @@ knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;stratified-sampling-vs-random-sampling&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Stratified sampling vs random sampling&lt;/h1&gt;
 &lt;p&gt;To check if we understand what &lt;code&gt;caret&lt;/code&gt; does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the &lt;code&gt;caret&lt;/code&gt; approach. As &lt;code&gt;caret&lt;/code&gt; requires a particular format (a named list of sets of train indices) we conform to this standard. However, all &lt;code&gt;caret&lt;/code&gt; partitioning functions seem to perform &lt;strong&gt;stratified random sampling&lt;/strong&gt;. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random &lt;strong&gt;within those groups&lt;/strong&gt; to partitions that have similar distributions for the outcome variable.&lt;/p&gt;
-&lt;p&gt;This not desirable for teaching, as it adds more complexity.
-In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
-&lt;p&gt;We therefore write a function that generates truly random partitions of the data.
-We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
+&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
+&lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
 prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
 
@@ -172,10 +170,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1]  9  1  7  2 10
+## [1] 9 1 2 4 8
 ## 
 ## $Resample2
-## [1]  3  5  1  8 10&lt;/code&gt;&lt;/pre&gt;
+## [1] 3 9 5 4 2&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -198,8 +196,7 @@ sqrt(mean((preds - Boston[-train,]$medv)^2))&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-in-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach in caret&lt;/h1&gt;
-&lt;p&gt;Now we use the &lt;code&gt;caret&lt;/code&gt; package.
-Regular usage requires two function calls, one to &lt;code&gt;trainControl&lt;/code&gt; to control the resampling behavior, and one to &lt;code&gt;train&lt;/code&gt; to do the actual model fitting and prediction generation.&lt;/p&gt;
+&lt;p&gt;Now we use the &lt;code&gt;caret&lt;/code&gt; package. Regular usage requires two function calls, one to &lt;code&gt;trainControl&lt;/code&gt; to control the resampling behavior, and one to &lt;code&gt;train&lt;/code&gt; to do the actual model fitting and prediction generation.&lt;/p&gt;
 &lt;p&gt;As the validation set approach is not one of the predefined methods, we need to make use of the &lt;code&gt;index&lt;/code&gt; argument to explicitely define the train partitions outside of &lt;code&gt;caret&lt;/code&gt;. It automatically predicts on the records that are not contained in the train partitions.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;index&lt;/code&gt; argument plays well with the &lt;code&gt;createDataPartition&lt;/code&gt; (Stratfied sampling) and &lt;code&gt;createRandomDataPartition&lt;/code&gt; (our own custom function that performs truly random sampling) functions, as these functions both generate partitions in precisely the format that &lt;code&gt;index&lt;/code&gt; wants: lists of training set indices.&lt;/p&gt;
 &lt;p&gt;In the code below, we generate four different 50/50 partitions of the data.&lt;/p&gt;
@@ -338,8 +335,7 @@ strat_sampl_res&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;analyzing-caret-resampling-results&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Analyzing caret resampling results&lt;/h1&gt;
-&lt;p&gt;We now analyse our resampling results.
-We can use the &lt;code&gt;summary&lt;/code&gt; method on our resamples object:&lt;/p&gt;
+&lt;p&gt;We now analyse our resampling results. We can use the &lt;code&gt;summary&lt;/code&gt; method on our resamples object:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## 
 ## Call:
@@ -362,15 +358,12 @@ We can use the &lt;code&gt;summary&lt;/code&gt; method on our resamples object:&
 ##             Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&amp;#39;s
 ## RAND  0.06982417 0.2259553 0.2733762 0.2753001 0.3249820 0.5195017    0
 ## STRAT 0.05306875 0.2263577 0.2752015 0.2777190 0.3277577 0.4977015    0&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We can also use the plot function provided by the &lt;code&gt;caret&lt;/code&gt; package.
-It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean.
-Note that the confidence intervals here are based on a normal approximation (One sample t-test).&lt;/p&gt;
+&lt;p&gt;We can also use the plot function provided by the &lt;code&gt;caret&lt;/code&gt; package. It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean. Note that the confidence intervals here are based on a normal approximation (One sample t-test).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# caret:::ggplot.resamples
 # t.test(resamples$values$`RAND~RMSE`)
 ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;My personal preference is to more directly display both distributions.
-This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
+&lt;p&gt;My personal preference is to more directly display both distributions. This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bwplot(resamples, metric = &amp;quot;RMSE&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;

@@ -719,10 +719,8 @@ knitr::kable(head(Boston))</code></pre>
 <div id="stratified-sampling-vs-random-sampling" class="section level1">
 <h1>Stratified sampling vs random sampling</h1>
 <p>To check if we understand what <code>caret</code> does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the <code>caret</code> approach. As <code>caret</code> requires a particular format (a named list of sets of train indices) we conform to this standard. However, all <code>caret</code> partitioning functions seem to perform <strong>stratified random sampling</strong>. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random <strong>within those groups</strong> to partitions that have similar distributions for the outcome variable.</p>
-<p>This not desirable for teaching, as it adds more complexity.
-In addition, it would be nice to be able to compare stratified vs. random sampling.</p>
-<p>We therefore write a function that generates truly random partitions of the data.
-We let it generate partitions in the format that <code>trainControl</code> likes.</p>
+<p>This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.</p>
+<p>We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that <code>trainControl</code> likes.</p>
 <pre class="r"><code># internal function from caret package, needed to play nice with resamples()
 prettySeq &lt;- function(x) paste(&quot;Resample&quot;, gsub(&quot; &quot;, &quot;0&quot;, format(seq(along = x))), sep = &quot;&quot;)
 
@@ -742,10 +740,10 @@ createRandomDataPartition &lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)</code></pre>
 <pre><code>## $Resample1
-## [1]  9  1  7  2 10
+## [1] 9 1 2 4 8
 ## 
 ## $Resample2
-## [1]  3  5  1  8 10</code></pre>
+## [1] 3 9 5 4 2</code></pre>
 </div>
 <div id="the-validation-set-approach-without-caret" class="section level1">
 <h1>The validation set approach without caret</h1>
@@ -768,8 +766,7 @@ sqrt(mean((preds - Boston[-train,]$medv)^2))</code></pre>
 </div>
 <div id="the-validation-set-approach-in-caret" class="section level1">
 <h1>The validation set approach in caret</h1>
-<p>Now we use the <code>caret</code> package.
-Regular usage requires two function calls, one to <code>trainControl</code> to control the resampling behavior, and one to <code>train</code> to do the actual model fitting and prediction generation.</p>
+<p>Now we use the <code>caret</code> package. Regular usage requires two function calls, one to <code>trainControl</code> to control the resampling behavior, and one to <code>train</code> to do the actual model fitting and prediction generation.</p>
 <p>As the validation set approach is not one of the predefined methods, we need to make use of the <code>index</code> argument to explicitely define the train partitions outside of <code>caret</code>. It automatically predicts on the records that are not contained in the train partitions.</p>
 <p>The <code>index</code> argument plays well with the <code>createDataPartition</code> (Stratfied sampling) and <code>createRandomDataPartition</code> (our own custom function that performs truly random sampling) functions, as these functions both generate partitions in precisely the format that <code>index</code> wants: lists of training set indices.</p>
 <p>In the code below, we generate four different 50/50 partitions of the data.</p>
@@ -908,8 +905,7 @@ strat_sampl_res</code></pre>
 </div>
 <div id="analyzing-caret-resampling-results" class="section level1">
 <h1>Analyzing caret resampling results</h1>
-<p>We now analyse our resampling results.
-We can use the <code>summary</code> method on our resamples object:</p>
+<p>We now analyse our resampling results. We can use the <code>summary</code> method on our resamples object:</p>
 <pre class="r"><code>summary(resamples)</code></pre>
 <pre><code>## 
 ## Call:
@@ -932,15 +928,12 @@ We can use the <code>summary</code> method on our resamples object:</p>
 ##             Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&#39;s
 ## RAND  0.06982417 0.2259553 0.2733762 0.2753001 0.3249820 0.5195017    0
 ## STRAT 0.05306875 0.2263577 0.2752015 0.2777190 0.3277577 0.4977015    0</code></pre>
-<p>We can also use the plot function provided by the <code>caret</code> package.
-It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean.
-Note that the confidence intervals here are based on a normal approximation (One sample t-test).</p>
+<p>We can also use the plot function provided by the <code>caret</code> package. It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean. Note that the confidence intervals here are based on a normal approximation (One sample t-test).</p>
 <pre class="r"><code># caret:::ggplot.resamples
 # t.test(resamples$values$`RAND~RMSE`)
 ggplot(resamples, metric = &quot;RMSE&quot;) </code></pre>
 <p><img src="/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<p>My personal preference is to more directly display both distributions.
-This is done by <code>bwplot()</code> (<code>caret</code> does not have ggplot version of this function).</p>
+<p>My personal preference is to more directly display both distributions. This is done by <code>bwplot()</code> (<code>caret</code> does not have ggplot version of this function).</p>
 <pre class="r"><code>bwplot(resamples, metric = &quot;RMSE&quot;)</code></pre>
 <p><img src="/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p>It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.</p>

@@ -34,8 +34,7 @@ library(bupaR)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
 ## logical.return = TRUE, : there is no package called &amp;#39;petrinetR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(processmapR)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case.
-Here’s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case. Here’s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;patients &amp;lt;- eventdataR::patients
 
 df &amp;lt;- eventlog(patients,
@@ -114,9 +113,7 @@ df &amp;lt;- eventlog(patients,
 &lt;p&gt;The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.&lt;/p&gt;
 &lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% processmapR::trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;
-So there are a few traces (0.6%) that do not end with a check-out.
-Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Cases that get an X-ray&lt;/li&gt;
 &lt;li&gt;Cases that get a blood test followed by an MRI scan&lt;/li&gt;
@@ -125,8 +122,7 @@ Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
 &lt;div id=&#34;the-dotted-chart&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The dotted chart&lt;/h1&gt;
 &lt;p&gt;A really powerful visualization in process mining comes in the form of a “dotted chart”. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
-&lt;p&gt;It has two nice use cases.
-The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
+&lt;p&gt;It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
   theme_gray()&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;

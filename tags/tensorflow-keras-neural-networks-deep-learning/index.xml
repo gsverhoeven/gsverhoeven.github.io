@@ -26,20 +26,12 @@
 
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Introduction&lt;/h1&gt;
-&lt;p&gt;I don’t change computers often. The fun for me is to make the most out of sparse resources.
-Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. &lt;a href=&#34;http://www.picotux.com/&#34; class=&#34;uri&#34;&gt;http://www.picotux.com/&lt;/a&gt;), as well as huge supercomputers (&lt;a href=&#34;https://itsfoss.com/linux-runs-top-supercomputers/&#34; class=&#34;uri&#34;&gt;https://itsfoss.com/linux-runs-top-supercomputers/&lt;/a&gt;).
-I do like to keep up with new tech developments.
-And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
-&lt;p&gt;And the nice thing about lagging behind: The choice for deep learning is now extremely simple.
-I need &lt;a href=&#34;https://keras.io/&#34;&gt;Keras&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;TensorFlow&lt;/a&gt; as a computational backend.
-Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.&lt;/p&gt;
+&lt;p&gt;I don’t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. &lt;a href=&#34;http://www.picotux.com/&#34; class=&#34;uri&#34;&gt;http://www.picotux.com/&lt;/a&gt;), as well as huge supercomputers (&lt;a href=&#34;https://itsfoss.com/linux-runs-top-supercomputers/&#34; class=&#34;uri&#34;&gt;https://itsfoss.com/linux-runs-top-supercomputers/&lt;/a&gt;). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
+&lt;p&gt;And the nice thing about lagging behind: The choice for deep learning is now extremely simple. I need &lt;a href=&#34;https://keras.io/&#34;&gt;Keras&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;TensorFlow&lt;/a&gt; as a computational backend. Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;tensorflow-and-avx&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;TensorFlow and AVX&lt;/h1&gt;
-&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation.
-And therefore it tries to exploit all hardware features that speed up computation.
-One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;.
-As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
+&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;. As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
 &lt;p&gt;But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;building-tensorflow-on-a-really-old-computer&#34; class=&#34;section level1&#34;&gt;
@@ -57,22 +49,18 @@ As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to 
 &lt;ul&gt;
 &lt;li&gt;Tweak Bazel arguments endlessly to reduce resource usage to be able to complete the build process succesfully&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;In the end, I removed the &lt;code&gt;-c opt&lt;/code&gt;, so no special optimization for my CPU.
-And asked for &lt;strong&gt;one CPU&lt;/strong&gt; (I have two cores :-), &lt;strong&gt;one job&lt;/strong&gt;, and &lt;strong&gt;max 2GB of RAM usage&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;In the end, I removed the &lt;code&gt;-c opt&lt;/code&gt;, so no special optimization for my CPU. And asked for &lt;strong&gt;one CPU&lt;/strong&gt; (I have two cores :-), &lt;strong&gt;one job&lt;/strong&gt;, and &lt;strong&gt;max 2GB of RAM usage&lt;/strong&gt;.&lt;/p&gt;
 &lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;cd tf_build_env/
 source bin/activate
 cd ~/Github/tensorflow/
 bazel build --config=opt --local_ram_resources=2048 --local_cpu_resources=HOST_CPUS-1 --jobs=1
   //tensorflow/tools/pip_package:build_pip_package&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I ran the build process in a terminal on the Ubuntu 18.04 Desktop, without any other programs loaded.
-As the Ubuntu Desktop + OS consumes about 1 GB on my system. This leave about 2.5 GB for bazel.
-Now as it turns out, according to &lt;code&gt;htop&lt;/code&gt; memory consumption went up to 3.6 GB (of my 3.9GB max), but it succeeded in the end. This was after 10 hours of compiling! (I let it run overnight)&lt;/p&gt;
+&lt;p&gt;I ran the build process in a terminal on the Ubuntu 18.04 Desktop, without any other programs loaded. My 2010 PC has in total 4 GB of RAM. As the Ubuntu Desktop + OS consumes about 1-1.5 GB on my system, this leaves about 2.5-3.0 GB for bazel. Now as it turns out, according to &lt;code&gt;htop&lt;/code&gt; memory consumption went up to 3.6 GB (of my 3.9GB max), but it succeeded in the end. This was after 10 hours of compiling! (I let it run overnight)&lt;/p&gt;
 &lt;p&gt;The final step was to turn the compiled TensorFlow into a Python Wheel package ready to install using &lt;code&gt;pip&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 # creates a &amp;#39;wheel&amp;#39; file called tensorflow-2.2.0-cp36-cp36m-linux_x86_64.whl&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the &lt;a href=&#34;https://www.tensorflow.org/tutorials/keras/classification&#34;&gt;Fashion MNIST classification with Keras&lt;/a&gt; example flawlessly.&lt;/p&gt;
-&lt;p&gt;And even on my ancient PC performance was quite good, training the model took around 1 minute.
-So, after glorious succes in Python, it was time to move on to R.&lt;/p&gt;
+&lt;p&gt;And even on my ancient PC performance was quite good, training the model took around 1 minute. So, after glorious succes in Python, it was time to move on to R.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;keras-in-r-with-the-classic-mnist&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Keras in R with the classic MNIST&lt;/h1&gt;
@@ -180,7 +168,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       loss   accuracy 
-## 0.08402114 0.97450000&lt;/code&gt;&lt;/pre&gt;
+## 0.08137871 0.97570002&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;

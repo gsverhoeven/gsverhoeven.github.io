@@ -596,20 +596,12 @@
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>I don’t change computers often. The fun for me is to make the most out of sparse resources.
-Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. <a href="http://www.picotux.com/" class="uri">http://www.picotux.com/</a>), as well as huge supercomputers (<a href="https://itsfoss.com/linux-runs-top-supercomputers/" class="uri">https://itsfoss.com/linux-runs-top-supercomputers/</a>).
-I do like to keep up with new tech developments.
-And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.</p>
-<p>And the nice thing about lagging behind: The choice for deep learning is now extremely simple.
-I need <a href="https://keras.io/">Keras</a> with <a href="https://www.tensorflow.org/">TensorFlow</a> as a computational backend.
-Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.</p>
+<p>I don’t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. <a href="http://www.picotux.com/" class="uri">http://www.picotux.com/</a>), as well as huge supercomputers (<a href="https://itsfoss.com/linux-runs-top-supercomputers/" class="uri">https://itsfoss.com/linux-runs-top-supercomputers/</a>). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.</p>
+<p>And the nice thing about lagging behind: The choice for deep learning is now extremely simple. I need <a href="https://keras.io/">Keras</a> with <a href="https://www.tensorflow.org/">TensorFlow</a> as a computational backend. Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.</p>
 </div>
 <div id="tensorflow-and-avx" class="section level1">
 <h1>TensorFlow and AVX</h1>
-<p>Then I ran into a problem: TensorFlow is all about FAST computation.
-And therefore it tries to exploit all hardware features that speed up computation.
-One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX</a>.
-As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.</p>
+<p>Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX</a>. As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.</p>
 <p>But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)</p>
 </div>
 <div id="building-tensorflow-on-a-really-old-computer" class="section level1">
@@ -627,22 +619,18 @@ As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to 
 <ul>
 <li>Tweak Bazel arguments endlessly to reduce resource usage to be able to complete the build process succesfully</li>
 </ul>
-<p>In the end, I removed the <code>-c opt</code>, so no special optimization for my CPU.
-And asked for <strong>one CPU</strong> (I have two cores :-), <strong>one job</strong>, and <strong>max 2GB of RAM usage</strong>.</p>
+<p>In the end, I removed the <code>-c opt</code>, so no special optimization for my CPU. And asked for <strong>one CPU</strong> (I have two cores :-), <strong>one job</strong>, and <strong>max 2GB of RAM usage</strong>.</p>
 <pre class="bash"><code>cd tf_build_env/
 source bin/activate
 cd ~/Github/tensorflow/
 bazel build --config=opt --local_ram_resources=2048 --local_cpu_resources=HOST_CPUS-1 --jobs=1
   //tensorflow/tools/pip_package:build_pip_package</code></pre>
-<p>I ran the build process in a terminal on the Ubuntu 18.04 Desktop, without any other programs loaded.
-As the Ubuntu Desktop + OS consumes about 1 GB on my system. This leave about 2.5 GB for bazel.
-Now as it turns out, according to <code>htop</code> memory consumption went up to 3.6 GB (of my 3.9GB max), but it succeeded in the end. This was after 10 hours of compiling! (I let it run overnight)</p>
+<p>I ran the build process in a terminal on the Ubuntu 18.04 Desktop, without any other programs loaded. My 2010 PC has in total 4 GB of RAM. As the Ubuntu Desktop + OS consumes about 1-1.5 GB on my system, this leaves about 2.5-3.0 GB for bazel. Now as it turns out, according to <code>htop</code> memory consumption went up to 3.6 GB (of my 3.9GB max), but it succeeded in the end. This was after 10 hours of compiling! (I let it run overnight)</p>
 <p>The final step was to turn the compiled TensorFlow into a Python Wheel package ready to install using <code>pip</code>.</p>
 <pre class="bash"><code>./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
 # creates a &#39;wheel&#39; file called tensorflow-2.2.0-cp36-cp36m-linux_x86_64.whl</code></pre>
 <p>To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the <a href="https://www.tensorflow.org/tutorials/keras/classification">Fashion MNIST classification with Keras</a> example flawlessly.</p>
-<p>And even on my ancient PC performance was quite good, training the model took around 1 minute.
-So, after glorious succes in Python, it was time to move on to R.</p>
+<p>And even on my ancient PC performance was quite good, training the model took around 1 minute. So, after glorious succes in Python, it was time to move on to R.</p>
 </div>
 <div id="keras-in-r-with-the-classic-mnist" class="section level1">
 <h1>Keras in R with the classic MNIST</h1>
@@ -750,7 +738,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 <pre class="r"><code>model %&gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)</code></pre>
 <pre><code>##       loss   accuracy 
-## 0.08402114 0.97450000</code></pre>
+## 0.08137871 0.97570002</code></pre>
 <p>Our model achieved ~98% accuracy on the test set.</p>
 <p>Awesome.</p>
 </div>

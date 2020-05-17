@@ -604,8 +604,7 @@ library(bupaR)</code></pre>
 <pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
 ## logical.return = TRUE, : there is no package called &#39;petrinetR&#39;</code></pre>
 <pre class="r"><code>library(processmapR)</code></pre>
-<p>Now, our dataset is already in <code>eventlog</code> format, but typically this not the case.
-Here’s how to turn a data.frame into an object of class <code>eventlog</code>:</p>
+<p>Now, our dataset is already in <code>eventlog</code> format, but typically this not the case. Here’s how to turn a data.frame into an object of class <code>eventlog</code>:</p>
 <pre class="r"><code>patients &lt;- eventdataR::patients
 
 df &lt;- eventlog(patients,
@@ -684,9 +683,7 @@ df &lt;- eventlog(patients,
 <p>The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.</p>
 <p>To visualize all traces, we set <code>coverage</code> to 1.0.</p>
 <pre class="r"><code>df %&gt;% processmapR::trace_explorer(type = &quot;frequent&quot;, coverage = 1.0)</code></pre>
-<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png" width="672" />
-So there are a few traces (0.6%) that do not end with a check-out.
-Ignoring these rare cases, we find that there are two types of cases:</p>
+<p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png" width="672" /> So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:</p>
 <ul>
 <li>Cases that get an X-ray</li>
 <li>Cases that get a blood test followed by an MRI scan</li>
@@ -695,8 +692,7 @@ Ignoring these rare cases, we find that there are two types of cases:</p>
 <div id="the-dotted-chart" class="section level1">
 <h1>The dotted chart</h1>
 <p>A really powerful visualization in process mining comes in the form of a “dotted chart”. The dotted chart function produces a <code>ggplot</code> graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.</p>
-<p>It has two nice use cases.
-The first is when we plot actual time on the x-axis, and sort the cases by starting date.</p>
+<p>It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.</p>
 <pre class="r"><code>df %&gt;% dotted_chart(x = &quot;absolute&quot;, sort = &quot;start&quot;) + ggtitle(&quot;All cases&quot;) +
   theme_gray()</code></pre>
 <pre><code>## Joining, by = &quot;patient&quot;</code></pre>

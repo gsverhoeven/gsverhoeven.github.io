@@ -636,8 +636,7 @@ pred_GLM &lt;- predict(my_glm, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)</code></pre>
-<p><img src="/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png" width="672" />
-# Run a RF on the discrepancy</p>
+<p><img src="/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png" width="672" /> # Run a RF on the discrepancy</p>
 <p>Discrepancy is defined as the difference between the predictions of both models for each observation.</p>
 <pre class="r"><code>pred_diff &lt;- pred_RF$predictions - pred_GLM
 
@@ -658,8 +657,8 @@ my_ranger_diff</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.243949 
-## R squared (OOB):                  0.659956</code></pre>
+## OOB prediction error (MSE):       5.212004 
+## R squared (OOB):                  0.6575567</code></pre>
 <p>It turns out the RF can “explain” 67% of these discrepancies.</p>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_diff)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -749,8 +748,8 @@ my_ranger_diff2</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.514541 
-## R squared (OOB):                  0.4460942</code></pre>
+## OOB prediction error (MSE):       5.401101 
+## R squared (OOB):                  0.4528993</code></pre>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_diff2)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -764,8 +763,7 @@ myres &lt;- myres[, i := as.integer(i)]</code></pre>
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()</code></pre>
 <p><img src="/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<p>Now the variables that best predict the discrepancy are <code>lstat</code> and <code>dis</code>.
-Add these two variables as an interaction.</p>
+<p>Now the variables that best predict the discrepancy are <code>lstat</code> and <code>dis</code>. Add these two variables as an interaction.</p>
 <pre class="r"><code>my_glm_int2 &lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
               family = &quot;gaussian&quot;)
 summary(my_glm_int2)</code></pre>
@@ -814,10 +812,7 @@ summary(my_glm_int2)</code></pre>
 </div>
 <div id="a-more-ambitious-goal-try-and-improve-harrison-rubinfelds-model-formula-for-boston-housing" class="section level1">
 <h1>A more ambitious goal: Try and improve Harrison &amp; Rubinfeld’s model formula for Boston housing</h1>
-<p>So far, we assumed that all relationships are linear.
-Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc.
-Let’s see if we can improve upon this model equation by applying our method to search for interactions.
-Their formula predicts <code>log(medv)</code>.</p>
+<p>So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let’s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts <code>log(medv)</code>.</p>
 <pre class="r"><code># Harrison and Rubinfeld (1978) model
 my_glm_hr &lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2), data = Boston, 
@@ -871,8 +866,7 @@ pred_GLM &lt;- predict(my_glm_hr, data = Boston)
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)</code></pre>
 <p><img src="/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<p>For low predicted values both models differ in a systematic way.
-This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.</p>
+<p>For low predicted values both models differ in a systematic way. This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.</p>
 <pre class="r"><code>pred_diff &lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_log_diff &lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -892,8 +886,8 @@ my_ranger_log_diff</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009044664 
-## R squared (OOB):                  0.5385485</code></pre>
+## OOB prediction error (MSE):       0.009213626 
+## R squared (OOB):                  0.534747</code></pre>
 <p>The RF indicates that 54% of the discrepancy can be “explained” by RF.</p>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_log_diff)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -987,8 +981,8 @@ my_ranger_log_diff2</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008926369 
-## R squared (OOB):                  0.5127509</code></pre>
+## OOB prediction error (MSE):       0.008909949 
+## R squared (OOB):                  0.5171111</code></pre>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_log_diff2)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -1057,13 +1051,14 @@ summary(my_glm_hr_int2)</code></pre>
 <div id="have-these-interactions-already-been-reported-on-in-the-literature" class="section level1">
 <h1>Have these interactions already been reported on in the literature?</h1>
 <p>Tom Minka reports on his website an analysis of interactions in the Boston Housing set:</p>
-<p>(<a href="http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/" class="uri">http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/</a>)
-<code>&gt; summary(fit3) Coefficients:                   Estimate Std. Error t value Pr(&gt;|t|)     (Intercept)      -227.5485    49.2363  -4.622 4.87e-06 *** lstat              50.8553    20.3184   2.503 0.012639 *   rm                 38.1245     7.0987   5.371 1.21e-07 *** dis               -16.8163     2.9174  -5.764 1.45e-08 *** ptratio            14.9592     2.5847   5.788 1.27e-08 *** lstat:rm           -6.8143     3.1209  -2.183 0.029475 *   lstat:dis           4.8736     1.3940   3.496 0.000514 *** lstat:ptratio      -3.3209     1.0345  -3.210 0.001412 **  rm:dis              2.0295     0.4435   4.576 5.99e-06 *** rm:ptratio         -1.9911     0.3757  -5.299 1.76e-07 *** lstat:rm:dis       -0.5216     0.2242  -2.327 0.020364 *   lstat:rm:ptratio    0.3368     0.1588   2.121 0.034423 *</code></p>
-<p>Rob mcCulloch, using BART (bayesian additive regression trees) also examines interactions in the Boston Housing data.
-There the co-occurence within trees is used to discover interactions:</p>
+<p>(<a href="http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/" class="uri">http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/</a>) <code>&gt; summary(fit3) Coefficients:                   Estimate Std. Error t value Pr(&gt;|t|)     (Intercept)      -227.5485    49.2363  -4.622 4.87e-06 *** lstat              50.8553    20.3184   2.503 0.012639 *   rm                 38.1245     7.0987   5.371 1.21e-07 *** dis               -16.8163     2.9174  -5.764 1.45e-08 *** ptratio            14.9592     2.5847   5.788 1.27e-08 *** lstat:rm           -6.8143     3.1209  -2.183 0.029475 *   lstat:dis           4.8736     1.3940   3.496 0.000514 *** lstat:ptratio      -3.3209     1.0345  -3.210 0.001412 **  rm:dis              2.0295     0.4435   4.576 5.99e-06 *** rm:ptratio         -1.9911     0.3757  -5.299 1.76e-07 *** lstat:rm:dis       -0.5216     0.2242  -2.327 0.020364 *   lstat:rm:ptratio    0.3368     0.1588   2.121 0.034423 *</code></p>
+<p>Rob mcCulloch, using BART (bayesian additive regression trees) also examines interactions in the Boston Housing data. There the co-occurence within trees is used to discover interactions:</p>
 <p><code>The second, interaction detection, uncovers which pairs of variables interact in analogous fashion by keeping track of the percentage of trees in the sum in which both variables occur.  This exploits the fact that a sum-of-trees model captures an interaction between xi and xj by using them both for splitting rules in the same tree.</code></p>
 <p><a href="http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf" class="uri">http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf</a></p>
-<p><img src="boston_uit_bart_book.png" /></p>
+<div class="figure">
+<img src="boston_uit_bart_book.png" />
+
+</div>
 </div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
