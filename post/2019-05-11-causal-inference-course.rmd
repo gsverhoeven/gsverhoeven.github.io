@@ -7,9 +7,12 @@ summary: In this blog post, I describe the introductory course on Causal Inferen
 draft: FALSE
 slug: causal-inference-course
 categories:
-  - R
+  - Causal inference
 tags:
-  - R, causal inference, DAG, causal graph 
+  - R
+  - causal inference
+  - DAG
+  - causal graph 
 header:
   image: 'headers/sharon-mccutcheon-532782-unsplash.jpg'
   caption: ''

@@ -1,0 +1,921 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R | Gertjan Verhoeven</title>
+    <link>https://gsverhoeven.github.io/tags/r/</link>
+      <atom:link href="https://gsverhoeven.github.io/tags/r/index.xml" rel="self" type="application/rss+xml" />
+    <description>R</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>R</title>
+      <link>https://gsverhoeven.github.io/tags/r/</link>
+    </image>
+    
+    <item>
+      <title>Simulating Fake Data in R</title>
+      <link>https://gsverhoeven.github.io/post/simulating-fake-data/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/simulating-fake-data/</guid>
+      <description>
+
+
+&lt;p&gt;This blog post is on simulating fake data. I&#39;m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
+&lt;p&gt;If we want to mimic an existing dataset, it is desirable to&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make sure that the simulated variables have the proper data type and comparable distribution of values and&lt;/li&gt;
+&lt;li&gt;correlations between the variables in the real dataset are taken into account.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In addition, it would be nice if such functionality is available in a standard R package. After reviewing several R packages that can simulate data, I picked the &lt;a href=&#34;https://www.rdatagen.net/page/simstudy/&#34;&gt;simstudy&lt;/a&gt; package as most promising to explore in more detail. &lt;code&gt;simstudy&lt;/code&gt; is created by &lt;strong&gt;Keith Goldfeld&lt;/strong&gt; from New York University.&lt;/p&gt;
+&lt;p&gt;In this blog post, I explain how &lt;code&gt;simstudy&lt;/code&gt; is able to generate correlated variables, having either continuous or binary values. Along the way, we learn about fancy statistical slang such as copula&#39;s and tetrachoric correlations. It turns out there is a close connection with psychometrics, which we&#39;ll briefly discuss.&lt;/p&gt;
+&lt;p&gt;Let&#39;s start with correlated continuous variables.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Loading required packages
+library(simstudy)
+library(data.table)
+library(ggplot2)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;copulas-simulating-continuous-correlated-variables&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Copulas: Simulating continuous correlated variables&lt;/h1&gt;
+&lt;p&gt;Copulas are a fancy word for correlated (&amp;quot;coupled&amp;quot;) variables that each have a uniform distribution between 0 and 1.&lt;/p&gt;
+&lt;p&gt;Using copulas, we can convert correlated multivariate normal data to data from any known continuous probability distribution, while keeping exactly the same correlation matrix. The normal data is something we can easily simulate, and by choosing appropriate probability distributions, we can approximate the variables in real datasets.&lt;/p&gt;
+&lt;p&gt;Ok let&#39;s do it!&lt;/p&gt;
+&lt;div id=&#34;step-1-correlated-multivariate-normal-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 1: correlated multivariate normal data&lt;/h2&gt;
+&lt;p&gt;The workhorse for our simulated data is a function to simulate multivariate normal data. We&#39;ll use the &lt;code&gt;MASS&lt;/code&gt; package function &lt;code&gt;mvrnorm()&lt;/code&gt;. Other slightly faster (factor 3-4) implementations exist, see e.g. &lt;code&gt;mvnfast&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The trick is to first generate multivariate normal data with the required correlation structure, with mean 0 and standard deviation 1. This gives us correlated data, where each variable is marginally (by itself) normal distributed.&lt;/p&gt;
+&lt;p&gt;Here I simulate two variables, but the same procedure holds for N variables. The Pearson correlation is set at &lt;code&gt;0.7&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.7
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e4, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
+&lt;p&gt;Did it work?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1, df$X2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.6985089&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-2-transform-variables-to-uniform-distribution&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 2: transform variables to uniform distribution&lt;/h2&gt;
+&lt;p&gt;Using the normal cumulative distribution function &lt;code&gt;pnorm()&lt;/code&gt;, we can transform our normally distributed variables to have a uniform distribution, while keeping the correlation structure intact!!!!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_U &amp;lt;- pnorm(df$X1)
+df$X2_U &amp;lt;- pnorm(df$X2)
+
+ggplot(df, aes(x = X1_U)) + geom_histogram(boundary = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_U, y = X2_U)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And here&#39;s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_U, df$X2_U)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.677868&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-3-from-uniform-to-any-standard-probability-distribution-we-like&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 3: from uniform to any standard probability distribution we like&lt;/h2&gt;
+&lt;p&gt;Now, if we plug in uniformly distributed data in a &lt;strong&gt;quantile function&lt;/strong&gt; of any arbitrary (known) probability distribution, we can make the variables have any distribution we like.&lt;/p&gt;
+&lt;p&gt;Let&#39;s pick for example a &lt;strong&gt;Gamma&lt;/strong&gt; distribution (Continuous, positive) with shape 4 and rate 1 for X1, and Let&#39;s pick a &lt;strong&gt;Normal&lt;/strong&gt; distribution (Continuous, symmetric) with mean 10 and sd 2 for X2.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_GAM &amp;lt;- qgamma(df$X1_U, shape = 4, rate =1)
+df$X2_NORM &amp;lt;- qnorm(df$X2_U, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X2_NORM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 10, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ok, that worked nicely. But what about their correlation?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_GAM, df$X2_NORM)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.682233&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Whoa!! They still have (almost) the same correlation we started out with before all our transformation magic.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simstudy-in-action&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simstudy in action&lt;/h1&gt;
+&lt;p&gt;Now let&#39;s see how &lt;code&gt;simstudy&lt;/code&gt; helps us generating this type of simulated data. Simstudy works with &amp;quot;definition tables&amp;quot; that allow us to specify, for each variable, which distribution and parameters to use, as well as the desired correlations between the variables.&lt;/p&gt;
+&lt;p&gt;After specifing a definition table, we can call one of its workhorse functions &lt;code&gt;genCorFlex()&lt;/code&gt; to generate the data.&lt;/p&gt;
+&lt;p&gt;N.b. Simstudy uses different parameters for the Gamma distribution, compared to R&#39;s &lt;code&gt;rgamma()&lt;/code&gt; function. Under water, it uses the &lt;code&gt;gammaGetShapeRate()&lt;/code&gt; to transform the &amp;quot;mean&amp;quot; and &amp;quot;variance/ dispersion&amp;quot; to the more conventional &amp;quot;shape&amp;quot; and &amp;quot;rate&amp;quot; parameters.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.7
+
+corr.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+# check that gamma parameters correspond to same shape and rate pars as used above
+#simstudy::gammaGetShapeRate(mean = 4, dispersion = 0.25)
+
+
+def &amp;lt;- defData(varname = &amp;quot;X1_GAM&amp;quot;, 
+               formula = 4, variance = 0.25, dist = &amp;quot;gamma&amp;quot;)
+
+def &amp;lt;- defData(def, varname = &amp;quot;X2_NORM&amp;quot;, 
+               formula = 10, variance = 2, dist = &amp;quot;normal&amp;quot;)
+
+
+
+dt &amp;lt;- genCorFlex(1e4, def, corMatrix = corr.mat)
+
+cor(dt[,-&amp;quot;id&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            X1_GAM   X2_NORM
+## X1_GAM  1.0000000 0.6823006
+## X2_NORM 0.6823006 1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dt, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;generate-correlated-binary-variables&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Generate correlated binary variables&lt;/h1&gt;
+&lt;p&gt;As it turns out, the copula approach does not work for binary variables. Well, it sort of works, but the correlations we get are lower than we actually specify.&lt;/p&gt;
+&lt;p&gt;Come to think of it: two binary variables cannot have all the correlations we like. To see why, check this out.&lt;/p&gt;
+&lt;div id=&#34;feasible-correlations-for-two-binary-variables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Feasible correlations for two binary variables&lt;/h2&gt;
+&lt;p&gt;Let&#39;s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.&lt;/p&gt;
+&lt;p&gt;To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1&#39;s, and let&#39;s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# maximal correlation
+x1 &amp;lt;- c(0, 0, 0, 0, 1)
+x2 &amp;lt;- c(0, 1, 1, 1, 1)
+
+mean(x1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.25&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# minimal correlation
+x1 &amp;lt;- c(1, 0, 0, 0, 0)
+x2 &amp;lt;- c(0, 1, 1, 1, 1)
+
+cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To get these vectors to be maximally correlated, we need to match &lt;code&gt;1&lt;/code&gt;&#39;s in &lt;code&gt;x1&lt;/code&gt; as much as possible with &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;. To get these vectors to be maximally anti-correlated, we need to match &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x1&lt;/code&gt; with as many &lt;code&gt;0&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this example, we conclude that the feasible correlation range is &lt;code&gt;{-1, 0.25}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;simstudy&lt;/code&gt; package contains a function to check for feasible boundaries, that contains this piece of code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p1 &amp;lt;- 0.2
+p2 &amp;lt;- 0.8
+
+# lowest correlation
+l &amp;lt;- (p1 * p2)/((1 - p1) * (1 - p2))
+
+max(-sqrt(l), -sqrt(1/l))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# highest correlation
+u &amp;lt;- (p1 * (1 - p2))/(p2 * (1 - p1))
+
+min(sqrt(u), sqrt(1/u))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.25&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This confirms our example above.&lt;/p&gt;
+&lt;p&gt;Note that if we want to mimic a real dataset with binary correlated variables, the correlations are a given, and are obviously all feasible because we obtain them from actual data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-model-for-two-correlated-binary-variables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;A model for two correlated binary variables&lt;/h2&gt;
+&lt;p&gt;Ok let&#39;s suppose we want a two binary vectors &lt;code&gt;B1&lt;/code&gt; and &lt;code&gt;B2&lt;/code&gt; , with means &lt;code&gt;p1 = 0.2&lt;/code&gt; and &lt;code&gt;p2 = 0.8&lt;/code&gt; and (feasible) Pearson correlation 0.1.&lt;/p&gt;
+&lt;p&gt;How? How?&lt;/p&gt;
+&lt;p&gt;The idea is that to get two binary variables to have an exact particular correlation, we imagine an underlying (&amp;quot;latent&amp;quot;) bivariate (2D) normal distribution. This normal distribution has the means fixed to 0, and the standard deviations fixed to 1.&lt;/p&gt;
+&lt;p&gt;Why? Because a) we know it very well theoretically and b) we know how to simulate efficiently from such a distribution, using &lt;code&gt;mvrnorm()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this bivariate normal distribution, we draw a quadrant (i.e. two thresholds). The thresholds define transformations to binary variables. Below the threshold, the binary value is 0, above it is 1. We have to pick the thresholds such that the resulting binary variables have the desired mean (i.e. percentage of 1&#39;s).&lt;/p&gt;
+&lt;p&gt;This approach reduces the problem to finding the right values of three parameters: multivariate normal correlation, and the two thresholds (above, we already fixed the means and variance to zero and one respectively).&lt;/p&gt;
+&lt;p&gt;For now, we&#39;ll just pick some value for the correlation in the bivariate normal, say 0.5, and focus on where to put the threshholds.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.5
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 10000, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ok, where to put the thresholds? That&#39;s simple, we just need to use the &lt;code&gt;quantile distribution function&lt;/code&gt; to partition the marginal normal variables into 0 and 1 portions.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
+df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
+
+mean(df$B1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.197&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.7988&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s check it out visually:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3) + 
+  geom_vline(xintercept = qnorm(0.2), col = &amp;quot;red&amp;quot;) +
+  geom_hline(yintercept = qnorm(0.8), col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Nice.&lt;/p&gt;
+&lt;p&gt;Ok, so now what is the correlation for these two binary variables?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1877482&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ok, so if X1 and X2 have a correlation of 0.5, this results in a correlation of 0.19 between the binary variables B1 and B2.&lt;/p&gt;
+&lt;p&gt;But we need B1 and B2 to have a correlation of 0.1!&lt;/p&gt;
+&lt;p&gt;At this point, there is only one free parameter left, the correlation of the normally distributed variables &lt;code&gt;X1&lt;/code&gt; and &lt;code&gt;X2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We could of course manually try to find which correlation we must choose between &lt;code&gt;X1&lt;/code&gt; and &lt;code&gt;X2&lt;/code&gt; to get the desired correlation of 0.1 in the binary variables. But that would be very unpractical.&lt;/p&gt;
+&lt;p&gt;Fortunately, Emrich and Piedmonte (1991) published an iterative method to solve this puzzle. And this method has been implemented in &lt;code&gt;simstudy&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;simstudy:::.findRhoBin(p1 = 0.2, 
+                       p2 = 0.8, d = 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s see if it works:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+corr &amp;lt;- 0.2218018
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e6, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))
+
+df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
+df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
+
+cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;relation-to-psychometrics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Relation to psychometrics&lt;/h1&gt;
+&lt;p&gt;So what has psychometrics to do with all this simulation of correlated binary vector stuff?&lt;/p&gt;
+&lt;p&gt;Well, psychometrics is all about theorizing about unobserved, latent, imaginary &amp;quot;constructs&amp;quot;, such as &lt;strong&gt;attitude&lt;/strong&gt;, &lt;strong&gt;general intelligence&lt;/strong&gt; or a &lt;strong&gt;personality trait&lt;/strong&gt;. To measure these constructs, questionnaires are used. The questions are called &lt;strong&gt;items&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Now imagine a situation where we are interested in a particular construct, say &lt;strong&gt;general intelligence&lt;/strong&gt;, and we design two questions to measure (hope to learn more about) the construct. Furthermore, assume that one question is more difficult than the other question. The answers to both questions can either be wrong or right.&lt;/p&gt;
+&lt;p&gt;We can model this by assuming that the (imaginary) variable &amp;quot;intelligence&amp;quot; of each respondent is located on a two-dimensional plane, with the distribution of the respondents determined by a bivariate normal distribution. Dividing this plane into four quadrants then gives us the measurable answers (right or wrong) to both questions. Learning the answers to both questions then gives us an approximate location of a respondent on our &amp;quot;intelligence&amp;quot; plane!&lt;/p&gt;
+&lt;div id=&#34;phi-tetrachoric-correlation-and-the-psych-package&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Phi, tetrachoric correlation and the psych package&lt;/h2&gt;
+&lt;p&gt;Officially, the Pearson correlation between two binary vectors is called the &lt;a href=&#34;https://en.wikipedia.org/wiki/Phi_coefficient&#34;&gt;Phi coefficient&lt;/a&gt;. This name was actually chosen by Karl Pearson himself.&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;psych&lt;/strong&gt; packages contains a set of convenient functions for calculating Phi coefficients from empirical two by two tables (of two binary vectors), and finding the corresponding Pearson coefficient for the 2d (latent) normal. This coefficient is called the &lt;strong&gt;tetrachoric correlation&lt;/strong&gt;. Again a fine archaic slang word for again a basic concept.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(psych)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &amp;#39;psych&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &amp;#39;package:ggplot2&amp;#39;:
+## 
+##     %+%, alpha&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# convert simulated binary vectors B1 and B2 to 2x2 table
+twobytwo &amp;lt;- table(df$B1, df$B2)/nrow(df)
+
+phi(twobytwo, digits = 6)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.099574&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# both give the same result&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can use &lt;strong&gt;phi2tetra&lt;/strong&gt; to find the tetrachoric correlation that corresponds to the combination of a &amp;quot;Phi coefficient&amp;quot;, i.e. the correlation between the two binary vectors, as well as their marginals. This is a wrapper that builds the two by two frequency table and then calls &lt;code&gt;tetrachoric()&lt;/code&gt; . This in turn uses &lt;code&gt;optimize&lt;/code&gt; (Maximum Likelihood method?) to find the tetrachoric correlation.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;phi2tetra(0.1, c(0.2, 0.8))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2217801&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# compare with EP method
+simstudy:::.findRhoBin(0.2, 0.8, 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Comparing with the Emrich and Piedmonte method, we find that they give identical answers. Great, case closed!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simstudy-in-action-ii&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simstudy in action II&lt;/h1&gt;
+&lt;p&gt;Now that we feel confident in our methods and assumptions, let&#39;s see &lt;code&gt;simstudy&lt;/code&gt; in action.&lt;/p&gt;
+&lt;p&gt;Let&#39;s generate two binary variables, that have marginals of 20% and 80% respectively, and a Pearson correlation coefficient of 0.1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+corr &amp;lt;- 0.1
+
+corr.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+res &amp;lt;- simstudy::genCorGen(10000, nvars = 2, 
+                 params1 = c(0.2, 0.8),
+                 corMatrix = corr.mat,
+                 dist = &amp;quot;binary&amp;quot;, 
+                 method = &amp;quot;ep&amp;quot;, wide = TRUE)
+
+# let&amp;#39;s check the result
+cor(res[, -c(&amp;quot;id&amp;quot;)])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            V1         V2
+## V1 1.00000000 0.09682531
+## V2 0.09682531 1.00000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Awesome, it worked!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;Recall, my motivation for simulating fake data with particular variable types and correlation structure is to mimic real datasets.&lt;/p&gt;
+&lt;p&gt;So are we there yet? Well, we made some progress. We now can handle correlated continuous data, as well as correlated binary data.&lt;/p&gt;
+&lt;p&gt;But we need to solve two more problems:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;To simulate a particular dataset, we still need to determine for each variable its data type (binary or continuous), and if it&#39;s continuous, what is the most appropriate probability distribution (Normal, Gamma, Log-normal, etc).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;we haven&#39;t properly solved correlation between dissimilar data types, e.g. a correlation between a continuous and a binary variable.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Judging from the literature (Amatya &amp;amp; Demirtas 2016) and packages such as &lt;code&gt;SimMultiCorrData&lt;/code&gt; by Allison Fialkowski, these are both solved, and I only need to learn about them! So, to be continued.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Exploring Process Mining in R</title>
+      <link>https://gsverhoeven.github.io/post/exploring-process-mining/</link>
+      <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/exploring-process-mining/</guid>
+      <description>
+
+
+&lt;p&gt;In this post, we&#39;ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
+&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an &amp;quot;Artifical eventlog about patients&amp;quot;.&lt;/p&gt;
+&lt;div id=&#34;getting-started&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;After installing all required packages, we can load the whole &amp;quot;bupaverse&amp;quot; by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+library(bupaR)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;xesreadR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;processmonitR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;petrinetR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(processmapR)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case. Here&#39;s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;patients &amp;lt;- eventdataR::patients
+
+df &amp;lt;- eventlog(patients,
+               case_id = &amp;quot;patient&amp;quot;,
+               activity_id = &amp;quot;handling&amp;quot;,
+               activity_instance_id = &amp;quot;handling_id&amp;quot;,
+               lifecycle_id = &amp;quot;registration_type&amp;quot;,
+               timestamp = &amp;quot;time&amp;quot;,
+               resource_id = &amp;quot;employee&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: The `add` argument of `group_by()` is deprecated as of dplyr 1.0.0.
+## Please use the `.add` argument instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s check it out.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Number of events:  5442
+## Number of cases:  500
+## Number of traces:  7
+## Number of distinct activities:  7
+## Average trace length:  10.884
+## 
+## Start eventlog:  2017-01-02 11:41:53
+## End eventlog:  2018-05-05 07:16:02&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                   handling      patient          employee  handling_id       
+##  Blood test           : 474   Length:5442        r1:1000   Length:5442       
+##  Check-out            : 984   Class :character   r2:1000   Class :character  
+##  Discuss Results      : 990   Mode  :character   r3: 474   Mode  :character  
+##  MRI SCAN             : 472                      r4: 472                     
+##  Registration         :1000                      r5: 522                     
+##  Triage and Assessment:1000                      r6: 990                     
+##  X-Ray                : 522                      r7: 984                     
+##  registration_type      time                         .order    
+##  complete:2721     Min.   :2017-01-02 11:41:53   Min.   :   1  
+##  start   :2721     1st Qu.:2017-05-06 17:15:18   1st Qu.:1361  
+##                    Median :2017-09-08 04:16:50   Median :2722  
+##                    Mean   :2017-09-02 20:52:34   Mean   :2722  
+##                    3rd Qu.:2017-12-22 15:44:11   3rd Qu.:4082  
+##                    Max.   :2018-05-05 07:16:02   Max.   :5442  
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we learn that there are 500 &amp;quot;cases&amp;quot;, i.e. patients. There are 7 different activities.&lt;/p&gt;
+&lt;p&gt;Let&#39;s check out the data for a single patient:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% filter(patient == 1) %&amp;gt;% 
+  arrange(handling_id) #%&amp;gt;% &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Log of 12 events consisting of:
+## 1 trace 
+## 1 case 
+## 6 instances of 6 activities 
+## 6 resources 
+## Events occurred from 2017-01-02 11:41:53 until 2017-01-09 19:45:45 
+##  
+## Variables were mapped as follows:
+## Case identifier:     patient 
+## Activity identifier:     handling 
+## Resource identifier:     employee 
+## Activity instance identifier:    handling_id 
+## Timestamp:           time 
+## Lifecycle transition:        registration_type 
+## 
+## # A tibble: 12 x 7
+##    handling patient employee handling_id registration_ty… time               
+##    &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;   &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;       &amp;lt;fct&amp;gt;            &amp;lt;dttm&amp;gt;             
+##  1 Registr… 1       r1       1           start            2017-01-02 11:41:53
+##  2 Registr… 1       r1       1           complete         2017-01-02 12:40:20
+##  3 Blood t… 1       r3       1001        start            2017-01-05 08:59:04
+##  4 Blood t… 1       r3       1001        complete         2017-01-05 14:34:27
+##  5 MRI SCAN 1       r4       1238        start            2017-01-05 21:37:12
+##  6 MRI SCAN 1       r4       1238        complete         2017-01-06 01:54:23
+##  7 Discuss… 1       r6       1735        start            2017-01-07 07:57:49
+##  8 Discuss… 1       r6       1735        complete         2017-01-07 10:18:08
+##  9 Check-o… 1       r7       2230        start            2017-01-09 17:09:43
+## 10 Check-o… 1       r7       2230        complete         2017-01-09 19:45:45
+## 11 Triage … 1       r2       501         start            2017-01-02 12:40:20
+## 12 Triage … 1       r2       501         complete         2017-01-02 22:32:25
+## # … with 1 more variable: .order &amp;lt;int&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt; # select(handling, handling_id, registration_type) # does not work&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We learn that each &amp;quot;handling&amp;quot; has a separate start and complete timestamp.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;traces&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Traces&lt;/h1&gt;
+&lt;p&gt;The summary info of the event log also counts so-called &amp;quot;traces&amp;quot;. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let&#39;s visualize them.&lt;/p&gt;
+&lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% processmapR::trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `rename_()` is deprecated as of dplyr 0.7.0.
+## Please use `rename()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cases that get an X-ray&lt;/li&gt;
+&lt;li&gt;Cases that get a blood test followed by an MRI scan&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-dotted-chart&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The dotted chart&lt;/h1&gt;
+&lt;p&gt;A really powerful visualization in process mining comes in the form of a &amp;quot;dotted chart&amp;quot;. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
+&lt;p&gt;It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The slope of this graphs learns us the rate of new cases, and if this changes over time. Here it appears constant, with 500 cases divided over five quarter years.&lt;/p&gt;
+&lt;p&gt;The second is to align all cases relative to the first event, and sort on duration of the whole sequence of events.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;relative&amp;quot;, sort = &amp;quot;duration&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;A nice pattern emerges, where all cases start with registration, then quickly proceed to triage and assessment, after that, a time varying period of 1-10 days follows where either the blood test + MRI scan, or the X-ray is performed, followed by discussing the results. Finally, check out occurs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;To conclude, the process mining approach to analyze time series event data appears highly promising. The dotted chart is a great addition to my data visualization repertoire, and the process mining folks appear to have at lot more goodies, such as Trace Alignment.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Designing an introductory course on Causal Inference</title>
+      <link>https://gsverhoeven.github.io/post/causal-inference-course/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/causal-inference-course/</guid>
+      <description>
+
+
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;(Short intro) This is me learning causal inference (CI) by self-study together with colleagues using online resources.&lt;/p&gt;
+&lt;p&gt;(Longer intro) A modern data scientist needs to become skilled in at least three topics (I left out visualization):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;(Bayesian) Statistical modeling&lt;/li&gt;
+&lt;li&gt;Machine Learning&lt;/li&gt;
+&lt;li&gt;Causal inference&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For the first two topics, great introductory books exist that&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;focus on learning-by-doing and&lt;/li&gt;
+&lt;li&gt;are low on math and high on simulation / programming in R&lt;/li&gt;
+&lt;li&gt;are fun / well written&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For Bayesian statistical modeling, we have the awesome textbook &lt;a href=&#34;https://xcelab.net/rm/statistical-rethinking/&#34;&gt;&amp;quot;Statistical Rethinking&amp;quot;&lt;/a&gt; by Richard mcElreath.&lt;/p&gt;
+&lt;p&gt;For Machine Learning, we have the (free) book &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;Introduction to Statistical Learning&amp;quot;&lt;/a&gt; by James, Witten, Hastie &amp;amp; Tibshirani.&lt;/p&gt;
+&lt;p&gt;However, for Causal Inference, such a book does not exist yet AFAIK. Therefore, I tried to piece together a Causal Inference course based on the criteria mentioned above.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;designing-an-introductory-causal-inference-course&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Designing an introductory causal inference course&lt;/h1&gt;
+&lt;p&gt;Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call &amp;quot;Quasi-experimental designs&amp;quot;, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).&lt;/p&gt;
+&lt;p&gt;In the end, I decided to combine the two causal chapters from Gelman &amp;amp; Hill (2007) &lt;a href=&#34;https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/&#34;&gt;(freely available on Gelman&#39;s website)&lt;/a&gt; with the introductory chapter on Causal Graphical Models by Felix Elwert &lt;a href=&#34;https://www.ssc.wisc.edu/~felwert/causality/&#34;&gt;(freely available on Elwert&#39;s website)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The Gelman &amp;amp; Hill chapters already come with a set of exercises. However, for DAGs, i could not find a suitable set of exercises.&lt;/p&gt;
+&lt;p&gt;So I created two R markdown notebooks with exercises in R, that make use of the &lt;a href=&#34;http://dagitty.net/&#34;&gt;DAGitty tool&lt;/a&gt;, created by Johannes Textor and freely available as R package.&lt;/p&gt;
+&lt;p&gt;Some exercises are taken from &lt;a href=&#34;http://bayes.cs.ucla.edu/PRIMER/&#34;&gt;Causal inference in statistics: A Primer&lt;/a&gt; by Pearl, Glymour &amp;amp; Jewell. (I probably should own this book. So I just ordered it :))&lt;/p&gt;
+&lt;p&gt;All materials are available in a &lt;a href=&#34;https://github.com/gsverhoeven/causal_course&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;outline-of-the-course&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Outline of the course&lt;/h1&gt;
+&lt;p&gt;The course has four parts.&lt;/p&gt;
+&lt;div id=&#34;general-introduction&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;General introduction&lt;/h2&gt;
+&lt;p&gt;The course starts with the first causal chapter of Gelman &amp;amp; Hill&#39;s book, &amp;quot;Causal inference using regression on the treatment variable&amp;quot;. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;identification-of-causal-effects-using-dags&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Identification of Causal effects using DAGs&lt;/h2&gt;
+&lt;p&gt;Next we dive into causal identification using the causal diagram approach. For this we use the chapter &amp;quot;Causal Graphical Models&amp;quot; by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;identification-and-estimation-strategies&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Identification and estimation strategies&lt;/h2&gt;
+&lt;p&gt;We then continue with the second causal chapter of Gelman &amp;amp; Hill &amp;quot;Causal inference using more advanced models&amp;quot;. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;varying-treatment-effects-using-machine-learning&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Varying treatment effects using Machine Learning&lt;/h2&gt;
+&lt;p&gt;Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp;amp; mcCullough) and non-bayesian (GRF, Athey &amp;amp; Wager) methods.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;looking-back-so-far&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Looking back so far&lt;/h1&gt;
+&lt;p&gt;The causal diagram / DAG approach is nonparametric and its purpose is to&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make assumptions on the data generating process explicit&lt;/li&gt;
+&lt;li&gt;Formalize identification of causal effects&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thus, it is separate from, and complements statistical estimation. The distinction between identification and estimation is not so explicitly made in the Gelman &amp;amp; Hill chapters, at least this is my impression. It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.&lt;/p&gt;
+&lt;p&gt;After having worked through these materials, I think reading Shalizi&#39;s chapters on Causal Effects would be a smart move. This is part III of his book &lt;a href=&#34;https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/&#34;&gt;&amp;quot;Advanced Data Analysis from an Elementary Point of View&amp;quot;&lt;/a&gt;, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.&lt;/p&gt;
+&lt;p&gt;If you have a question, would like to comment or share ideas feel free to &lt;a href=&#34;https://gsverhoeven.github.io/#contact&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The validation set approach in caret</title>
+      <link>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
+      <description>
+
+
+&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
+&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;&#39;s preset methods.&lt;/p&gt;
+&lt;p&gt;But for teaching purposes it would be very nice to have a &lt;code&gt;caret&lt;/code&gt; implementation.&lt;/p&gt;
+&lt;p&gt;This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.&lt;/p&gt;
+&lt;p&gt;We pick the &lt;code&gt;BostonHousing&lt;/code&gt; dataset for our example code.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Boston Housing 
+knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;right&#34;&gt;crim&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;zn&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;indus&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;chas&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;nox&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;rm&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;age&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;dis&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;rad&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;tax&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ptratio&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;black&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;lstat&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;medv&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.00632&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.31&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.538&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.575&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;65.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0900&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;296&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.98&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02731&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.469&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.421&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;78.9&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.9671&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;242&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;21.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02729&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.469&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.185&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;61.1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.9671&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;242&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;392.83&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;34.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.03237&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.998&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;45.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;394.63&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.94&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;33.4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.06905&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.147&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.33&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;36.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02985&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.430&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;58.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;394.12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.21&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;28.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Our model is predicting &lt;code&gt;medv&lt;/code&gt; (Median house value) using predictors &lt;code&gt;indus&lt;/code&gt; and &lt;code&gt;chas&lt;/code&gt; in a multiple linear regression. We split the data in half, 50% for fitting the model, and 50% to use as a validation set.&lt;/p&gt;
+&lt;div id=&#34;stratified-sampling-vs-random-sampling&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Stratified sampling vs random sampling&lt;/h1&gt;
+&lt;p&gt;To check if we understand what &lt;code&gt;caret&lt;/code&gt; does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the &lt;code&gt;caret&lt;/code&gt; approach. As &lt;code&gt;caret&lt;/code&gt; requires a particular format (a named list of sets of train indices) we conform to this standard. However, all &lt;code&gt;caret&lt;/code&gt; partitioning functions seem to perform &lt;strong&gt;stratified random sampling&lt;/strong&gt;. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random &lt;strong&gt;within those groups&lt;/strong&gt; to partitions that have similar distributions for the outcome variable.&lt;/p&gt;
+&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
+&lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
+prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
+
+createRandomDataPartition &amp;lt;- function(y, times, p) {
+  vec &amp;lt;- 1:length(y)
+  n_samples &amp;lt;- round(p * length(y))
+  
+  result &amp;lt;- list()
+  for(t in 1:times){
+    indices &amp;lt;- sample(vec, n_samples, replace = FALSE)
+    result[[t]] &amp;lt;- indices
+    #names(result)[t] &amp;lt;- paste0(&amp;quot;Resample&amp;quot;, t)
+  }
+  names(result) &amp;lt;- prettySeq(result)
+  result
+}
+
+createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Resample1
+## [1] 8 3 1 2 7
+## 
+## $Resample2
+## [1]  1  6 10  8  9&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
+&lt;p&gt;Here is the validation set approach without using caret. We create a single random partition of the data in train and validation set, fit the model on the training data, predict on the validation data, and calculate the RMSE error on the test predictions.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = 1, p = 0.5)
+
+train &amp;lt;- parts$Resample1
+
+# fit ols on train data
+lm.fit &amp;lt;- lm(medv ~ indus + chas , data = Boston[train,])
+
+# predict on held out data
+preds &amp;lt;- predict(lm.fit, newdata = Boston[-train,])
+
+# calculate RMSE validation error
+sqrt(mean((preds - Boston[-train,]$medv)^2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.930076&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let&#39;s find out!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-validation-set-approach-in-caret&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The validation set approach in caret&lt;/h1&gt;
+&lt;p&gt;Now we use the &lt;code&gt;caret&lt;/code&gt; package. Regular usage requires two function calls, one to &lt;code&gt;trainControl&lt;/code&gt; to control the resampling behavior, and one to &lt;code&gt;train&lt;/code&gt; to do the actual model fitting and prediction generation.&lt;/p&gt;
+&lt;p&gt;As the validation set approach is not one of the predefined methods, we need to make use of the &lt;code&gt;index&lt;/code&gt; argument to explicitely define the train partitions outside of &lt;code&gt;caret&lt;/code&gt;. It automatically predicts on the records that are not contained in the train partitions.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;index&lt;/code&gt; argument plays well with the &lt;code&gt;createDataPartition&lt;/code&gt; (Stratfied sampling) and &lt;code&gt;createRandomDataPartition&lt;/code&gt; (our own custom function that performs truly random sampling) functions, as these functions both generate partitions in precisely the format that &lt;code&gt;index&lt;/code&gt; wants: lists of training set indices.&lt;/p&gt;
+&lt;p&gt;In the code below, we generate four different 50/50 partitions of the data.&lt;/p&gt;
+&lt;p&gt;We set &lt;code&gt;savePredictions&lt;/code&gt; to &lt;code&gt;TRUE&lt;/code&gt; to be able to verify the calculated metrics such as the test RMSE.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+# create four partitions
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = 4, p = 0.5)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;, 
+                     ## The method doesn&amp;#39;t matter
+                     ## since we are defining the resamples
+                     index= parts, 
+                     ##verboseIter = TRUE, 
+                     ##repeats = 1,
+                     savePredictions = TRUE
+                     ##returnResamp = &amp;quot;final&amp;quot;
+                     ) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can run caret and fit the model four times:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 253, 253, 253, 253 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   7.906538  0.2551047  5.764773
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From the result returned by &lt;code&gt;train&lt;/code&gt; we can verify that it has fitted a model on four different datasets, each of size &lt;code&gt;253&lt;/code&gt;. By default it reports the average test error over the four validation sets. We can also extract the four individual test errors:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# strangely enough, resamples() always wants at least two train() results
+# see also the man page for resamples()
+resamples &amp;lt;- resamples(list(MOD1 = res, 
+                            MOD2 = res))
+
+resamples$values$`MOD1~RMSE`&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.930076 8.135428 7.899054 7.661595&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# check that we recover the RMSE reported by train() in the Resampling results
+mean(resamples$values$`MOD1~RMSE`)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.906538&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## summary.resamples(object = resamples)
+## 
+## Models: MOD1, MOD2 
+## Number of resamples: 4 
+## 
+## MAE 
+##          Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## MOD1 5.516407 5.730172 5.809746 5.764773 5.844347 5.923193    0
+## MOD2 5.516407 5.730172 5.809746 5.764773 5.844347 5.923193    0
+## 
+## RMSE 
+##          Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## MOD1 7.661595 7.839689 7.914565 7.906538 7.981414 8.135428    0
+## MOD2 7.661595 7.839689 7.914565 7.906538 7.981414 8.135428    0
+## 
+## Rsquared 
+##           Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&amp;#39;s
+## MOD1 0.2339796 0.2377464 0.2541613 0.2551047 0.2715197 0.2781167    0
+## MOD2 0.2339796 0.2377464 0.2541613 0.2551047 0.2715197 0.2781167    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that the RMSE value for the first train/test partition is exactly equal to our own implementation of the validation set approach. Awesome.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;validation-set-approach-stratified-sampling-versus-random-sampling&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Validation set approach: stratified sampling versus random sampling&lt;/h1&gt;
+&lt;p&gt;Since we now know what we are doing, let&#39;s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# simulation settings
+n_repeats &amp;lt;- 3000
+train_fraction &amp;lt;- 0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First we fit the models on the random sampling data partitions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = n_repeats, p = train_fraction)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+rand_sampl_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+rand_sampl_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 405, 405, 405, 405, 405, 405, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   7.868972  0.2753001  5.790874
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next, we fit the models on the stratified sampling data partitions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createDataPartition(Boston$medv, times = n_repeats, p = train_fraction, list = T)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+strat_sampl_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+strat_sampl_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 407, 407, 407, 407, 407, 407, ... 
+## Resampling results:
+## 
+##   RMSE     Rsquared  MAE     
+##   7.83269  0.277719  5.769507
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, we merge the two results to compare the distributions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;resamples &amp;lt;- resamples(list(RAND = rand_sampl_res, 
+                          STRAT = strat_sampl_res))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;analyzing-caret-resampling-results&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Analyzing caret resampling results&lt;/h1&gt;
+&lt;p&gt;We now analyse our resampling results. We can use the &lt;code&gt;summary&lt;/code&gt; method on our resamples object:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## summary.resamples(object = resamples)
+## 
+## Models: RAND, STRAT 
+## Number of resamples: 3000 
+## 
+## MAE 
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## RAND  4.406326 5.475846 5.775077 5.790874 6.094820 7.582886    0
+## STRAT 4.401729 5.477664 5.758201 5.769507 6.058652 7.356133    0
+## 
+## RMSE 
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## RAND  5.328128 7.323887 7.847369 7.868972 8.408855 10.78024    0
+## STRAT 5.560942 7.304199 7.828765 7.832690 8.328966 10.44186    0
+## 
+## Rsquared 
+##             Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&amp;#39;s
+## RAND  0.06982417 0.2259553 0.2733762 0.2753001 0.3249820 0.5195017    0
+## STRAT 0.05306875 0.2263577 0.2752015 0.2777190 0.3277577 0.4977015    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can also use the plot function provided by the &lt;code&gt;caret&lt;/code&gt; package. It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean. Note that the confidence intervals here are based on a normal approximation (One sample t-test).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# caret:::ggplot.resamples
+# t.test(resamples$values$`RAND~RMSE`)
+ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;My personal preference is to more directly display both distributions. This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bwplot(resamples, metric = &amp;quot;RMSE&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;
+&lt;p&gt;Based on these results, it seems like stratified sampling is indeed a reasonable default setting for &lt;code&gt;caret&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;update-lgocv&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Update: LGOCV&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;LGOCV&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     repeats = n_repeats,
+                     number = 1,
+                     p = 0.5,
+                     savePredictions = TRUE
+                     ) &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `repeats` has no meaning for this resampling method.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lgocv_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+lgocv_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Repeated Train/Test Splits Estimated (1 reps, 50%) 
+## Summary of sample sizes: 254 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   8.137926  0.2389733  5.763309
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

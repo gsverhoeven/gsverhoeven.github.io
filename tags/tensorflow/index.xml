@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tensorflow | Gertjan Verhoeven</title>
+    <link>https://gsverhoeven.github.io/tags/tensorflow/</link>
+      <atom:link href="https://gsverhoeven.github.io/tags/tensorflow/index.xml" rel="self" type="application/rss+xml" />
+    <description>tensorflow</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>tensorflow</title>
+      <link>https://gsverhoeven.github.io/tags/tensorflow/</link>
+    </image>
+    
+    <item>
+      <title>Building TensorFlow 2.2 on an old PC</title>
+      <link>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</guid>
+      <description>
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;I don&#39;t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. &lt;a href=&#34;http://www.picotux.com/&#34; class=&#34;uri&#34;&gt;http://www.picotux.com/&lt;/a&gt;), as well as huge supercomputers (&lt;a href=&#34;https://itsfoss.com/linux-runs-top-supercomputers/&#34; class=&#34;uri&#34;&gt;https://itsfoss.com/linux-runs-top-supercomputers/&lt;/a&gt;). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
+&lt;p&gt;And the nice thing about lagging behind: The choice for deep learning is now extremely simple. I need &lt;a href=&#34;https://keras.io/&#34;&gt;Keras&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;TensorFlow&lt;/a&gt; as a computational backend. Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;tensorflow-and-avx&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;TensorFlow and AVX&lt;/h1&gt;
+&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU&#39;s and TPU&#39;s to do the number crunching. But even for CPU&#39;s, TensorFlow likes to make use of all the computational features that modern CPU&#39;s offer. One of these is the &amp;quot;Advanced Vector Instruction Set&amp;quot; , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;. As most CPU&#39;s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
+&lt;p&gt;But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;building-tensorflow-on-a-really-old-computer&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Building TensorFlow on a really old computer&lt;/h1&gt;
+&lt;p&gt;I followed the &lt;a href=&#34;https://www.tensorflow.org/install/source&#34;&gt;tutorial from TensorFlow&lt;/a&gt; to build from source on a Linux system (Ubuntu 18.04 LTS). Therefore, these notes are most useful to other Linux users, and my future self of course.&lt;/p&gt;
+&lt;p&gt;Roughly this consisted of:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Creating a virtual environment for Python 3.6.9&lt;/li&gt;
+&lt;li&gt;Checking my GCC version (7.5.0, which is greater than 7.3 that is used for the official TF packages)&lt;/li&gt;
+&lt;li&gt;Clone the &lt;a href=&#34;https://github.com/tensorflow/tensorflow&#34;&gt;TensorFlow repository&lt;/a&gt; from GitHub&lt;/li&gt;
+&lt;li&gt;Git checkout the latest official TensorFlow release (v2.2)&lt;/li&gt;
+&lt;li&gt;Installed the latest release of &lt;a href=&#34;https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu&#34;&gt;Bazel&lt;/a&gt; (Google&#39;s Make program), version 3.1. Then install exactly the right version needed for TF2.2 (2.0.0, as specified by MIN_BAZEL_VERSION in &lt;code&gt;tensorflow/configure.py&lt;/code&gt;, use &lt;code&gt;.baselversion&lt;/code&gt; to easily install multiple bazel versions side by side)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Then came the hard part, the final step:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Tweak Bazel arguments endlessly to reduce resource usage to be able to complete the build process succesfully&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the end, I removed the &lt;code&gt;-c opt&lt;/code&gt;, so no special optimization for my CPU. And asked for &lt;strong&gt;one CPU&lt;/strong&gt; (I have two cores :-), &lt;strong&gt;one job&lt;/strong&gt;, and &lt;strong&gt;max 2GB of RAM usage&lt;/strong&gt;.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;cd tf_build_env/
+source bin/activate
+cd ~/Github/tensorflow/
+bazel build --config=opt --local_ram_resources=2048 --local_cpu_resources=HOST_CPUS-1 --jobs=1
+  //tensorflow/tools/pip_package:build_pip_package&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I ran the build process in a terminal on the Ubuntu 18.04 Desktop, without any other programs loaded. My 2010 PC has in total 4 GB of RAM. As the Ubuntu Desktop + OS consumes about 1-1.5 GB on my system, this leaves about 2.5-3.0 GB for bazel. Now as it turns out, according to &lt;code&gt;htop&lt;/code&gt; memory consumption went up to 3.6 GB (of my 3.9GB max), but it succeeded in the end. This was after 10 hours of compiling! (I let it run overnight)&lt;/p&gt;
+&lt;p&gt;The final step was to turn the compiled TensorFlow into a Python Wheel package ready to install using &lt;code&gt;pip&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+# creates a &amp;#39;wheel&amp;#39; file called tensorflow-2.2.0-cp36-cp36m-linux_x86_64.whl&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the &lt;a href=&#34;https://www.tensorflow.org/tutorials/keras/classification&#34;&gt;Fashion MNIST classification with Keras&lt;/a&gt; example flawlessly.&lt;/p&gt;
+&lt;p&gt;And even on my ancient PC performance was quite good, training the model took around 1 minute. So, after glorious succes in Python, it was time to move on to R.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;keras-in-r-with-the-classic-mnist&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Keras in R with the classic MNIST&lt;/h1&gt;
+&lt;p&gt;I had to install the development version of the R package &lt;code&gt;keras&lt;/code&gt; from GitHub to fix a bug that prevented Keras in R from working with TF v2.2.&lt;/p&gt;
+&lt;p&gt;From the release notes: (&lt;a href=&#34;https://github.com/rstudio/keras/blob/master/NEWS.md&#34; class=&#34;uri&#34;&gt;https://github.com/rstudio/keras/blob/master/NEWS.md&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Fixed issue regarding the KerasMetricsCallback with TF v2.2 (#1020)&lt;/code&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;devtools::install_github(&amp;quot;rstudio/keras&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For my first deep learning in R, I followed the tutorial from &lt;a href=&#34;https://tensorflow.rstudio.com/tutorials/beginners/&#34; class=&#34;uri&#34;&gt;https://tensorflow.rstudio.com/tutorials/beginners/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;First load all the required packages.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tensorflow)
+
+use_virtualenv(&amp;quot;~/venvs/keras_env&amp;quot;, required = TRUE)
+# this was the same environment that I tested TensorFlow with Python
+
+library(keras)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Read in the dataset.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mnist &amp;lt;- dataset_mnist()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Rescale pixel values to be between 0 and 1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mnist$train$x &amp;lt;- mnist$train$x/255
+mnist$test$x &amp;lt;- mnist$test$x/255&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Plot the data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x_train &amp;lt;- mnist$train$x
+y_train &amp;lt;- mnist$train$y
+
+# visualize the digits
+par(mfcol=c(6,6))
+par(mar=c(0, 0, 3, 0), xaxs=&amp;#39;i&amp;#39;, yaxs=&amp;#39;i&amp;#39;)
+for (idx in 1:12) { 
+    im &amp;lt;- x_train[idx,,]
+    im &amp;lt;- t(apply(im, 2, rev)) 
+    image(1:28, 1:28, im, col=gray((0:255)/255), 
+          xaxt=&amp;#39;n&amp;#39;, main=paste(y_train[idx]))
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;keras-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Keras model&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- keras_model_sequential() %&amp;gt;% 
+  layer_flatten(input_shape = c(28, 28)) %&amp;gt;% 
+  layer_dense(units = 128, activation = &amp;quot;relu&amp;quot;) %&amp;gt;% 
+  layer_dropout(0.2) %&amp;gt;% 
+  layer_dense(10, activation = &amp;quot;softmax&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(model)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Model: &amp;quot;sequential&amp;quot;
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## flatten (Flatten)                   (None, 784)                     0           
+## ________________________________________________________________________________
+## dense (Dense)                       (None, 128)                     100480      
+## ________________________________________________________________________________
+## dropout (Dropout)                   (None, 128)                     0           
+## ________________________________________________________________________________
+## dense_1 (Dense)                     (None, 10)                      1290        
+## ================================================================================
+## Total params: 101,770
+## Trainable params: 101,770
+## Non-trainable params: 0
+## ________________________________________________________________________________&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It has over 100.000 parameters!!&lt;/p&gt;
+&lt;p&gt;Python has a nice &lt;code&gt;plot_model()&lt;/code&gt; function, in R we can use the &lt;code&gt;deepviz&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;devtools::install_github(&amp;quot;andrie/deepviz&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(deepviz)
+library(magrittr)
+
+model %&amp;gt;% plot_model()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `select_()` is deprecated as of dplyr 0.7.0.
+## Please use `select()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
+## Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:672px;height:480px;&#34; class=&#34;grViz html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [layout = \&#34;neato\&#34;,\n       outputorder = \&#34;edgesfirst\&#34;,\n       bgcolor = \&#34;white\&#34;]\n\nnode [fontname = \&#34;Helvetica\&#34;,\n      fontsize = \&#34;10\&#34;,\n      shape = \&#34;circle\&#34;,\n      fixedsize = \&#34;true\&#34;,\n      width = \&#34;0.5\&#34;,\n      style = \&#34;filled\&#34;,\n      fillcolor = \&#34;aliceblue\&#34;,\n      color = \&#34;gray70\&#34;,\n      fontcolor = \&#34;gray50\&#34;]\n\nedge [fontname = \&#34;Helvetica\&#34;,\n     fontsize = \&#34;8\&#34;,\n     len = \&#34;1.5\&#34;,\n     color = \&#34;gray80\&#34;,\n     arrowsize = \&#34;0.5\&#34;]\n\n  \&#34;1\&#34; [label = \&#34;flatten\nFlatten\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,4!\&#34;] \n  \&#34;2\&#34; [label = \&#34;dense\nDense\nrelu\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,3!\&#34;] \n  \&#34;3\&#34; [label = \&#34;dropout\nDropout\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,2!\&#34;] \n  \&#34;4\&#34; [label = \&#34;dense_1\nDense\nsoftmax\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,1!\&#34;] \n  \&#34;1\&#34;-&gt;\&#34;2\&#34; \n  \&#34;2\&#34;-&gt;\&#34;3\&#34; \n  \&#34;3\&#34;-&gt;\&#34;4\&#34; \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compile-the-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Compile the model&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
+  compile(
+    loss = &amp;quot;sparse_categorical_crossentropy&amp;quot;,
+    optimizer = &amp;quot;adam&amp;quot;,
+    metrics = &amp;quot;accuracy&amp;quot;
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-the-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fit the model&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
+  fit(
+    x = mnist$train$x, 
+    y = mnist$train$y,
+    epochs = 5,
+    validation_split = 0.3,
+    verbose = 1
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;make-predictions&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Make predictions&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predictions &amp;lt;- predict(model, mnist$test$x)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Visualize a single prediction:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+id &amp;lt;- 9
+
+ggplot(data.frame(digit = 0:9, prob = predictions[id,]), 
+       aes(x = factor(digit), y = prob)) + geom_col() +
+  ggtitle(paste0(&amp;quot;prediction for true value of &amp;quot;, mnist$test$y[id]))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;check-model-performance-on-the-test-set&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Check model performance on the test set&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
+  evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       loss   accuracy 
+## 0.08484858 0.97289997&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
+&lt;p&gt;Awesome.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

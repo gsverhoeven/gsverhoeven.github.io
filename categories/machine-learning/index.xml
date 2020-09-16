@@ -1,0 +1,1573 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Machine learning | Gertjan Verhoeven</title>
+    <link>https://gsverhoeven.github.io/categories/machine-learning/</link>
+      <atom:link href="https://gsverhoeven.github.io/categories/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+    <description>Machine learning</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Machine learning</title>
+      <link>https://gsverhoeven.github.io/categories/machine-learning/</link>
+    </image>
+    
+    <item>
+      <title>Building TensorFlow 2.2 on an old PC</title>
+      <link>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</guid>
+      <description>
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;I don&#39;t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. &lt;a href=&#34;http://www.picotux.com/&#34; class=&#34;uri&#34;&gt;http://www.picotux.com/&lt;/a&gt;), as well as huge supercomputers (&lt;a href=&#34;https://itsfoss.com/linux-runs-top-supercomputers/&#34; class=&#34;uri&#34;&gt;https://itsfoss.com/linux-runs-top-supercomputers/&lt;/a&gt;). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
+&lt;p&gt;And the nice thing about lagging behind: The choice for deep learning is now extremely simple. I need &lt;a href=&#34;https://keras.io/&#34;&gt;Keras&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;TensorFlow&lt;/a&gt; as a computational backend. Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;tensorflow-and-avx&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;TensorFlow and AVX&lt;/h1&gt;
+&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU&#39;s and TPU&#39;s to do the number crunching. But even for CPU&#39;s, TensorFlow likes to make use of all the computational features that modern CPU&#39;s offer. One of these is the &amp;quot;Advanced Vector Instruction Set&amp;quot; , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;. As most CPU&#39;s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
+&lt;p&gt;But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;building-tensorflow-on-a-really-old-computer&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Building TensorFlow on a really old computer&lt;/h1&gt;
+&lt;p&gt;I followed the &lt;a href=&#34;https://www.tensorflow.org/install/source&#34;&gt;tutorial from TensorFlow&lt;/a&gt; to build from source on a Linux system (Ubuntu 18.04 LTS). Therefore, these notes are most useful to other Linux users, and my future self of course.&lt;/p&gt;
+&lt;p&gt;Roughly this consisted of:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Creating a virtual environment for Python 3.6.9&lt;/li&gt;
+&lt;li&gt;Checking my GCC version (7.5.0, which is greater than 7.3 that is used for the official TF packages)&lt;/li&gt;
+&lt;li&gt;Clone the &lt;a href=&#34;https://github.com/tensorflow/tensorflow&#34;&gt;TensorFlow repository&lt;/a&gt; from GitHub&lt;/li&gt;
+&lt;li&gt;Git checkout the latest official TensorFlow release (v2.2)&lt;/li&gt;
+&lt;li&gt;Installed the latest release of &lt;a href=&#34;https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu&#34;&gt;Bazel&lt;/a&gt; (Google&#39;s Make program), version 3.1. Then install exactly the right version needed for TF2.2 (2.0.0, as specified by MIN_BAZEL_VERSION in &lt;code&gt;tensorflow/configure.py&lt;/code&gt;, use &lt;code&gt;.baselversion&lt;/code&gt; to easily install multiple bazel versions side by side)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Then came the hard part, the final step:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Tweak Bazel arguments endlessly to reduce resource usage to be able to complete the build process succesfully&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the end, I removed the &lt;code&gt;-c opt&lt;/code&gt;, so no special optimization for my CPU. And asked for &lt;strong&gt;one CPU&lt;/strong&gt; (I have two cores :-), &lt;strong&gt;one job&lt;/strong&gt;, and &lt;strong&gt;max 2GB of RAM usage&lt;/strong&gt;.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;cd tf_build_env/
+source bin/activate
+cd ~/Github/tensorflow/
+bazel build --config=opt --local_ram_resources=2048 --local_cpu_resources=HOST_CPUS-1 --jobs=1
+  //tensorflow/tools/pip_package:build_pip_package&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I ran the build process in a terminal on the Ubuntu 18.04 Desktop, without any other programs loaded. My 2010 PC has in total 4 GB of RAM. As the Ubuntu Desktop + OS consumes about 1-1.5 GB on my system, this leaves about 2.5-3.0 GB for bazel. Now as it turns out, according to &lt;code&gt;htop&lt;/code&gt; memory consumption went up to 3.6 GB (of my 3.9GB max), but it succeeded in the end. This was after 10 hours of compiling! (I let it run overnight)&lt;/p&gt;
+&lt;p&gt;The final step was to turn the compiled TensorFlow into a Python Wheel package ready to install using &lt;code&gt;pip&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+# creates a &amp;#39;wheel&amp;#39; file called tensorflow-2.2.0-cp36-cp36m-linux_x86_64.whl&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To try it out, I created a new empty Python 3 virtual environment with only TensorFlow and Jupyter Notebook installed. To my delight it ran the &lt;a href=&#34;https://www.tensorflow.org/tutorials/keras/classification&#34;&gt;Fashion MNIST classification with Keras&lt;/a&gt; example flawlessly.&lt;/p&gt;
+&lt;p&gt;And even on my ancient PC performance was quite good, training the model took around 1 minute. So, after glorious succes in Python, it was time to move on to R.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;keras-in-r-with-the-classic-mnist&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Keras in R with the classic MNIST&lt;/h1&gt;
+&lt;p&gt;I had to install the development version of the R package &lt;code&gt;keras&lt;/code&gt; from GitHub to fix a bug that prevented Keras in R from working with TF v2.2.&lt;/p&gt;
+&lt;p&gt;From the release notes: (&lt;a href=&#34;https://github.com/rstudio/keras/blob/master/NEWS.md&#34; class=&#34;uri&#34;&gt;https://github.com/rstudio/keras/blob/master/NEWS.md&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Fixed issue regarding the KerasMetricsCallback with TF v2.2 (#1020)&lt;/code&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;devtools::install_github(&amp;quot;rstudio/keras&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For my first deep learning in R, I followed the tutorial from &lt;a href=&#34;https://tensorflow.rstudio.com/tutorials/beginners/&#34; class=&#34;uri&#34;&gt;https://tensorflow.rstudio.com/tutorials/beginners/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;First load all the required packages.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tensorflow)
+
+use_virtualenv(&amp;quot;~/venvs/keras_env&amp;quot;, required = TRUE)
+# this was the same environment that I tested TensorFlow with Python
+
+library(keras)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Read in the dataset.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mnist &amp;lt;- dataset_mnist()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Rescale pixel values to be between 0 and 1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mnist$train$x &amp;lt;- mnist$train$x/255
+mnist$test$x &amp;lt;- mnist$test$x/255&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Plot the data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x_train &amp;lt;- mnist$train$x
+y_train &amp;lt;- mnist$train$y
+
+# visualize the digits
+par(mfcol=c(6,6))
+par(mar=c(0, 0, 3, 0), xaxs=&amp;#39;i&amp;#39;, yaxs=&amp;#39;i&amp;#39;)
+for (idx in 1:12) { 
+    im &amp;lt;- x_train[idx,,]
+    im &amp;lt;- t(apply(im, 2, rev)) 
+    image(1:28, 1:28, im, col=gray((0:255)/255), 
+          xaxt=&amp;#39;n&amp;#39;, main=paste(y_train[idx]))
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;keras-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Keras model&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- keras_model_sequential() %&amp;gt;% 
+  layer_flatten(input_shape = c(28, 28)) %&amp;gt;% 
+  layer_dense(units = 128, activation = &amp;quot;relu&amp;quot;) %&amp;gt;% 
+  layer_dropout(0.2) %&amp;gt;% 
+  layer_dense(10, activation = &amp;quot;softmax&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(model)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Model: &amp;quot;sequential&amp;quot;
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## flatten (Flatten)                   (None, 784)                     0           
+## ________________________________________________________________________________
+## dense (Dense)                       (None, 128)                     100480      
+## ________________________________________________________________________________
+## dropout (Dropout)                   (None, 128)                     0           
+## ________________________________________________________________________________
+## dense_1 (Dense)                     (None, 10)                      1290        
+## ================================================================================
+## Total params: 101,770
+## Trainable params: 101,770
+## Non-trainable params: 0
+## ________________________________________________________________________________&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It has over 100.000 parameters!!&lt;/p&gt;
+&lt;p&gt;Python has a nice &lt;code&gt;plot_model()&lt;/code&gt; function, in R we can use the &lt;code&gt;deepviz&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;devtools::install_github(&amp;quot;andrie/deepviz&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(deepviz)
+library(magrittr)
+
+model %&amp;gt;% plot_model()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `select_()` is deprecated as of dplyr 0.7.0.
+## Please use `select()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
+## Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:672px;height:480px;&#34; class=&#34;grViz html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [layout = \&#34;neato\&#34;,\n       outputorder = \&#34;edgesfirst\&#34;,\n       bgcolor = \&#34;white\&#34;]\n\nnode [fontname = \&#34;Helvetica\&#34;,\n      fontsize = \&#34;10\&#34;,\n      shape = \&#34;circle\&#34;,\n      fixedsize = \&#34;true\&#34;,\n      width = \&#34;0.5\&#34;,\n      style = \&#34;filled\&#34;,\n      fillcolor = \&#34;aliceblue\&#34;,\n      color = \&#34;gray70\&#34;,\n      fontcolor = \&#34;gray50\&#34;]\n\nedge [fontname = \&#34;Helvetica\&#34;,\n     fontsize = \&#34;8\&#34;,\n     len = \&#34;1.5\&#34;,\n     color = \&#34;gray80\&#34;,\n     arrowsize = \&#34;0.5\&#34;]\n\n  \&#34;1\&#34; [label = \&#34;flatten\nFlatten\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,4!\&#34;] \n  \&#34;2\&#34; [label = \&#34;dense\nDense\nrelu\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,3!\&#34;] \n  \&#34;3\&#34; [label = \&#34;dropout\nDropout\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,2!\&#34;] \n  \&#34;4\&#34; [label = \&#34;dense_1\nDense\nsoftmax\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,1!\&#34;] \n  \&#34;1\&#34;-&gt;\&#34;2\&#34; \n  \&#34;2\&#34;-&gt;\&#34;3\&#34; \n  \&#34;3\&#34;-&gt;\&#34;4\&#34; \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compile-the-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Compile the model&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
+  compile(
+    loss = &amp;quot;sparse_categorical_crossentropy&amp;quot;,
+    optimizer = &amp;quot;adam&amp;quot;,
+    metrics = &amp;quot;accuracy&amp;quot;
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-the-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fit the model&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
+  fit(
+    x = mnist$train$x, 
+    y = mnist$train$y,
+    epochs = 5,
+    validation_split = 0.3,
+    verbose = 1
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;make-predictions&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Make predictions&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predictions &amp;lt;- predict(model, mnist$test$x)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Visualize a single prediction:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+id &amp;lt;- 9
+
+ggplot(data.frame(digit = 0:9, prob = predictions[id,]), 
+       aes(x = factor(digit), y = prob)) + geom_col() +
+  ggtitle(paste0(&amp;quot;prediction for true value of &amp;quot;, mnist$test$y[id]))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;check-model-performance-on-the-test-set&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Check model performance on the test set&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
+  evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##       loss   accuracy 
+## 0.08484858 0.97289997&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
+&lt;p&gt;Awesome.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The validation set approach in caret</title>
+      <link>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</link>
+      <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
+      <description>
+
+
+&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
+&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;&#39;s preset methods.&lt;/p&gt;
+&lt;p&gt;But for teaching purposes it would be very nice to have a &lt;code&gt;caret&lt;/code&gt; implementation.&lt;/p&gt;
+&lt;p&gt;This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.&lt;/p&gt;
+&lt;p&gt;We pick the &lt;code&gt;BostonHousing&lt;/code&gt; dataset for our example code.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Boston Housing 
+knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;right&#34;&gt;crim&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;zn&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;indus&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;chas&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;nox&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;rm&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;age&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;dis&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;rad&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;tax&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;ptratio&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;black&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;lstat&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;medv&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.00632&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.31&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.538&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.575&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;65.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0900&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;296&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.98&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;24.0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02731&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.469&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.421&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;78.9&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.9671&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;242&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;21.6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02729&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.469&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.185&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;61.1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.9671&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;242&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;392.83&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.03&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;34.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.03237&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.998&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;45.8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;394.63&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.94&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;33.4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.06905&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7.147&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54.2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;396.90&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.33&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;36.2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;right&#34;&gt;0.02985&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.18&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.458&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.430&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;58.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6.0622&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;222&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;18.7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;394.12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.21&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;28.7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Our model is predicting &lt;code&gt;medv&lt;/code&gt; (Median house value) using predictors &lt;code&gt;indus&lt;/code&gt; and &lt;code&gt;chas&lt;/code&gt; in a multiple linear regression. We split the data in half, 50% for fitting the model, and 50% to use as a validation set.&lt;/p&gt;
+&lt;div id=&#34;stratified-sampling-vs-random-sampling&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Stratified sampling vs random sampling&lt;/h1&gt;
+&lt;p&gt;To check if we understand what &lt;code&gt;caret&lt;/code&gt; does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the &lt;code&gt;caret&lt;/code&gt; approach. As &lt;code&gt;caret&lt;/code&gt; requires a particular format (a named list of sets of train indices) we conform to this standard. However, all &lt;code&gt;caret&lt;/code&gt; partitioning functions seem to perform &lt;strong&gt;stratified random sampling&lt;/strong&gt;. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random &lt;strong&gt;within those groups&lt;/strong&gt; to partitions that have similar distributions for the outcome variable.&lt;/p&gt;
+&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
+&lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
+prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
+
+createRandomDataPartition &amp;lt;- function(y, times, p) {
+  vec &amp;lt;- 1:length(y)
+  n_samples &amp;lt;- round(p * length(y))
+  
+  result &amp;lt;- list()
+  for(t in 1:times){
+    indices &amp;lt;- sample(vec, n_samples, replace = FALSE)
+    result[[t]] &amp;lt;- indices
+    #names(result)[t] &amp;lt;- paste0(&amp;quot;Resample&amp;quot;, t)
+  }
+  names(result) &amp;lt;- prettySeq(result)
+  result
+}
+
+createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## $Resample1
+## [1] 8 3 1 2 7
+## 
+## $Resample2
+## [1]  1  6 10  8  9&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
+&lt;p&gt;Here is the validation set approach without using caret. We create a single random partition of the data in train and validation set, fit the model on the training data, predict on the validation data, and calculate the RMSE error on the test predictions.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = 1, p = 0.5)
+
+train &amp;lt;- parts$Resample1
+
+# fit ols on train data
+lm.fit &amp;lt;- lm(medv ~ indus + chas , data = Boston[train,])
+
+# predict on held out data
+preds &amp;lt;- predict(lm.fit, newdata = Boston[-train,])
+
+# calculate RMSE validation error
+sqrt(mean((preds - Boston[-train,]$medv)^2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.930076&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let&#39;s find out!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-validation-set-approach-in-caret&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The validation set approach in caret&lt;/h1&gt;
+&lt;p&gt;Now we use the &lt;code&gt;caret&lt;/code&gt; package. Regular usage requires two function calls, one to &lt;code&gt;trainControl&lt;/code&gt; to control the resampling behavior, and one to &lt;code&gt;train&lt;/code&gt; to do the actual model fitting and prediction generation.&lt;/p&gt;
+&lt;p&gt;As the validation set approach is not one of the predefined methods, we need to make use of the &lt;code&gt;index&lt;/code&gt; argument to explicitely define the train partitions outside of &lt;code&gt;caret&lt;/code&gt;. It automatically predicts on the records that are not contained in the train partitions.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;index&lt;/code&gt; argument plays well with the &lt;code&gt;createDataPartition&lt;/code&gt; (Stratfied sampling) and &lt;code&gt;createRandomDataPartition&lt;/code&gt; (our own custom function that performs truly random sampling) functions, as these functions both generate partitions in precisely the format that &lt;code&gt;index&lt;/code&gt; wants: lists of training set indices.&lt;/p&gt;
+&lt;p&gt;In the code below, we generate four different 50/50 partitions of the data.&lt;/p&gt;
+&lt;p&gt;We set &lt;code&gt;savePredictions&lt;/code&gt; to &lt;code&gt;TRUE&lt;/code&gt; to be able to verify the calculated metrics such as the test RMSE.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+# create four partitions
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = 4, p = 0.5)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;, 
+                     ## The method doesn&amp;#39;t matter
+                     ## since we are defining the resamples
+                     index= parts, 
+                     ##verboseIter = TRUE, 
+                     ##repeats = 1,
+                     savePredictions = TRUE
+                     ##returnResamp = &amp;quot;final&amp;quot;
+                     ) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can run caret and fit the model four times:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 253, 253, 253, 253 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   7.906538  0.2551047  5.764773
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From the result returned by &lt;code&gt;train&lt;/code&gt; we can verify that it has fitted a model on four different datasets, each of size &lt;code&gt;253&lt;/code&gt;. By default it reports the average test error over the four validation sets. We can also extract the four individual test errors:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# strangely enough, resamples() always wants at least two train() results
+# see also the man page for resamples()
+resamples &amp;lt;- resamples(list(MOD1 = res, 
+                            MOD2 = res))
+
+resamples$values$`MOD1~RMSE`&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.930076 8.135428 7.899054 7.661595&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# check that we recover the RMSE reported by train() in the Resampling results
+mean(resamples$values$`MOD1~RMSE`)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 7.906538&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## summary.resamples(object = resamples)
+## 
+## Models: MOD1, MOD2 
+## Number of resamples: 4 
+## 
+## MAE 
+##          Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## MOD1 5.516407 5.730172 5.809746 5.764773 5.844347 5.923193    0
+## MOD2 5.516407 5.730172 5.809746 5.764773 5.844347 5.923193    0
+## 
+## RMSE 
+##          Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## MOD1 7.661595 7.839689 7.914565 7.906538 7.981414 8.135428    0
+## MOD2 7.661595 7.839689 7.914565 7.906538 7.981414 8.135428    0
+## 
+## Rsquared 
+##           Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&amp;#39;s
+## MOD1 0.2339796 0.2377464 0.2541613 0.2551047 0.2715197 0.2781167    0
+## MOD2 0.2339796 0.2377464 0.2541613 0.2551047 0.2715197 0.2781167    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that the RMSE value for the first train/test partition is exactly equal to our own implementation of the validation set approach. Awesome.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;validation-set-approach-stratified-sampling-versus-random-sampling&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Validation set approach: stratified sampling versus random sampling&lt;/h1&gt;
+&lt;p&gt;Since we now know what we are doing, let&#39;s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# simulation settings
+n_repeats &amp;lt;- 3000
+train_fraction &amp;lt;- 0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First we fit the models on the random sampling data partitions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createRandomDataPartition(Boston$medv, times = n_repeats, p = train_fraction)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+rand_sampl_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+rand_sampl_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 405, 405, 405, 405, 405, 405, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   7.868972  0.2753001  5.790874
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next, we fit the models on the stratified sampling data partitions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+parts &amp;lt;- createDataPartition(Boston$medv, times = n_repeats, p = train_fraction, list = T)
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;repeatedcv&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     index= parts, 
+                     savePredictions = TRUE
+                     ) 
+
+strat_sampl_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+strat_sampl_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold, repeated 1 times) 
+## Summary of sample sizes: 407, 407, 407, 407, 407, 407, ... 
+## Resampling results:
+## 
+##   RMSE     Rsquared  MAE     
+##   7.83269  0.277719  5.769507
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, we merge the two results to compare the distributions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;resamples &amp;lt;- resamples(list(RAND = rand_sampl_res, 
+                          STRAT = strat_sampl_res))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;analyzing-caret-resampling-results&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Analyzing caret resampling results&lt;/h1&gt;
+&lt;p&gt;We now analyse our resampling results. We can use the &lt;code&gt;summary&lt;/code&gt; method on our resamples object:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(resamples)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## summary.resamples(object = resamples)
+## 
+## Models: RAND, STRAT 
+## Number of resamples: 3000 
+## 
+## MAE 
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## RAND  4.406326 5.475846 5.775077 5.790874 6.094820 7.582886    0
+## STRAT 4.401729 5.477664 5.758201 5.769507 6.058652 7.356133    0
+## 
+## RMSE 
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA&amp;#39;s
+## RAND  5.328128 7.323887 7.847369 7.868972 8.408855 10.78024    0
+## STRAT 5.560942 7.304199 7.828765 7.832690 8.328966 10.44186    0
+## 
+## Rsquared 
+##             Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&amp;#39;s
+## RAND  0.06982417 0.2259553 0.2733762 0.2753001 0.3249820 0.5195017    0
+## STRAT 0.05306875 0.2263577 0.2752015 0.2777190 0.3277577 0.4977015    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can also use the plot function provided by the &lt;code&gt;caret&lt;/code&gt; package. It plots the mean of our performance metric (RMSE), as well as estimation uncertainty of this mean. Note that the confidence intervals here are based on a normal approximation (One sample t-test).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# caret:::ggplot.resamples
+# t.test(resamples$values$`RAND~RMSE`)
+ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;My personal preference is to more directly display both distributions. This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bwplot(resamples, metric = &amp;quot;RMSE&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;
+&lt;p&gt;Based on these results, it seems like stratified sampling is indeed a reasonable default setting for &lt;code&gt;caret&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;update-lgocv&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Update: LGOCV&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+
+ctrl &amp;lt;- trainControl(method = &amp;quot;LGOCV&amp;quot;,  ## The method doesn&amp;#39;t matter
+                     repeats = n_repeats,
+                     number = 1,
+                     p = 0.5,
+                     savePredictions = TRUE
+                     ) &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `repeats` has no meaning for this resampling method.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lgocv_res &amp;lt;- train(medv ~ indus + chas, data = Boston, method = &amp;quot;lm&amp;quot;,
+             trControl = ctrl)
+
+lgocv_res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Linear Regression 
+## 
+## 506 samples
+##   2 predictor
+## 
+## No pre-processing
+## Resampling: Repeated Train/Test Splits Estimated (1 reps, 50%) 
+## Summary of sample sizes: 254 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   8.137926  0.2389733  5.763309
+## 
+## Tuning parameter &amp;#39;intercept&amp;#39; was held constant at a value of TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>BART vs Causal forests showdown</title>
+      <link>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</link>
+      <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
+      <description>
+
+
+&lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Load packages&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
+#devtools::install_github(&amp;quot;vdorie/dbarts&amp;quot;)
+library(dbarts)
+library(ggplot2)
+library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## ✔ tibble  3.0.3     ✔ dplyr   1.0.2
+## ✔ tidyr   1.1.2     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.5.0
+## ✔ purrr   0.3.4&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ tidyr::extract() masks dbarts::extract()
+## ✖ dplyr::filter()  masks stats::filter()
+## ✖ dplyr::lag()     masks stats::lag()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(grf)
+#devtools::install_github(&amp;quot;vdorie/aciccomp/2017&amp;quot;)
+library(aciccomp2017)
+library(cowplot)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## ********************************************************&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Note: As of version 1.0.0, cowplot does not change the&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   default ggplot2 theme anymore. To recover the previous&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   behavior, execute:
+##   theme_set(theme_cowplot())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## ********************************************************&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;CalcPosteriors.R&amp;quot;)
+
+fullrun &amp;lt;- 0&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-1-simulated-dataset-from-friedman-mars-paper&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 1: Simulated dataset from Friedman MARS paper&lt;/h1&gt;
+&lt;p&gt;This is not a causal problem but a prediction problem.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## y = f(x) + epsilon , epsilon ~ N(0, sigma)
+## x consists of 10 variables, only first 5 matter
+
+f &amp;lt;- function(x) {
+    10 * sin(pi * x[,1] * x[,2]) + 20 * (x[,3] - 0.5)^2 +
+      10 * x[,4] + 5 * x[,5]
+}
+
+set.seed(99)
+sigma &amp;lt;- 1.0
+n     &amp;lt;- 100
+
+x  &amp;lt;- matrix(runif(n * 10), n, 10)
+Ey &amp;lt;- f(x)
+y  &amp;lt;- rnorm(n, Ey, sigma)
+
+df &amp;lt;- data.frame(x, y, y_true = Ey)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;fit-bart-model-on-simulated-friedman-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;fit BART model on simulated Friedman data&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
+## run BART
+  set.seed(99)
+  bartFit &amp;lt;- bart(x, y)
+  saveRDS(bartFit, &amp;quot;s1.rds&amp;quot;)
+} else { bartFit &amp;lt;- readRDS(&amp;quot;s1.rds&amp;quot;)}
+
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;MCMC or sigma looks ok.&lt;/p&gt;
+&lt;div id=&#34;compare-bart-fit-to-true-values&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;compare BART fit to true values&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df2 &amp;lt;- data.frame(df, 
+  ql = apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=0.05),
+  qm = apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=.5),
+  qu &amp;lt;- apply(bartFit$yhat.train, length(dim(bartFit$yhat.train)), quantile,probs=0.95)
+)
+
+bartp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point() + geom_smooth() +
+  geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)
+
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This looks nice.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-grf-regression-forest-on-friedman-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit Grf regression forest on Friedman data&lt;/h2&gt;
+&lt;p&gt;From the manual: Trains a regression forest that can be used to estimate the conditional mean function mu(x) = E[Y | X = x]&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
+  reg.forest = regression_forest(x, y, num.trees = 2000)
+  saveRDS(reg.forest, &amp;quot;s00.rds&amp;quot;)
+} else {reg.forest &amp;lt;- readRDS(&amp;quot;s00.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df3 &amp;lt;- CalcPredictionsGRF(x, reg.forest)
+
+df3 &amp;lt;- data.frame(df3, y)
+
+ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This is pretty bad compared to BART. What&#39;s wrong here?&lt;/p&gt;
+&lt;p&gt;From reference.md: &lt;strong&gt;GRF isn&#39;t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.&lt;/li&gt;
+&lt;li&gt;Skipping the variance estimate computation, by setting ci.group.size to 1 during training, then increasing sample.fraction. Because of how variance estimation is implemented, sample.fraction cannot be greater than 0.5 when it is enabled. If variance estimates are not needed, it may help to disable this computation and use a larger subsample size for training.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI&#39;s&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
+  reg.forest2 = regression_forest(x, y, num.trees = 2000,
+                                 honesty = FALSE)
+  saveRDS(reg.forest2, &amp;quot;s001.rds&amp;quot;)
+} else {reg.forest2 &amp;lt;- readRDS(&amp;quot;s001.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df2 &amp;lt;- CalcPredictionsGRF(x, reg.forest2)
+
+df2 &amp;lt;- data.frame(df2, y)
+
+grfp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point() + geom_smooth() +
+  geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)
+
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ah! better now. But Grf still worse than BART. We ran with 2000 trees and turned of honesty. Perhaps dataset too small? Maybe check out the sample.fraction parameter? Sample.fraction is set by default at 0.5, so only half of data is used to grow tree. OR use tune.parameters = TRUE&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-methods&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare methods&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;
+## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-2-simulated-data-from-acic-2017&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 2: Simulated data from ACIC 2017&lt;/h1&gt;
+&lt;p&gt;This is a bigger dataset, N=4302.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Treatment effect &lt;span class=&#34;math inline&#34;&gt;\(\tau\)&lt;/span&gt; is a function of covariates x3, x24, x14, x15&lt;/li&gt;
+&lt;li&gt;Probability of treatment &lt;span class=&#34;math inline&#34;&gt;\(\pi\)&lt;/span&gt; is a function of covariates x1, x43, x10.&lt;/li&gt;
+&lt;li&gt;Outcome is a function of x43&lt;/li&gt;
+&lt;li&gt;Noise is a function of x21&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(input_2017[, c(3,24,14,15)])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   x_3  x_24 x_14 x_15
+## 1  20 white    0    2
+## 2   0 black    0    0
+## 3   0 white    0    1
+## 4  10 white    0    0
+## 5   0 black    0    0
+## 6   1 white    0    0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Check transformed covariates used to create simulated datasets.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# zit hidden in package
+head(aciccomp2017:::transformedData_2017)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##              x_1   x_3  x_10  x_14  x_15 x_21 x_24       x_43
+## 2665 -1.18689448  gt_0 leq_0 leq_0  gt_0    J    E -1.0897971
+## 22   -0.04543705 leq_0 leq_0 leq_0 leq_0    J    B  1.1223750
+## 2416  0.13675482 leq_0 leq_0 leq_0  gt_0    J    E  0.6136700
+## 1350 -0.24062700  gt_0 leq_0 leq_0 leq_0    J    E -0.2995632
+## 3850  1.02054653 leq_0 leq_0 leq_0 leq_0    I    B  0.6136700
+## 4167 -1.18689448  gt_0 leq_0 leq_0 leq_0    K    E -1.5961206&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we find that we should not take the functions in Dorie 2018 (debrief.pdf) literately. x_3 used to calculate the treatment effect is &lt;strong&gt;derived&lt;/strong&gt; from x_3 in the input data. x_24 used to calculate the treatment effect is &lt;strong&gt;derived&lt;/strong&gt; from x_24 in the input data. Both have become binary variables.&lt;/p&gt;
+&lt;p&gt;Turns out that this was a feature of the 2016 ACIC and IS mentioned in the debrief.pdf&lt;/p&gt;
+&lt;p&gt;We pick the iid, strong signal, low noise, low confounding first. Actually from estimated PS (W.hat) it seems that every obs has probability of treatment 50%.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;parameters_2017[21,]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    errors magnitude noise confounding
+## 21    iid         1     0           0&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# easiest?&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Grab the first replicate.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sim &amp;lt;- dgp_2017(21, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;fit-bart-to-acic-2017-dataset&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit BART to ACIC 2017 dataset&lt;/h2&gt;
+&lt;p&gt;Need also counterfactual predictions. Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.&lt;/p&gt;
+&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more &amp;quot;burn in&amp;quot; samples.&lt;/p&gt;
+&lt;p&gt;Prepare data for BART, including x.test with treatment reversed:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# combine x and y
+y &amp;lt;- sim$y
+x &amp;lt;- model.matrix(~. ,cbind(z = sim$z, input_2017))
+
+# flip z for counterfactual predictions (needed for BART)
+x.test &amp;lt;- model.matrix(~. ,cbind(z = 1 - sim$z, input_2017))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## run BART
+#fullrun &amp;lt;- 0
+if(fullrun){
+  set.seed(99)
+
+  bartFit &amp;lt;- bart(x, y, x.test, nskip = 350, ntree = 1000)
+  saveRDS(bartFit, &amp;quot;s2.rds&amp;quot;)
+} else { bartFit &amp;lt;- readRDS(&amp;quot;s2.rds&amp;quot;)}
+
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit&lt;/h3&gt;
+&lt;p&gt;This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
+sim &amp;lt;- CalcPosteriorsBART(sim, bartFit, &amp;quot;z&amp;quot;)
+
+sim &amp;lt;- sim %&amp;gt;% arrange(alpha)
+
+bartp &amp;lt;- ggplot(sim, aes(x = 1:nrow(sim), qm))  + 
+  geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point() + 
+  geom_smooth() + geom_point(aes(y = alpha), col = &amp;quot;red&amp;quot;) + ylim(-2.5, 4.5)
+
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This looks sort of ok, but still weird. Some points it gets REALLY wrong.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;calculate-coverage&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Calculate coverage&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sim &amp;lt;- sim %&amp;gt;% mutate(in_ci = ql &amp;lt; alpha &amp;amp; qu &amp;gt; alpha) 
+
+mean(sim$in_ci)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.4363087&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Pretty bad coverage. Look into whats going on here. Here it should be 0.9&lt;/p&gt;
+&lt;p&gt;The iid plot for method 2 gives coverage 0.7 (where it should be 0.95)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;calculate-rmse-of-cate&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Calculate RMSE of CATE&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sqrt(mean((sim$alpha - sim$ite)^2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1587338&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For All i.i.d. (averaged over 250 replicates averaged over 8 scenarios) method 2 (BART should have RMSE of CATE of 0.35-0.4)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-grf-to-acic-2017-dataset&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit grf to ACIC 2017 dataset&lt;/h2&gt;
+&lt;p&gt;need large num.trees for CI.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# prep data for Grf
+# combine x and y
+sim &amp;lt;- dgp_2017(21, 1)
+
+Y &amp;lt;- sim$y
+X &amp;lt;- model.matrix(~. ,input_2017)
+W = sim$z
+
+# Train a causal forest.
+#fullrun &amp;lt;- 0
+
+if(fullrun){
+  grf.fit_alt &amp;lt;- causal_forest(X, Y, W, num.trees = 500)
+  saveRDS(grf.fit_alt, &amp;quot;s3.rds&amp;quot;)
+} else{grf.fit_alt &amp;lt;- readRDS(&amp;quot;s3.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It appears that using 4000 trees consumes too much memory (bad_alloc)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-predictions-vs-true-value&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare predictions vs true value&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(X, grf.fit_alt)
+
+df_sep2 &amp;lt;- data.frame(df_sep2, Y, W, TAU = sim$alpha)
+
+df_sep2 &amp;lt;- df_sep2 %&amp;gt;% arrange(TAU)
+
+grfp &amp;lt;- ggplot(df_sep2, aes(x = 1:nrow(df_sep2), y = qm))   +
+  geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) + geom_point() + geom_smooth() + 
+  geom_point(aes(y = TAU), col = &amp;quot;red&amp;quot;) + ylim(-2.5, 4.5)
+
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This works ok now.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-both-methods&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare both methods&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-3-simulated-data-used-by-grf-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 3: simulated data used by grf example&lt;/h1&gt;
+&lt;p&gt;THis dataset is used in the Grf manual page. Size N = 2000. Probability of treatment function of X1. Treatment effect function of X1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Generate data.
+set.seed(123)
+n = 2000; p = 10
+X = matrix(rnorm(n*p), n, p)
+
+# treatment
+W = rbinom(n, 1, 0.4 + 0.2 * (X[,1] &amp;gt; 0))
+# outcome (parallel max)
+Y = pmax(X[,1], 0) * W + X[,2] + pmin(X[,3], 0) + rnorm(n)
+
+# TAU is true treatment effect
+df &amp;lt;- data.frame(X, W, Y, TAU = pmax(X[,1], 0))&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;fit-grf&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit GRF&lt;/h2&gt;
+&lt;p&gt;Default settings are honesty = TRUE.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Train a causal forest.
+if(fullrun){
+  tau.forest = causal_forest(X, Y, W, num.trees = 2000)
+  saveRDS(tau.forest, &amp;quot;s4.rds&amp;quot;)
+} else {tau.forest &amp;lt;- readRDS(&amp;quot;s4.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;oob-predictions&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;OOB predictions&lt;/h2&gt;
+&lt;p&gt;From the GRF manual:&lt;/p&gt;
+&lt;p&gt;Given a test example, the GRF algorithm computes a prediction as follows:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;For each tree, the test example is &amp;#39;pushed down&amp;#39; to determine what leaf it falls in.
+Given this information, we create a list of neighboring training examples, weighted by how many times the example fell in the same leaf as the test example.
+A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through &#39;majority voting&#39;. It&#39;s worth noting that for regression forests, the GRF algorithm described above is identical this &#39;ensemble&#39; approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate treatment effects for the training data using out-of-bag prediction.
+tau.hat.oob = predict(tau.forest)
+
+res &amp;lt;- data.frame(df, pred = tau.hat.oob$predictions)
+
+ggplot(res, aes(x = X1, y = pred)) + geom_point() + geom_smooth() + geom_abline(intercept = 0, slope = 1) +
+  geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ate-att&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;ATE &amp;amp; ATT&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate the conditional average treatment effect on the full sample (CATE).
+average_treatment_effect(tau.forest, target.sample = &amp;quot;all&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   estimate    std.err 
+## 0.37316437 0.04795009&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(res$TAU)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.4138061&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate the conditional average treatment effect on the treated sample (CATT).
+# Here, we don&amp;#39;t expect much difference between the CATE and the CATT, since
+# treatment assignment was randomized.
+average_treatment_effect(tau.forest, target.sample = &amp;quot;treated&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   estimate    std.err 
+## 0.47051526 0.04850751&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(res[res$W == 1,]$TAU)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.5010723&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-more-trees-for-cis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit more trees for CI&#39;s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Add confidence intervals for heterogeneous treatment effects; growing more
+# trees is now recommended.
+if(fullrun){
+  tau.forest_big = causal_forest(X, Y, W, num.trees = 4000)
+  saveRDS(tau.forest_big, &amp;quot;s5.rds&amp;quot;)
+} else {tau.forest_big &amp;lt;- readRDS(&amp;quot;s5.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;plot-cis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Plot CI&#39;s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## PM
+#source(&amp;quot;CalcPosteriors.R&amp;quot;)
+df_res &amp;lt;- CalcPredictionsGRF(df, tau.forest_big)
+
+grfp &amp;lt;- ggplot(df_res, aes(x = X1, y = qm)) + 
+  geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point()  + 
+  geom_smooth() + geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) +
+   ylim(-1,3.5)
+
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-bart-on-this-dataset&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x.train &amp;lt;- model.matrix(~. ,data.frame(W, X))
+x.test &amp;lt;- model.matrix(~. ,data.frame(W = 1 - W, X))
+y.train &amp;lt;- Y
+
+if(fullrun){
+  bartFit &amp;lt;- bart(x.train, y.train, x.test, ntree = 2000, ndpost = 1000, nskip = 100)
+  saveRDS(bartFit, &amp;quot;s10.rds&amp;quot;)
+} else {bartFit &amp;lt;- readRDS(&amp;quot;s10.rds&amp;quot;)}
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
+sim &amp;lt;- CalcPosteriorsBART(df, bartFit, treatname = &amp;quot;W&amp;quot;)
+
+
+bartp &amp;lt;- ggplot(sim, aes(x = X1, qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point() + geom_smooth() +
+  geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) + ylim(-1,3.5)
+
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
+## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Here Grf appears more accurate. Mental note: Both W and TAU function of X1.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dataset-4-fit-separate-grf-forests-for-y-and-w&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Dataset 4: Fit separate grf forests for Y and W&lt;/h1&gt;
+&lt;p&gt;This dataset has a complex propensity of treatment function (Exponential of X1 and X2), as well as hetergeneous treatment effect that is exponential function of X3. It has size N=4000.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# In some examples, pre-fitting models for Y and W separately may
+# be helpful (e.g., if different models use different covariates).
+# In some applications, one may even want to get Y.hat and W.hat
+# using a completely different method (e.g., boosting).
+set.seed(123)
+# Generate new data.
+n = 4000; p = 20
+X = matrix(rnorm(n * p), n, p)
+TAU = 1 / (1 + exp(-X[, 3]))
+W = rbinom(n ,1, 1 / (1 + exp(-X[, 1] - X[, 2])))
+Y = pmax(X[, 2] + X[, 3], 0) + rowMeans(X[, 4:6]) / 2 + W * TAU + rnorm(n)
+
+df_sep4 &amp;lt;- data.frame(X, TAU, W, Y)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;grf-two-step-first-fit-model-for-w-ps&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Grf two-step: First fit model for W (PS)&lt;/h2&gt;
+&lt;p&gt;Regression forest to predict W from X. This is a propensity score.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
+  forest.W &amp;lt;- regression_forest(X, W, tune.parameters = c(&amp;quot;min.node.size&amp;quot;, &amp;quot;honesty.prune.leaves&amp;quot;), 
+                               num.trees = 2000)
+  saveRDS(forest.W, &amp;quot;s6.rds&amp;quot;)
+} else {forest.W &amp;lt;- readRDS(&amp;quot;s6.rds&amp;quot;)}
+
+W.hat = predict(forest.W)$predictions&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;grfthen-fit-model-for-y-selecting-covariates&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf:Then Fit model for Y, selecting covariates&lt;/h3&gt;
+&lt;p&gt;This predict Y from X, ignoring treatment.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
+  forest.Y = regression_forest(X, Y, tune.parameters = c(&amp;quot;min.node.size&amp;quot;, &amp;quot;honesty.prune.leaves&amp;quot;), 
+                               num.trees = 2000)
+  saveRDS(forest.Y, &amp;quot;s7.rds&amp;quot;)
+} else {forest.Y &amp;lt;- readRDS(&amp;quot;s7.rds&amp;quot;)}
+
+Y.hat = predict(forest.Y)$predictions&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;grfselect-variables-that-predict-y.&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf:Select variables that predict Y.&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;forest.Y.varimp = variable_importance(forest.Y)
+# Note: Forests may have a hard time when trained on very few variables
+# (e.g., ncol(X) = 1, 2, or 3). We recommend not being too aggressive
+# in selection.
+selected.vars = which(forest.Y.varimp / mean(forest.Y.varimp) &amp;gt; 0.2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This selects five variables of 20. Indeed these are the variables that were used to simulate Y.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;grf-finally-fit-causal-forest-using-ps-and-selected-covariates&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf: Finally, Fit causal forest using PS and selected covariates&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
+tau.forest2 = causal_forest(X[, selected.vars], Y, W,
+                           W.hat = W.hat, Y.hat = Y.hat,
+                           tune.parameters = c(&amp;quot;min.node.size&amp;quot;, &amp;quot;honesty.prune.leaves&amp;quot;), 
+                           num.trees = 4000)
+  saveRDS(tau.forest2, &amp;quot;s8.rds&amp;quot;)
+} else {tau.forest2 &amp;lt;- readRDS(&amp;quot;s8.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;grf-check-fit-and-cis&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Grf: Check fit and CI&#39;s&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(df_sep4[,selected.vars], tau.forest2)
+
+grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
+  geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) + geom_point() + 
+  geom_smooth() + 
+  geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) + ylim(-0.7,2)
+
+grfp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-bart-on-this-dataset-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x.train &amp;lt;- model.matrix(~. ,data.frame(W, X))
+x.test &amp;lt;- model.matrix(~. ,data.frame(W = 1 - W, X))
+y.train &amp;lt;- Y
+
+if(fullrun){
+  bartFit &amp;lt;- bart(x.train, y.train, x.test, ntree = 4000)
+  saveRDS(bartFit, &amp;quot;s9.rds&amp;quot;)
+} else {bartFit &amp;lt;- readRDS(&amp;quot;s9.rds&amp;quot;)}
+plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
+sim &amp;lt;- CalcPosteriorsBART(df_sep4, bartFit, treatname = &amp;quot;W&amp;quot;)
+
+
+bartp &amp;lt;- ggplot(sim, aes(x = X3, qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
+  geom_point() + geom_smooth() +
+  geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1) + ylim(-0.7,2)
+
+bartp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-bart-and-grf&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Compare BART and grf&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &amp;lt;- plot_grid(bartp, grfp)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
+## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Very similar results. BART appears slightly more accurate, especially for low values of X3.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Improving a parametric regression model using machine learning</title>
+      <link>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</link>
+      <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
+      <description>
+
+
+&lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
+&lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Load packages&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+#library(randomForest)
+#library(party)
+library(ranger)
+library(data.table)
+library(ggplot2)
+library(MASS)
+
+rdunif &amp;lt;- function(n,k) sample(1:k, n, replace = T)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-1-run-a-rf-on-the-boston-housing-set&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Step 1: Run a RF on the Boston Housing set&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_ranger &amp;lt;- ranger(medv ~ ., data = Boston,
+                                  importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
+                                  mtry = 5, replace = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Extract the permutation importance measure.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger);
+myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
+#my_rownames &amp;lt;- row.names(myres)
+myres &amp;lt;- data.table(myres)
+setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
+setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
+myres &amp;lt;- myres[, varname := as.factor(varname)]
+myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
+       aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-an-ols-to-the-boston-housing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fit an OLS to the Boston Housing&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm &amp;lt;- glm(medv ~., data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-predictions-of-both-models&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Compare predictions of both models&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger, data = Boston)
+#pred_RF$predictions
+pred_GLM &amp;lt;- predict(my_glm, data = Boston)
+
+plot(pred_RF$predictions, pred_GLM)
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
+&lt;p&gt;Discrepancy is defined as the difference between the predictions of both models for each observation.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+
+my_ranger_diff &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
+                                  importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
+                                  mtry = 5, replace = TRUE)
+my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Ranger result
+## 
+## Call:
+##  ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff,      Boston), importance = &amp;quot;permutation&amp;quot;, num.trees = 500, mtry = 5,      replace = TRUE) 
+## 
+## Type:                             Regression 
+## Number of trees:                  500 
+## Sample size:                      506 
+## Number of independent variables:  13 
+## Mtry:                             5 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       5.355079 
+## R squared (OOB):                  0.6550466&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
+myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
+#my_rownames &amp;lt;- row.names(myres)
+myres &amp;lt;- data.table(myres)
+setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
+setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
+myres &amp;lt;- myres[, varname := as.factor(varname)]
+myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
+       aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It turns out that &lt;code&gt;rm&lt;/code&gt; and &lt;code&gt;lstat&lt;/code&gt; are the variables that best predict the discrepancy.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int &amp;lt;- glm(medv ~. + rm:lstat, data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)
+summary(my_glm_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## glm(formula = medv ~ . + rm:lstat, family = &amp;quot;gaussian&amp;quot;, data = Boston)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -21.5738   -2.3319   -0.3584    1.8149   27.9558  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)   6.073638   5.038175   1.206 0.228582    
+## crim         -0.157100   0.028808  -5.453 7.85e-08 ***
+## zn            0.027199   0.012020   2.263 0.024083 *  
+## indus         0.052272   0.053475   0.978 0.328798    
+## chas          2.051584   0.750060   2.735 0.006459 ** 
+## nox         -15.051627   3.324807  -4.527 7.51e-06 ***
+## rm            7.958907   0.488520  16.292  &amp;lt; 2e-16 ***
+## age           0.013466   0.011518   1.169 0.242918    
+## dis          -1.120269   0.175498  -6.383 4.02e-10 ***
+## rad           0.320355   0.057641   5.558 4.49e-08 ***
+## tax          -0.011968   0.003267  -3.664 0.000276 ***
+## ptratio      -0.721302   0.115093  -6.267 8.06e-10 ***
+## black         0.003985   0.002371   1.681 0.093385 .  
+## lstat         1.844883   0.191833   9.617  &amp;lt; 2e-16 ***
+## rm:lstat     -0.418259   0.032955 -12.692  &amp;lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 16.98987)
+## 
+##     Null deviance: 42716  on 505  degrees of freedom
+## Residual deviance:  8342  on 491  degrees of freedom
+## AIC: 2886
+## 
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The interaction we have added is indeed highly significant.&lt;/p&gt;
+&lt;p&gt;Compare approximate out-of-sample prediction accuracy using AIC:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 3027.609&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 2886.043&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Indeed, the addition of the interaction greatly increases the prediction accuracy.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;repeat-this-process&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Repeat this process&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger, data = Boston)
+#pred_RF$predictions
+pred_GLM &amp;lt;- predict(my_glm_int, data = Boston)
+
+plot(pred_RF$predictions, pred_GLM)
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+
+my_ranger_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
+                                  importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
+                                  mtry = 5, replace = TRUE)
+my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Ranger result
+## 
+## Call:
+##  ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff,      Boston), importance = &amp;quot;permutation&amp;quot;, num.trees = 500, mtry = 5,      replace = TRUE) 
+## 
+## Type:                             Regression 
+## Number of trees:                  500 
+## Sample size:                      506 
+## Number of independent variables:  13 
+## Mtry:                             5 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       5.767179 
+## R squared (OOB):                  0.4279085&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
+myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
+#my_rownames &amp;lt;- row.names(myres)
+myres &amp;lt;- data.table(myres)
+setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
+setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
+myres &amp;lt;- myres[, varname := as.factor(varname)]
+myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
+       aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now the variables that best predict the discrepancy are &lt;code&gt;lstat&lt;/code&gt; and &lt;code&gt;dis&lt;/code&gt;. Add these two variables as an interaction.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int2 &amp;lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)
+summary(my_glm_int2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## glm(formula = medv ~ . + rm:lstat + lstat:dis, family = &amp;quot;gaussian&amp;quot;, 
+##     data = Boston)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -23.3918   -2.2997   -0.4077    1.6475   27.6766  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)   1.552991   5.107295   0.304 0.761201    
+## crim         -0.139370   0.028788  -4.841 1.73e-06 ***
+## zn            0.042984   0.012550   3.425 0.000667 ***
+## indus         0.066690   0.052878   1.261 0.207834    
+## chas          1.760779   0.743688   2.368 0.018290 *  
+## nox         -11.544280   3.404577  -3.391 0.000753 ***
+## rm            8.640503   0.513593  16.824  &amp;lt; 2e-16 ***
+## age          -0.002127   0.012067  -0.176 0.860140    
+## dis          -1.904982   0.268056  -7.107 4.22e-12 ***
+## rad           0.304689   0.057000   5.345 1.39e-07 ***
+## tax          -0.011220   0.003228  -3.476 0.000554 ***
+## ptratio      -0.641380   0.115418  -5.557 4.51e-08 ***
+## black         0.003756   0.002339   1.606 0.108924    
+## lstat         1.925223   0.190368  10.113  &amp;lt; 2e-16 ***
+## rm:lstat     -0.466947   0.034897 -13.381  &amp;lt; 2e-16 ***
+## dis:lstat     0.076716   0.020009   3.834 0.000143 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 16.52869)
+## 
+##     Null deviance: 42716.3  on 505  degrees of freedom
+## Residual deviance:  8099.1  on 490  degrees of freedom
+## AIC: 2873.1
+## 
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_int2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 2873.087&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 2886.043&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We conclude that the second interaction also results in significant model improvement.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-more-ambitious-goal-try-and-improve-harrison-rubinfelds-model-formula-for-boston-housing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld&#39;s model formula for Boston housing&lt;/h1&gt;
+&lt;p&gt;So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let&#39;s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Harrison and Rubinfeld (1978) model
+my_glm_hr &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
+                     black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2), data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)
+
+summary(my_glm_hr)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## glm(formula = log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + 
+##     tax + ptratio + black + I(black^2) + log(lstat) + crim + 
+##     zn + indus + chas + I(nox^2), family = &amp;quot;gaussian&amp;quot;, data = Boston)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.73091  -0.09274  -0.00710   0.09800   0.78607  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)  4.474e+00  1.579e-01  28.343  &amp;lt; 2e-16 ***
+## I(rm^2)      6.634e-03  1.313e-03   5.053 6.15e-07 ***
+## age          3.491e-05  5.245e-04   0.067 0.946950    
+## log(dis)    -1.927e-01  3.325e-02  -5.796 1.22e-08 ***
+## log(rad)     9.613e-02  1.905e-02   5.047 6.35e-07 ***
+## tax         -4.295e-04  1.222e-04  -3.515 0.000481 ***
+## ptratio     -2.977e-02  5.024e-03  -5.926 5.85e-09 ***
+## black        1.520e-03  5.068e-04   3.000 0.002833 ** 
+## I(black^2)  -2.597e-06  1.114e-06  -2.331 0.020153 *  
+## log(lstat)  -3.695e-01  2.491e-02 -14.833  &amp;lt; 2e-16 ***
+## crim        -1.157e-02  1.246e-03  -9.286  &amp;lt; 2e-16 ***
+## zn           7.257e-05  5.034e-04   0.144 0.885430    
+## indus       -1.943e-04  2.360e-03  -0.082 0.934424    
+## chas         9.180e-02  3.305e-02   2.777 0.005690 ** 
+## I(nox^2)    -6.566e-01  1.129e-01  -5.815 1.09e-08 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.03299176)
+## 
+##     Null deviance: 84.376  on 505  degrees of freedom
+## Residual deviance: 16.199  on 491  degrees of freedom
+## AIC: -273.48
+## 
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_ranger_log &amp;lt;- ranger(log(medv) ~ ., data = Boston,
+                                  importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
+                                  mtry = 5, replace = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger_log, data = Boston)
+#pred_RF$predictions
+pred_GLM &amp;lt;- predict(my_glm_hr, data = Boston)
+
+plot(pred_RF$predictions, pred_GLM)
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;For low predicted values both models differ in a systematic way. This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+
+my_ranger_log_diff &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
+                                  importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
+                                  mtry = 5, replace = TRUE)
+my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Ranger result
+## 
+## Call:
+##  ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff,      Boston), importance = &amp;quot;permutation&amp;quot;, num.trees = 500, mtry = 5,      replace = TRUE) 
+## 
+## Type:                             Regression 
+## Number of trees:                  500 
+## Sample size:                      506 
+## Number of independent variables:  13 
+## Mtry:                             5 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       0.009032278 
+## R squared (OOB):                  0.5343749&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
+myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
+#my_rownames &amp;lt;- row.names(myres)
+myres &amp;lt;- data.table(myres)
+setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
+setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
+myres &amp;lt;- myres[, varname := as.factor(varname)]
+myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
+       aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Add the top 2 vars as an interaction to their model equation.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
+                     black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
+                   lstat:nox, data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)
+summary(my_glm_hr_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## glm(formula = log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + 
+##     tax + ptratio + black + I(black^2) + log(lstat) + crim + 
+##     zn + indus + chas + I(nox^2) + lstat:nox, family = &amp;quot;gaussian&amp;quot;, 
+##     data = Boston)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.70340  -0.09274  -0.00665   0.10068   0.75004  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)  4.243e+00  1.613e-01  26.304  &amp;lt; 2e-16 ***
+## I(rm^2)      7.053e-03  1.286e-03   5.484 6.66e-08 ***
+## age         -3.146e-04  5.174e-04  -0.608  0.54354    
+## log(dis)    -2.254e-01  3.317e-02  -6.795 3.15e-11 ***
+## log(rad)     9.829e-02  1.862e-02   5.278 1.96e-07 ***
+## tax         -4.589e-04  1.196e-04  -3.838  0.00014 ***
+## ptratio     -2.990e-02  4.910e-03  -6.089 2.30e-09 ***
+## black        1.445e-03  4.955e-04   2.917  0.00370 ** 
+## I(black^2)  -2.470e-06  1.089e-06  -2.268  0.02376 *  
+## log(lstat)  -2.143e-01  3.989e-02  -5.373 1.20e-07 ***
+## crim        -1.046e-02  1.238e-03  -8.448 3.40e-16 ***
+## zn           7.309e-04  5.099e-04   1.434  0.15234    
+## indus       -8.166e-05  2.307e-03  -0.035  0.97178    
+## chas         8.746e-02  3.231e-02   2.707  0.00704 ** 
+## I(nox^2)    -3.618e-01  1.256e-01  -2.880  0.00415 ** 
+## lstat:nox   -2.367e-02  4.819e-03  -4.911 1.24e-06 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.03150809)
+## 
+##     Null deviance: 84.376  on 505  degrees of freedom
+## Residual deviance: 15.439  on 490  degrees of freedom
+## AIC: -295.79
+## 
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -273.4788&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -295.7931&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This results in a significant improvement!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;repeat-this-procedure&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Repeat this procedure&lt;/h1&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_RF &amp;lt;- predict(my_ranger_log, data = Boston)
+#pred_RF$predictions
+pred_GLM &amp;lt;- predict(my_glm_hr_int, data = Boston)
+
+plot(pred_RF$predictions, pred_GLM)
+abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
+
+my_ranger_log_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
+                                  importance = &amp;quot;permutation&amp;quot;, num.trees = 500,
+                                  mtry = 5, replace = TRUE)
+my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Ranger result
+## 
+## Call:
+##  ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff,      Boston), importance = &amp;quot;permutation&amp;quot;, num.trees = 500, mtry = 5,      replace = TRUE) 
+## 
+## Type:                             Regression 
+## Number of trees:                  500 
+## Sample size:                      506 
+## Number of independent variables:  13 
+## Mtry:                             5 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        variance 
+## OOB prediction error (MSE):       0.008521645 
+## R squared (OOB):                  0.5301491&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
+myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
+#my_rownames &amp;lt;- row.names(myres)
+myres &amp;lt;- data.table(myres)
+setnames(myres, &amp;quot;V1&amp;quot;, &amp;quot;varname&amp;quot;)
+setnames(myres, &amp;quot;myres_tmp&amp;quot;, &amp;quot;MeanDecreaseAccuracy&amp;quot;)
+myres &amp;lt;- myres[, varname := as.factor(varname)]
+myres &amp;lt;- myres[, MeanDecreaseAccuracy := as.numeric(MeanDecreaseAccuracy)]
+myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
+       aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
+  geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now we add lstat and dis as an interaction.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int2 &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
+                     black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
+                   lstat:nox + lstat:dis, data = Boston, 
+              family = &amp;quot;gaussian&amp;quot;)
+summary(my_glm_hr_int2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## glm(formula = log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + 
+##     tax + ptratio + black + I(black^2) + log(lstat) + crim + 
+##     zn + indus + chas + I(nox^2) + lstat:nox + lstat:dis, family = &amp;quot;gaussian&amp;quot;, 
+##     data = Boston)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.70136  -0.08746  -0.00589   0.08857   0.76349  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)  4.535e+00  1.712e-01  26.481  &amp;lt; 2e-16 ***
+## I(rm^2)      7.498e-03  1.266e-03   5.924 5.94e-09 ***
+## age         -1.262e-03  5.504e-04  -2.293  0.02226 *  
+## log(dis)    -4.065e-01  5.203e-02  -7.813 3.43e-14 ***
+## log(rad)     9.668e-02  1.828e-02   5.290 1.85e-07 ***
+## tax         -4.622e-04  1.173e-04  -3.940 9.35e-05 ***
+## ptratio     -2.640e-02  4.881e-03  -5.409 9.93e-08 ***
+## black        1.313e-03  4.871e-04   2.696  0.00727 ** 
+## I(black^2)  -2.172e-06  1.071e-06  -2.029  0.04303 *  
+## log(lstat)  -3.181e-01  4.553e-02  -6.987 9.23e-12 ***
+## crim        -1.049e-02  1.215e-03  -8.635  &amp;lt; 2e-16 ***
+## zn           9.078e-04  5.019e-04   1.809  0.07108 .  
+## indus       -2.733e-04  2.264e-03  -0.121  0.90395    
+## chas         7.166e-02  3.191e-02   2.246  0.02515 *  
+## I(nox^2)    -2.569e-01  1.255e-01  -2.048  0.04113 *  
+## lstat:nox   -2.729e-02  4.798e-03  -5.689 2.21e-08 ***
+## lstat:dis    3.906e-03  8.754e-04   4.462 1.01e-05 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.03033711)
+## 
+##     Null deviance: 84.376  on 505  degrees of freedom
+## Residual deviance: 14.835  on 489  degrees of freedom
+## AIC: -313.99
+## 
+## Number of Fisher Scoring iterations: 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr_int2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -313.9904&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(my_glm_hr_int)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -295.7931&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And again we find an improvement in model fit.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;have-these-interactions-already-been-reported-on-in-the-literature&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Have these interactions already been reported on in the literature?&lt;/h1&gt;
+&lt;p&gt;Tom Minka reports on his website an analysis of interactions in the Boston Housing set:&lt;/p&gt;
+&lt;p&gt;(&lt;a href=&#34;http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/&#34; class=&#34;uri&#34;&gt;http://alumni.media.mit.edu/~tpminka/courses/36-350.2001/lectures/day30/&lt;/a&gt;) &lt;code&gt;&amp;gt; summary(fit3) Coefficients:                   Estimate Std. Error t value Pr(&amp;gt;|t|)     (Intercept)      -227.5485    49.2363  -4.622 4.87e-06 *** lstat              50.8553    20.3184   2.503 0.012639 *   rm                 38.1245     7.0987   5.371 1.21e-07 *** dis               -16.8163     2.9174  -5.764 1.45e-08 *** ptratio            14.9592     2.5847   5.788 1.27e-08 *** lstat:rm           -6.8143     3.1209  -2.183 0.029475 *   lstat:dis           4.8736     1.3940   3.496 0.000514 *** lstat:ptratio      -3.3209     1.0345  -3.210 0.001412 **  rm:dis              2.0295     0.4435   4.576 5.99e-06 *** rm:ptratio         -1.9911     0.3757  -5.299 1.76e-07 *** lstat:rm:dis       -0.5216     0.2242  -2.327 0.020364 *   lstat:rm:ptratio    0.3368     0.1588   2.121 0.034423 *&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Rob mcCulloch, using BART (bayesian additive regression trees) also examines interactions in the Boston Housing data. There the co-occurence within trees is used to discover interactions:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;The second, interaction detection, uncovers which pairs of variables interact in analogous fashion by keeping track of the percentage of trees in the sum in which both variables occur.  This exploits the fact that a sum-of-trees model captures an interaction between xi and xj by using them both for splitting rules in the same tree.&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf&#34; class=&#34;uri&#34;&gt;http://www.rob-mcculloch.org/some_papers_and_talks/papers/working/cgm_as.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;boston_uit_bart_book.png&#34; /&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;We conclude that this appears a fruitfull approach to at least discovering where a regression model can be improved.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

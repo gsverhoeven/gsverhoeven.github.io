@@ -559,7 +559,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/r/">R</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/machine-learning/">machine learning</a></span>
   
 
 </div>
@@ -657,9 +657,9 @@ my_ranger_diff</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.212004 
-## R squared (OOB):                  0.6575567</code></pre>
-<p>It turns out the RF can “explain” 67% of these discrepancies.</p>
+## OOB prediction error (MSE):       5.355079 
+## R squared (OOB):                  0.6550466</code></pre>
+<p>It turns out the RF can &quot;explain&quot; 67% of these discrepancies.</p>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_diff)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -748,8 +748,8 @@ my_ranger_diff2</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.401101 
-## R squared (OOB):                  0.4528993</code></pre>
+## OOB prediction error (MSE):       5.767179 
+## R squared (OOB):                  0.4279085</code></pre>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_diff2)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -811,8 +811,8 @@ summary(my_glm_int2)</code></pre>
 <p>We conclude that the second interaction also results in significant model improvement.</p>
 </div>
 <div id="a-more-ambitious-goal-try-and-improve-harrison-rubinfelds-model-formula-for-boston-housing" class="section level1">
-<h1>A more ambitious goal: Try and improve Harrison &amp; Rubinfeld’s model formula for Boston housing</h1>
-<p>So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let’s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts <code>log(medv)</code>.</p>
+<h1>A more ambitious goal: Try and improve Harrison &amp; Rubinfeld's model formula for Boston housing</h1>
+<p>So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let's see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts <code>log(medv)</code>.</p>
 <pre class="r"><code># Harrison and Rubinfeld (1978) model
 my_glm_hr &lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2), data = Boston, 
@@ -886,9 +886,9 @@ my_ranger_log_diff</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009213626 
-## R squared (OOB):                  0.534747</code></pre>
-<p>The RF indicates that 54% of the discrepancy can be “explained” by RF.</p>
+## OOB prediction error (MSE):       0.009032278 
+## R squared (OOB):                  0.5343749</code></pre>
+<p>The RF indicates that 54% of the discrepancy can be &quot;explained&quot; by RF.</p>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_log_diff)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -981,8 +981,8 @@ my_ranger_log_diff2</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008909949 
-## R squared (OOB):                  0.5171111</code></pre>
+## OOB prediction error (MSE):       0.008521645 
+## R squared (OOB):                  0.5301491</code></pre>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_log_diff2)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -1075,7 +1075,11 @@ summary(my_glm_hr_int2)</code></pre>
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/interaction-detection-random-forest-ranger/">interaction detection, random forest, ranger</a>
+  <a class="badge badge-light" href="/tags/interaction-detection/">interaction detection</a>
+  
+  <a class="badge badge-light" href="/tags/random-forest/">random forest</a>
+  
+  <a class="badge badge-light" href="/tags/ranger/">ranger</a>
   
 </div>
 

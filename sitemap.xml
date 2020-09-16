@@ -3,47 +3,127 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://gsverhoeven.github.io/tags/bayesian-statistics/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/brms/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/categories/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/causal-inference/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/post/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/rstan/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/stan/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/categories/statistics/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/post/posterior-distribution-average-treatment-effect/</loc>
+    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/categories/</loc>
+    <loc>https://gsverhoeven.github.io/categories/deep-learning/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/</loc>
+    <loc>https://gsverhoeven.github.io/tags/deep-learning/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/post/</loc>
+    <loc>https://gsverhoeven.github.io/tags/keras/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/categories/r/</loc>
+    <loc>https://gsverhoeven.github.io/categories/machine-learning/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/tags/</loc>
+    <loc>https://gsverhoeven.github.io/tags/neural-networks/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/tags/tensorflow-keras-neural-networks-deep-learning/</loc>
+    <loc>https://gsverhoeven.github.io/tags/tensorflow/</loc>
     <lastmod>2020-05-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</loc>
+    <loc>https://gsverhoeven.github.io/tags/copula/</loc>
+    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/categories/data-science/</loc>
+    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/fake-data/</loc>
+    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/r/</loc>
     <lastmod>2019-10-26T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://gsverhoeven.github.io/post/simulating-fake-data/</loc>
+    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/simulation/</loc>
+    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/tetrachoric-correlation/</loc>
     <lastmod>2019-10-26T00:00:00+00:00</lastmod>
   </url>
   
@@ -58,28 +138,33 @@
   </url>
   
   <url>
+    <loc>https://gsverhoeven.github.io/tags/causal-graph/</loc>
+    <lastmod>2019-05-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/categories/causal-inference/</loc>
+    <lastmod>2019-05-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/dag/</loc>
+    <lastmod>2019-05-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://gsverhoeven.github.io/post/causal-inference-course/</loc>
     <lastmod>2019-05-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</loc>
-    <lastmod>2019-05-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://gsverhoeven.github.io/tags/r-caret/</loc>
+    <loc>https://gsverhoeven.github.io/tags/caret/</loc>
     <lastmod>2019-03-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</loc>
     <lastmod>2019-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://gsverhoeven.github.io/categories/arduino/</loc>
-    <lastmod>2019-03-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -93,12 +178,22 @@
   </url>
   
   <url>
+    <loc>https://gsverhoeven.github.io/categories/electronics/</loc>
+    <lastmod>2019-03-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/bart/</loc>
+    <lastmod>2018-12-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</loc>
     <lastmod>2018-12-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/tags/causal-inference-bart-grf/</loc>
+    <loc>https://gsverhoeven.github.io/tags/grf/</loc>
     <lastmod>2018-12-15T00:00:00+00:00</lastmod>
   </url>
   
@@ -108,7 +203,17 @@
   </url>
   
   <url>
-    <loc>https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/</loc>
+    <loc>https://gsverhoeven.github.io/tags/interaction-detection/</loc>
+    <lastmod>2017-09-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/random-forest/</loc>
+    <lastmod>2017-09-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/tags/ranger/</loc>
     <lastmod>2017-09-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -118,6 +223,10 @@
   
   <url>
     <loc>https://gsverhoeven.github.io/authors/</loc>
+  </url>
+  
+  <url>
+    <loc>https://gsverhoeven.github.io/post/bogetoft_rl/</loc>
   </url>
   
   <url>

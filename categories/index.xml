@@ -5,7 +5,7 @@
     <link>https://gsverhoeven.github.io/categories/</link>
       <atom:link href="https://gsverhoeven.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <description>Categories</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 04 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Categories</title>
@@ -13,18 +13,50 @@
     </image>
     
     <item>
-      <title>R</title>
-      <link>https://gsverhoeven.github.io/categories/r/</link>
-      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/categories/r/</guid>
+      <title>Statistics</title>
+      <link>https://gsverhoeven.github.io/categories/statistics/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/categories/statistics/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Arduino</title>
-      <link>https://gsverhoeven.github.io/categories/arduino/</link>
+      <title>Deep learning</title>
+      <link>https://gsverhoeven.github.io/categories/deep-learning/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/categories/deep-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Machine learning</title>
+      <link>https://gsverhoeven.github.io/categories/machine-learning/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/categories/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Data science</title>
+      <link>https://gsverhoeven.github.io/categories/data-science/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/categories/data-science/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Causal inference</title>
+      <link>https://gsverhoeven.github.io/categories/causal-inference/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/categories/causal-inference/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Electronics</title>
+      <link>https://gsverhoeven.github.io/categories/electronics/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/categories/arduino/</guid>
+      <guid>https://gsverhoeven.github.io/categories/electronics/</guid>
       <description></description>
     </item>
     

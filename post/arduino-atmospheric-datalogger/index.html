@@ -559,7 +559,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/arduino/">Arduino</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/electronics/">Electronics</a></span>
   
 
 </div>
@@ -591,7 +591,7 @@
 
 
 <p>In this post, I show how to create a Arduino-based atmospheric sensor circuit capable of storing large amounts of data on a microSD card.</p>
-<p>Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. <a href="https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger" class="uri">https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger</a>). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!</p>
+<p>Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. <a href="https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger" class="uri">https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger</a>). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!</p>
 <div id="components" class="section level1">
 <h1>Components</h1>
 <p>After some research I ordered:</p>
@@ -661,7 +661,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
   facet_grid(~ trace_name) + geom_smooth(size = 1)</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
 <p><img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>The basement, which is the lowest, has the highest pressure. But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let’s move on to the temperature!</p>
+<p>The basement, which is the lowest, has the highest pressure. But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let's move on to the temperature!</p>
 </div>
 <div id="temperature" class="section level2">
 <h2>Temperature</h2>
@@ -680,7 +680,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
            group = variable)) +
   geom_point() + facet_grid(~ trace_name)</code></pre>
 <p><img src="/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p>Here we see that the living room is at a agreeable 45% RH. The basement has a higher RH percentage, expected because it’s colder.</p>
+<p>Here we see that the living room is at a agreeable 45% RH. The basement has a higher RH percentage, expected because it's colder.</p>
 <p>According to Wikipedia:</p>
 <p><strong>Humans can be comfortable within a wide range of humidities depending on the temperature—from 30% to 70%[14]—but ideally between 50%[15] and 60%.[16] Very low humidity can create discomfort, respiratory problems, and aggravate allergies in some individuals.</strong></p>
 <p>The bedroom is also at a nice humidity level of 55% RH. The bathroom floor was being heated, and this unsurprisingly reduces the local RH to below 40%.</p>
@@ -702,7 +702,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/arduino/">arduino</a>
+  <a class="badge badge-light" href="/tags/arduino/">Arduino</a>
   
 </div>
 

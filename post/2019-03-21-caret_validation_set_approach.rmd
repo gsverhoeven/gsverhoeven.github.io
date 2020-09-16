@@ -6,9 +6,10 @@ summary: In this blog post, we explore how to implement the validation set appro
 draft: FALSE
 slug: validation-set-approach-in-caret
 categories:
-  - R
+  - Machine learning
 tags:
-  - R, caret 
+  - R
+  - caret 
 baseurl: "https://gsverhoeven.github.io"
 header:
   image: "headers/balls-blur-close-up-278911.jpg"

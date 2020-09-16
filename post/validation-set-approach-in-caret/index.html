@@ -559,7 +559,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/r/">R</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/machine-learning/">Machine learning</a></span>
   
 
 </div>
@@ -590,8 +590,8 @@
       
 
 
-<p>In this blog post, we explore how to implement the <em>validation set approach</em> in <code>caret</code>. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook <a href="http://www-bcf.usc.edu/~gareth/ISL/">“An introduction to Statistical Learning”</a> uses the validation set approach to introduce resampling methods.</p>
-<p>In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of <code>caret</code>’s preset methods.</p>
+<p>In this blog post, we explore how to implement the <em>validation set approach</em> in <code>caret</code>. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook <a href="http://www-bcf.usc.edu/~gareth/ISL/">&quot;An introduction to Statistical Learning&quot;</a> uses the validation set approach to introduce resampling methods.</p>
+<p>In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of <code>caret</code>'s preset methods.</p>
 <p>But for teaching purposes it would be very nice to have a <code>caret</code> implementation.</p>
 <p>This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.</p>
 <p>We pick the <code>BostonHousing</code> dataset for our example code.</p>
@@ -719,7 +719,7 @@ knitr::kable(head(Boston))</code></pre>
 <div id="stratified-sampling-vs-random-sampling" class="section level1">
 <h1>Stratified sampling vs random sampling</h1>
 <p>To check if we understand what <code>caret</code> does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the <code>caret</code> approach. As <code>caret</code> requires a particular format (a named list of sets of train indices) we conform to this standard. However, all <code>caret</code> partitioning functions seem to perform <strong>stratified random sampling</strong>. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random <strong>within those groups</strong> to partitions that have similar distributions for the outcome variable.</p>
-<p>This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.</p>
+<p>This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.</p>
 <p>We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that <code>trainControl</code> likes.</p>
 <pre class="r"><code># internal function from caret package, needed to play nice with resamples()
 prettySeq &lt;- function(x) paste(&quot;Resample&quot;, gsub(&quot; &quot;, &quot;0&quot;, format(seq(along = x))), sep = &quot;&quot;)
@@ -740,10 +740,10 @@ createRandomDataPartition &lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)</code></pre>
 <pre><code>## $Resample1
-## [1] 9 1 2 4 8
+## [1] 8 3 1 2 7
 ## 
 ## $Resample2
-## [1] 3 9 5 4 2</code></pre>
+## [1]  1  6 10  8  9</code></pre>
 </div>
 <div id="the-validation-set-approach-without-caret" class="section level1">
 <h1>The validation set approach without caret</h1>
@@ -762,7 +762,7 @@ preds &lt;- predict(lm.fit, newdata = Boston[-train,])
 # calculate RMSE validation error
 sqrt(mean((preds - Boston[-train,]$medv)^2))</code></pre>
 <pre><code>## [1] 7.930076</code></pre>
-<p>If we feed <code>caret</code> the same data partition, we expect <em>exactly</em> the same test error for the held-out data. Let’s find out!</p>
+<p>If we feed <code>caret</code> the same data partition, we expect <em>exactly</em> the same test error for the held-out data. Let's find out!</p>
 </div>
 <div id="the-validation-set-approach-in-caret" class="section level1">
 <h1>The validation set approach in caret</h1>
@@ -841,7 +841,7 @@ mean(resamples$values$`MOD1~RMSE`)</code></pre>
 </div>
 <div id="validation-set-approach-stratified-sampling-versus-random-sampling" class="section level1">
 <h1>Validation set approach: stratified sampling versus random sampling</h1>
-<p>Since we now know what we are doing, let’s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.</p>
+<p>Since we now know what we are doing, let's perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.</p>
 <pre class="r"><code># simulation settings
 n_repeats &lt;- 3000
 train_fraction &lt;- 0.8</code></pre>
@@ -981,7 +981,9 @@ lgocv_res</code></pre>
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/r-caret/">R, caret</a>
+  <a class="badge badge-light" href="/tags/r/">R</a>
+  
+  <a class="badge badge-light" href="/tags/caret/">caret</a>
   
 </div>
 

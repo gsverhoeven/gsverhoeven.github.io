@@ -28,10 +28,10 @@ library(dbarts)
 library(ggplot2)
 library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ✔ tibble  2.1.3     ✔ dplyr   0.8.4
-## ✔ tidyr   1.0.2     ✔ stringr 1.4.0
-## ✔ readr   1.3.1     ✔ forcats 0.4.0
-## ✔ purrr   0.3.3&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## ✔ tibble  3.0.3     ✔ dplyr   1.0.2
+## ✔ tidyr   1.1.2     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.5.0
+## ✔ purrr   0.3.4&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ tidyr::extract() masks dbarts::extract()
 ## ✖ dplyr::filter()  masks stats::filter()
@@ -116,14 +116,14 @@ ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col =
   geom_point() + 
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;This is pretty bad compared to BART. What’s wrong here?&lt;/p&gt;
-&lt;p&gt;From reference.md: &lt;strong&gt;GRF isn’t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is pretty bad compared to BART. What&#39;s wrong here?&lt;/p&gt;
+&lt;p&gt;From reference.md: &lt;strong&gt;GRF isn&#39;t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.&lt;/li&gt;
 &lt;li&gt;Skipping the variance estimate computation, by setting ci.group.size to 1 during training, then increasing sample.fraction. Because of how variance estimation is implemented, sample.fraction cannot be greater than 0.5 when it is enabled. If variance estimates are not needed, it may help to disable this computation and use a larger subsample size for training.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI’s&lt;/p&gt;
+&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI&#39;s&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
   reg.forest2 = regression_forest(x, y, num.trees = 2000,
                                  honesty = FALSE)
@@ -190,7 +190,7 @@ head(aciccomp2017:::transformedData_2017)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;fit-bart-to-acic-2017-dataset&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Fit BART to ACIC 2017 dataset&lt;/h2&gt;
 &lt;p&gt;Need also counterfactual predictions. Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.&lt;/p&gt;
-&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more “burn in” samples.&lt;/p&gt;
+&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more &amp;quot;burn in&amp;quot; samples.&lt;/p&gt;
 &lt;p&gt;Prepare data for BART, including x.test with treatment reversed:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# combine x and y
 y &amp;lt;- sim$y
@@ -322,7 +322,7 @@ if(fullrun){
 &lt;pre&gt;&lt;code&gt;For each tree, the test example is &amp;#39;pushed down&amp;#39; to determine what leaf it falls in.
 Given this information, we create a list of neighboring training examples, weighted by how many times the example fell in the same leaf as the test example.
 A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through ‘majority voting’. It’s worth noting that for regression forests, the GRF algorithm described above is identical this ‘ensemble’ approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
+&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through &#39;majority voting&#39;. It&#39;s worth noting that for regression forests, the GRF algorithm described above is identical this &#39;ensemble&#39; approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate treatment effects for the training data using out-of-bag prediction.
 tau.hat.oob = predict(tau.forest)
 
@@ -351,7 +351,7 @@ average_treatment_effect(tau.forest, target.sample = &amp;quot;treated&amp;quot;
 &lt;pre&gt;&lt;code&gt;## [1] 0.5010723&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-more-trees-for-cis&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Fit more trees for CI’s&lt;/h2&gt;
+&lt;h2&gt;Fit more trees for CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Add confidence intervals for heterogeneous treatment effects; growing more
 # trees is now recommended.
 if(fullrun){
@@ -360,7 +360,7 @@ if(fullrun){
 } else {tau.forest_big &amp;lt;- readRDS(&amp;quot;s5.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;plot-cis&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Plot CI’s&lt;/h2&gt;
+&lt;h2&gt;Plot CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## PM
 #source(&amp;quot;CalcPosteriors.R&amp;quot;)
 df_res &amp;lt;- CalcPredictionsGRF(df, tau.forest_big)
@@ -389,7 +389,7 @@ plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
+&lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(df, bartFit, treatname = &amp;quot;W&amp;quot;)
 
@@ -469,7 +469,7 @@ tau.forest2 = causal_forest(X[, selected.vars], Y, W,
 } else {tau.forest2 &amp;lt;- readRDS(&amp;quot;s8.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;grf-check-fit-and-cis&#34; class=&#34;section level3&#34;&gt;
-&lt;h3&gt;Grf: Check fit and CI’s&lt;/h3&gt;
+&lt;h3&gt;Grf: Check fit and CI&#39;s&lt;/h3&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(df_sep4[,selected.vars], tau.forest2)
 
 grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
@@ -496,7 +496,7 @@ plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
+&lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(df_sep4, bartFit, treatname = &amp;quot;W&amp;quot;)
 

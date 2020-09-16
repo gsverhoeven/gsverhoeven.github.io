@@ -559,7 +559,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/r/">R</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/causal-inference/">Causal inference</a></span>
   
 
 </div>
@@ -605,14 +605,14 @@
 <li>are low on math and high on simulation / programming in R</li>
 <li>are fun / well written</li>
 </ul>
-<p>For Bayesian statistical modeling, we have the awesome textbook <a href="https://xcelab.net/rm/statistical-rethinking/">“Statistical Rethinking”</a> by Richard mcElreath.</p>
-<p>For Machine Learning, we have the (free) book <a href="http://www-bcf.usc.edu/~gareth/ISL/">“Introduction to Statistical Learning”</a> by James, Witten, Hastie &amp; Tibshirani.</p>
+<p>For Bayesian statistical modeling, we have the awesome textbook <a href="https://xcelab.net/rm/statistical-rethinking/">&quot;Statistical Rethinking&quot;</a> by Richard mcElreath.</p>
+<p>For Machine Learning, we have the (free) book <a href="http://www-bcf.usc.edu/~gareth/ISL/">&quot;Introduction to Statistical Learning&quot;</a> by James, Witten, Hastie &amp; Tibshirani.</p>
 <p>However, for Causal Inference, such a book does not exist yet AFAIK. Therefore, I tried to piece together a Causal Inference course based on the criteria mentioned above.</p>
 </div>
 <div id="designing-an-introductory-causal-inference-course" class="section level1">
 <h1>Designing an introductory causal inference course</h1>
-<p>Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call “Quasi-experimental designs”, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).</p>
-<p>In the end, I decided to combine the two causal chapters from Gelman &amp; Hill (2007) <a href="https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/">(freely available on Gelman’s website)</a> with the introductory chapter on Causal Graphical Models by Felix Elwert <a href="https://www.ssc.wisc.edu/~felwert/causality/">(freely available on Elwert’s website)</a>.</p>
+<p>Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call &quot;Quasi-experimental designs&quot;, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).</p>
+<p>In the end, I decided to combine the two causal chapters from Gelman &amp; Hill (2007) <a href="https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/">(freely available on Gelman's website)</a> with the introductory chapter on Causal Graphical Models by Felix Elwert <a href="https://www.ssc.wisc.edu/~felwert/causality/">(freely available on Elwert's website)</a>.</p>
 <p>The Gelman &amp; Hill chapters already come with a set of exercises. However, for DAGs, i could not find a suitable set of exercises.</p>
 <p>So I created two R markdown notebooks with exercises in R, that make use of the <a href="http://dagitty.net/">DAGitty tool</a>, created by Johannes Textor and freely available as R package.</p>
 <p>Some exercises are taken from <a href="http://bayes.cs.ucla.edu/PRIMER/">Causal inference in statistics: A Primer</a> by Pearl, Glymour &amp; Jewell. (I probably should own this book. So I just ordered it :))</p>
@@ -623,19 +623,19 @@
 <p>The course has four parts.</p>
 <div id="general-introduction" class="section level2">
 <h2>General introduction</h2>
-<p>The course starts with the first causal chapter of Gelman &amp; Hill’s book, “Causal inference using regression on the treatment variable”. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.</p>
+<p>The course starts with the first causal chapter of Gelman &amp; Hill's book, &quot;Causal inference using regression on the treatment variable&quot;. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.</p>
 </div>
 <div id="identification-of-causal-effects-using-dags" class="section level2">
 <h2>Identification of Causal effects using DAGs</h2>
-<p>Next we dive into causal identification using the causal diagram approach. For this we use the chapter “Causal Graphical Models” by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.</p>
+<p>Next we dive into causal identification using the causal diagram approach. For this we use the chapter &quot;Causal Graphical Models&quot; by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.</p>
 </div>
 <div id="identification-and-estimation-strategies" class="section level2">
 <h2>Identification and estimation strategies</h2>
-<p>We then continue with the second causal chapter of Gelman &amp; Hill “Causal inference using more advanced models”. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.</p>
+<p>We then continue with the second causal chapter of Gelman &amp; Hill &quot;Causal inference using more advanced models&quot;. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.</p>
 </div>
 <div id="varying-treatment-effects-using-machine-learning" class="section level2">
 <h2>Varying treatment effects using Machine Learning</h2>
-<p>Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp; mcCullough) and non-bayesian (GRF, Athey &amp; Wager) methods.</p>
+<p>Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp; mcCullough) and non-bayesian (GRF, Athey &amp; Wager) methods.</p>
 </div>
 </div>
 <div id="looking-back-so-far" class="section level1">
@@ -646,7 +646,7 @@
 <li>Formalize identification of causal effects</li>
 </ul>
 <p>Thus, it is separate from, and complements statistical estimation. The distinction between identification and estimation is not so explicitly made in the Gelman &amp; Hill chapters, at least this is my impression. It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.</p>
-<p>After having worked through these materials, I think reading Shalizi’s chapters on Causal Effects would be a smart move. This is part III of his book <a href="https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/">“Advanced Data Analysis from an Elementary Point of View”</a>, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.</p>
+<p>After having worked through these materials, I think reading Shalizi's chapters on Causal Effects would be a smart move. This is part III of his book <a href="https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/">&quot;Advanced Data Analysis from an Elementary Point of View&quot;</a>, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.</p>
 <p>If you have a question, would like to comment or share ideas feel free to <a href="https://gsverhoeven.github.io/#contact">contact me</a>.</p>
 </div>
 
@@ -660,7 +660,13 @@
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/r-causal-inference-dag-causal-graph/">R, causal inference, DAG, causal graph</a>
+  <a class="badge badge-light" href="/tags/r/">R</a>
+  
+  <a class="badge badge-light" href="/tags/causal-inference/">causal inference</a>
+  
+  <a class="badge badge-light" href="/tags/dag/">DAG</a>
+  
+  <a class="badge badge-light" href="/tags/causal-graph/">causal graph</a>
   
 </div>
 
@@ -883,6 +889,17 @@
 
 
   
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/validation-set-approach-in-caret/">The validation set approach in caret</a></li>
+      
+      <li><a href="/post/bart_vs_grf/bart-vs-grf-showdown/">BART vs Causal forests showdown</a></li>
+      
+    </ul>
+  </div>
   
 
 

@@ -5,12 +5,234 @@
     <link>https://gsverhoeven.github.io/post/</link>
       <atom:link href="https://gsverhoeven.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 04 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Posts</title>
       <link>https://gsverhoeven.github.io/post/</link>
     </image>
+    
+    <item>
+      <title>Using posterior predictive distributions to get the Average Treatment Effect (ATE) with uncertainty</title>
+      <link>https://gsverhoeven.github.io/post/posterior-distribution-average-treatment-effect/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/posterior-distribution-average-treatment-effect/</guid>
+      <description>
+
+
+&lt;p&gt;Here we show how to use &lt;a href=&#34;https://mc-stan.org&#34;&gt;Stan&lt;/a&gt; with the &lt;a href=&#34;https://github.com/paul-buerkner/brms&#34;&gt;brms&lt;/a&gt; R-package to calculate the posterior predictive distribution of a covariate-adjusted average treatment effect. We fit a model on simulated data that mimics a (very clean) experiment with random treatment assignment.&lt;/p&gt;
+&lt;div id=&#34;introduction&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Suppose we have data from a Randomized Controlled Trial (RCT) and we want to estimate the average treatment effect (ATE). Patients get treated, or not, depending only on a coin flip. This is encoded in the &lt;code&gt;Treatment&lt;/code&gt; variable. The outcome is a count variable &lt;code&gt;Admissions&lt;/code&gt;, representing the number of times the patient gets admitted to the hospital. The treatment is expected to reduce the number of hospital admissions for patients.&lt;/p&gt;
+&lt;p&gt;To complicate matters (a bit): As is often the case with patients, not all patients are identical. Suppose that older patients have on average more Admissions. So &lt;code&gt;Age&lt;/code&gt; is a covariate.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;average-treatment-effect-ate&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Average treatment effect (ATE)&lt;/h3&gt;
+&lt;p&gt;Now, after we fitted a model to the data, we want to actually &lt;strong&gt;use&lt;/strong&gt; our model to answer &amp;quot;What-if&amp;quot; questions (counterfactuals). Here we answer the following question:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;What would the average reduction in Admissions be if we had treated &lt;strong&gt;ALL&lt;/strong&gt; the patients in the sample, compared to a situation where &lt;strong&gt;NO&lt;/strong&gt; patient in the sample would have received treatment?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Well, that is easy, we just take the fitted model, change treatment from zero to one for each, and observe the (&amp;quot;marginal&amp;quot;) effect on the outcome, right?&lt;/p&gt;
+&lt;p&gt;Yes, but the uncertainty is harder. We have uncertainty in the estimated coefficients of the intercept and covariate, as well as in the coefficient of the treatment variable. And these uncertainties can be correlated (for example between the coefficients of intercept and covariate).&lt;/p&gt;
+&lt;p&gt;Here we show how to use &lt;code&gt;posterior_predict()&lt;/code&gt; to simulate outcomes of the model using the sampled parameters. If we do this for two counterfactuals, all patients treated, and all patients untreated, and subtract these, we can easily calculate the posterior predictive distribution of the average treatment effect.&lt;/p&gt;
+&lt;p&gt;Let&#39;s do it!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;load-packages&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Load packages&lt;/h3&gt;
+&lt;p&gt;This tutorial uses &lt;a href=&#34;https://github.com/paul-buerkner/brms&#34;&gt;brms&lt;/a&gt;, a user friendly interface to full Bayesian modelling with &lt;a href=&#34;https://mc-stan.org/&#34;&gt;Stan&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+library(rstan)
+library(brms) &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data-simulation&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Data simulation&lt;/h3&gt;
+&lt;p&gt;We generate fake data that matches our problem setup.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Admissions&lt;/code&gt; are determined by patient &lt;code&gt;Age&lt;/code&gt;, whether the patient has &lt;code&gt;Treatment&lt;/code&gt;, and some random &lt;code&gt;Noise&lt;/code&gt; to capture unobserved effects that influence &lt;code&gt;Admissions&lt;/code&gt;. We exponentiate them to always get a positive number, and plug it in the Poisson distribution using &lt;code&gt;rpois()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123) 
+
+id &amp;lt;- 1:200   
+n_obs &amp;lt;- length(id)
+b_tr &amp;lt;- -0.7
+b_age &amp;lt;- 0.1
+
+df_sim &amp;lt;- as.data.frame(id) %&amp;gt;% 
+mutate(Age = rgamma(n_obs, shape = 5, scale = 2)) %&amp;gt;% # positive cont predictor
+mutate(Noise = rnorm(n_obs, mean = 0, sd = 0.5)) %&amp;gt;% # add noise
+mutate(Treatment = ifelse(runif(n_obs) &amp;lt; 0.5, 0, 1)) %&amp;gt;% # Flip a coin for treatment
+mutate(Lambda = exp(b_age * Age + b_tr * Treatment + Noise)) %&amp;gt;% # generate lambda for the poisson dist
+mutate(Admissions = rpois(n_obs, lambda = Lambda))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;summarize-data&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Summarize data&lt;/h3&gt;
+&lt;p&gt;Ok, so what does our dataset look like?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df_sim)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##        id              Age             Noise            Treatment    
+##  Min.   :  1.00   Min.   : 1.794   Min.   :-1.32157   Min.   :0.000  
+##  1st Qu.: 50.75   1st Qu.: 6.724   1st Qu.:-0.28614   1st Qu.:0.000  
+##  Median :100.50   Median : 8.791   Median : 0.04713   Median :0.000  
+##  Mean   :100.50   Mean   : 9.474   Mean   : 0.02427   Mean   :0.495  
+##  3rd Qu.:150.25   3rd Qu.:11.713   3rd Qu.: 0.36025   3rd Qu.:1.000  
+##  Max.   :200.00   Max.   :24.835   Max.   : 1.28573   Max.   :1.000  
+##      Lambda          Admissions    
+##  Min.   : 0.2479   Min.   : 0.000  
+##  1st Qu.: 1.1431   1st Qu.: 1.000  
+##  Median : 1.8104   Median : 2.000  
+##  Mean   : 2.6528   Mean   : 2.485  
+##  3rd Qu.: 3.0960   3rd Qu.: 3.000  
+##  Max.   :37.1296   Max.   :38.000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The Treatment variable should reduce admissions. Lets visualize the distribution of Admission values for both treated and untreated patients.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(data = df_sim, aes(x = Admissions)) +
+  geom_histogram(stat=&amp;quot;count&amp;quot;) +
+  facet_wrap(~ Treatment) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The effect of the treatment on reducing admissions is clearly visible.&lt;/p&gt;
+&lt;p&gt;We can also visualize the relationship between &lt;code&gt;Admissions&lt;/code&gt; and &lt;code&gt;Age&lt;/code&gt;, for both treated and untreated patients. We use the &lt;code&gt;viridis&lt;/code&gt; scales to provide colour maps that are designed to be perceived by viewers with common forms of colour blindness.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(data = df_sim, aes(x = Age, y = Admissions, color = as.factor(Treatment))) +
+  geom_point() +
+  scale_color_viridis_d(labels = c(&amp;quot;No Treatment&amp;quot;, &amp;quot;Treatment&amp;quot;)) +
+  labs(color = &amp;quot;Treatment&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now lets fit our Bayesian Poisson regression model to it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fit-model&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Fit model&lt;/h3&gt;
+&lt;p&gt;We use &lt;code&gt;brms&lt;/code&gt; default priors for convenience here. For a real application we would of course put effort into into crafting priors that reflect our current knowledge of the problem at hand.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model1 &amp;lt;- brm(
+  formula = as.integer(Admissions) ~  Age + Treatment,
+   data = df_sim,
+  family = poisson(),
+  warmup = 2000, iter = 5000, 
+  cores = 2, 
+  chains = 4,
+  seed = 123,
+  silent = TRUE,
+  refresh = 0,
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Compiling Stan program...&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Start sampling&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;check-model-fit&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Check model fit&lt;/h3&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(model1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##  Family: poisson 
+##   Links: mu = log 
+## Formula: as.integer(Admissions) ~ Age + Treatment 
+##    Data: df_sim (Number of observations: 200) 
+## Samples: 4 chains, each with iter = 5000; warmup = 2000; thin = 1;
+##          total post-warmup samples = 12000
+## 
+## Population-Level Effects: 
+##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## Intercept    -0.05      0.12    -0.28     0.18 1.00     7410     7333
+## Age           0.12      0.01     0.10     0.14 1.00     8052     8226
+## Treatment    -0.83      0.10    -1.02    -0.63 1.00     7794     7606
+## 
+## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the posterior dists for &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Age}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Treatment}\)&lt;/span&gt; cover the true values, so looking good. To get a fuller glimpse into the (correlated) uncertainty of the model parameters we make a pairs plot:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pairs(model1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As expected, the coefficients &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Intercept}\)&lt;/span&gt; (added by &lt;code&gt;brms&lt;/code&gt;) and &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Age}\)&lt;/span&gt; are highly correlated.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;first-attempt-calculate-individual-treatment-effects-using-the-model-fit-object&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;First attempt: Calculate Individual Treatment effects using the model fit object&lt;/h3&gt;
+&lt;p&gt;Conceptually, the simplest approach for prediction is to take the most likely values for all the model parameters, and use these to calculate for each patient an individual treatment effect. This is what plain OLS regression does when we call &lt;code&gt;predict.lm()&lt;/code&gt; on a fitted model.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;est_intercept &amp;lt;- fixef(model1, pars = &amp;quot;Intercept&amp;quot;)[,1]
+est_age_eff &amp;lt;- fixef(model1, pars = &amp;quot;Age&amp;quot;)[,1]
+est_t &amp;lt;- fixef(model1, pars = &amp;quot;Treatment&amp;quot;)[,1]
+
+# brm fit parameters (intercept plus treatment)
+ites &amp;lt;- exp(est_intercept + (est_age_eff * df_sim$Age) +  est_t) - exp(est_intercept + (est_age_eff * df_sim$Age))
+
+ggplot(data.frame(ites), aes(x = ites)) + 
+  geom_histogram() +
+  geom_vline(xintercept = mean(ites), col = &amp;quot;red&amp;quot;) +
+  ggtitle(&amp;quot;Effect of treatment on Admissions for each observation&amp;quot;) +
+   expand_limits(x = 0) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Averaging the ITEs gives us the ATE, displayed in red.&lt;/p&gt;
+&lt;p&gt;Ok, so &lt;strong&gt;on average&lt;/strong&gt;, our treatment reduces the number of Admissions by -1.9.&lt;/p&gt;
+&lt;p&gt;You may wonder: why do we even have a distribution of treatment effects here? Should it not be the same for each patient? Here a peculiarity of the Poisson regression model comes to surface: The effect of changing &lt;code&gt;Treatment&lt;/code&gt; from 0 to 1 on the outcome depends on the value of &lt;code&gt;Age&lt;/code&gt; of the patient. This is because we &lt;strong&gt;exponentiate&lt;/strong&gt; the linear model before we plug it into the Poisson distribution.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;next-the-uncertainty-in-the-ate&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Next, the uncertainty in the ATE&lt;/h3&gt;
+&lt;p&gt;How to get all this underlying, correlated uncertainty in the model parameters, that have varying effects depending on the covariates of patients, and properly propagate that to the ATE? What is the range of plausible values of the ATE consistent with the data &amp;amp; model?&lt;/p&gt;
+&lt;p&gt;At this point, using only the summary statistics of the model fit (i.e. the coefficients), we hit a wall. To make progress we have to work with the full posterior distribution of model parameters, and use this to make predictions. That is why it is often called &amp;quot;the posterior predictive distribution&amp;quot; (Check &lt;a href=&#34;http://www.stat.columbia.edu/~gelman/book/BDA3.pdf&#34;&gt;BDA3&lt;/a&gt; for the full story).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;posterior-predictive-distribution-ppd-two-tricks&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Posterior predictive distribution (PPD): two tricks&lt;/h3&gt;
+&lt;p&gt;Ok, you say, a Posterior Predictive Distribution, let&#39;s have it! Where can I get one?&lt;/p&gt;
+&lt;p&gt;Luckily for us, most of the work is already done, because we have fitted our model. And thus we have a large collection of parameter draws (or samples, to confuse things a bit). All the correlated uncertainty is contained in these draws.&lt;/p&gt;
+&lt;p&gt;This is the first trick. Conceptually, we imagine that each separate draw of the posterior represents a particular version of our model.&lt;/p&gt;
+&lt;p&gt;In our example model fit, we have 12.000 samples from the posterior. In our imagination, we now have 12.000 versions of our model, where unlikely parameter combinations are present less often compared to likely parameter combinations. The full uncertainty of our model parameters is contained in this &amp;quot;collection of models&amp;quot; .&lt;/p&gt;
+&lt;p&gt;The second trick is that we simulate (generate) predictions for all observations, from each of these 12.000 models. Under the hood, this means computing for each model (we have 12.000), for each observation (we have 200) the predicted lambda value given the covariates, and drawing a single value from a Poisson distribution with that &lt;span class=&#34;math inline&#34;&gt;\(\Lambda\)&lt;/span&gt; value (e.g. running &lt;code&gt;rpois(n = 1, lambda)&lt;/code&gt; ).&lt;/p&gt;
+&lt;p&gt;This gives us a 12.000 x 200 matrix, that we can compute with.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;computing-with-the-ppd-brmsposterior_predict&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Computing with the PPD: brms::posterior_predict()&lt;/h3&gt;
+&lt;p&gt;To compute PPD&#39;s, we can use &lt;code&gt;brms::posterior_predict()&lt;/code&gt;. We can feed it any dataset using the &lt;code&gt;newdata&lt;/code&gt; argument, and have it generate a PPD.&lt;/p&gt;
+&lt;p&gt;For our application, the computation can be broken down in two steps:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Step 1: use &lt;code&gt;posterior_predict()&lt;/code&gt; on our dataset with &lt;code&gt;Treatment&lt;/code&gt; set to zero, do the same for our dataset with &lt;code&gt;Treatment&lt;/code&gt; set to one, and subtract the two matrices. This gives us a matrix of outcome differences / treatment effects.&lt;/li&gt;
+&lt;li&gt;Step 2: Averaging over all cols (the N=200 simulated outcomes for each draw) should give us the distribution of the ATE. This distribution now represents the variability (uncertainty) of the estimate.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Ok, step 1:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# create two versions of our dataset, with all Tr= 0 and all Tr=1
+df_sim_t0 &amp;lt;- df_sim %&amp;gt;% mutate(Treatment = 0)
+
+df_sim_t1 &amp;lt;- df_sim %&amp;gt;% mutate(Treatment = 1)
+
+# simulate the PPDs
+pp_t0 &amp;lt;- posterior_predict(model1, newdata = df_sim_t0)
+
+pp_t1 &amp;lt;- posterior_predict(model1, newdata = df_sim_t1)
+
+diff &amp;lt;- pp_t1 - pp_t0
+
+dim(diff)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 12000   200&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And step 2 (averaging by row over the cols):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ATE_per_draw &amp;lt;- apply(diff, 1, mean)
+
+# equivalent expression for tidyverse fans
+#ATE_per_draw &amp;lt;- data.frame(diff) %&amp;gt;% rowwise() %&amp;gt;% summarise(avg = mean(c_across(cols = everything())))
+
+length(ATE_per_draw)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 12000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Finally, a distribution of plausible ATE values. Oo, that is so nice. Lets visualize it!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(data.frame(ATE_per_draw), aes(x = ATE_per_draw)) +
+  geom_histogram() + 
+  geom_vline(xintercept = mean(ites), col = &amp;quot;red&amp;quot;) +
+  ggtitle(&amp;quot;Posterior distribution of the Average Treatment Effect (ATE)&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We can compare this distribution with the point estimate of the ATE we obtained above using the model coefficients. It sits right in the middle (red line), just as it should be!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;demonstrating-the-versatility-uncertainty-in-the-sum-of-treatment-effects&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Demonstrating the versatility: uncertainty in the sum of treatment effects&lt;/h3&gt;
+&lt;p&gt;Now suppose we are a policy maker, and we want to estimate the total reduction in Admissions if all patients get the treatment. And we want to quantify the range of plausible values of this summary statistic.&lt;/p&gt;
+&lt;p&gt;To do so, we can easily adjust our code to summing instead of averaging all the treatment effects within each draw (i.e. by row):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TTE_per_draw &amp;lt;- apply(diff, 1, sum)
+
+ggplot(data.frame(TTE_per_draw), aes(x = TTE_per_draw)) +
+  geom_histogram() + 
+  geom_vline(xintercept = sum(ites), col = &amp;quot;red&amp;quot;) +
+  ggtitle(&amp;quot;Posterior distribution of the Total Treatment Effect (TTE)&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;So our model predicts for the aggregate reduction of patient Admissions a value in the range of -500 to -250.&lt;/p&gt;
+&lt;p&gt;This distribution can then be used to answer questions such as &amp;quot;what is the probability that our treatment reduces Admissions by at least 400&amp;quot;?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TTE &amp;lt;- data.frame(TTE_per_draw) %&amp;gt;%
+  mutate(counter = ifelse(TTE_per_draw &amp;lt; -400, 1, 0)) 
+
+mean(TTE$counter) * 100&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 38.1&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;take-home-message-ppd-with-brms-is-easy-and-powerful&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Take home message: PPD with brms is easy and powerful&lt;/h3&gt;
+&lt;p&gt;We hope to have demonstrated that when doing a full bayesian analysis with &lt;code&gt;brms&lt;/code&gt; and &lt;code&gt;Stan&lt;/code&gt;, it is very easy to create Posterior Predictive Distributions using &lt;code&gt;posterior_predict()&lt;/code&gt;. And that if we &lt;em&gt;have&lt;/em&gt; a posterior predictive distribution, incorporating uncertainty in various &amp;quot;marginal effects&amp;quot; type analyses becomes dead-easy. These analyses include what-if scenarios using the original data, or scenarios using new data with different covariate distributions (for example if we have an RCT that is enriched in young students, and we want to apply it to the general population). Ok, that it is for today, happy modelling!&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Building TensorFlow 2.2 on an old PC</title>
@@ -26,12 +248,12 @@
 
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Introduction&lt;/h1&gt;
-&lt;p&gt;I don’t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. &lt;a href=&#34;http://www.picotux.com/&#34; class=&#34;uri&#34;&gt;http://www.picotux.com/&lt;/a&gt;), as well as huge supercomputers (&lt;a href=&#34;https://itsfoss.com/linux-runs-top-supercomputers/&#34; class=&#34;uri&#34;&gt;https://itsfoss.com/linux-runs-top-supercomputers/&lt;/a&gt;). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
+&lt;p&gt;I don&#39;t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. &lt;a href=&#34;http://www.picotux.com/&#34; class=&#34;uri&#34;&gt;http://www.picotux.com/&lt;/a&gt;), as well as huge supercomputers (&lt;a href=&#34;https://itsfoss.com/linux-runs-top-supercomputers/&#34; class=&#34;uri&#34;&gt;https://itsfoss.com/linux-runs-top-supercomputers/&lt;/a&gt;). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.&lt;/p&gt;
 &lt;p&gt;And the nice thing about lagging behind: The choice for deep learning is now extremely simple. I need &lt;a href=&#34;https://keras.io/&#34;&gt;Keras&lt;/a&gt; with &lt;a href=&#34;https://www.tensorflow.org/&#34;&gt;TensorFlow&lt;/a&gt; as a computational backend. Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;tensorflow-and-avx&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;TensorFlow and AVX&lt;/h1&gt;
-&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;. As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
+&lt;p&gt;Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU&#39;s and TPU&#39;s to do the number crunching. But even for CPU&#39;s, TensorFlow likes to make use of all the computational features that modern CPU&#39;s offer. One of these is the &amp;quot;Advanced Vector Instruction Set&amp;quot; , aka &lt;a href=&#34;https://en.wikipedia.org/wiki/Advanced_Vector_Extensions&#34;&gt;AVX&lt;/a&gt;. As most CPU&#39;s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.&lt;/p&gt;
 &lt;p&gt;But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;building-tensorflow-on-a-really-old-computer&#34; class=&#34;section level1&#34;&gt;
@@ -41,9 +263,9 @@
 &lt;ul&gt;
 &lt;li&gt;Creating a virtual environment for Python 3.6.9&lt;/li&gt;
 &lt;li&gt;Checking my GCC version (7.5.0, which is greater than 7.3 that is used for the official TF packages)&lt;/li&gt;
-&lt;li&gt;Install &lt;a href=&#34;https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu&#34;&gt;Bazel&lt;/a&gt; (Google’s Make program), version 3.1&lt;/li&gt;
 &lt;li&gt;Clone the &lt;a href=&#34;https://github.com/tensorflow/tensorflow&#34;&gt;TensorFlow repository&lt;/a&gt; from GitHub&lt;/li&gt;
 &lt;li&gt;Git checkout the latest official TensorFlow release (v2.2)&lt;/li&gt;
+&lt;li&gt;Installed the latest release of &lt;a href=&#34;https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu&#34;&gt;Bazel&lt;/a&gt; (Google&#39;s Make program), version 3.1. Then install exactly the right version needed for TF2.2 (2.0.0, as specified by MIN_BAZEL_VERSION in &lt;code&gt;tensorflow/configure.py&lt;/code&gt;, use &lt;code&gt;.baselversion&lt;/code&gt; to easily install multiple bazel versions side by side)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Then came the hard part, the final step:&lt;/p&gt;
 &lt;ul&gt;
@@ -127,6 +349,14 @@ for (idx in 1:12) {
 library(magrittr)
 
 model %&amp;gt;% plot_model()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `select_()` is deprecated as of dplyr 0.7.0.
+## Please use `select()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
+## Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:672px;height:480px;&#34; class=&#34;grViz html-widget&#34;&gt;&lt;/div&gt;
 &lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [layout = \&#34;neato\&#34;,\n       outputorder = \&#34;edgesfirst\&#34;,\n       bgcolor = \&#34;white\&#34;]\n\nnode [fontname = \&#34;Helvetica\&#34;,\n      fontsize = \&#34;10\&#34;,\n      shape = \&#34;circle\&#34;,\n      fixedsize = \&#34;true\&#34;,\n      width = \&#34;0.5\&#34;,\n      style = \&#34;filled\&#34;,\n      fillcolor = \&#34;aliceblue\&#34;,\n      color = \&#34;gray70\&#34;,\n      fontcolor = \&#34;gray50\&#34;]\n\nedge [fontname = \&#34;Helvetica\&#34;,\n     fontsize = \&#34;8\&#34;,\n     len = \&#34;1.5\&#34;,\n     color = \&#34;gray80\&#34;,\n     arrowsize = \&#34;0.5\&#34;]\n\n  \&#34;1\&#34; [label = \&#34;flatten\nFlatten\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,4!\&#34;] \n  \&#34;2\&#34; [label = \&#34;dense\nDense\nrelu\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,3!\&#34;] \n  \&#34;3\&#34; [label = \&#34;dropout\nDropout\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,2!\&#34;] \n  \&#34;4\&#34; [label = \&#34;dense_1\nDense\nsoftmax\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,1!\&#34;] \n  \&#34;1\&#34;-&gt;\&#34;2\&#34; \n  \&#34;2\&#34;-&gt;\&#34;3\&#34; \n  \&#34;3\&#34;-&gt;\&#34;4\&#34; \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
 &lt;/div&gt;
@@ -168,7 +398,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       loss   accuracy 
-## 0.08137871 0.97570002&lt;/code&gt;&lt;/pre&gt;
+## 0.08484858 0.97289997&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;
@@ -183,27 +413,27 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       <description>
 
 
-&lt;p&gt;This blog post is on simulating fake data. I’m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
+&lt;p&gt;This blog post is on simulating fake data. I&#39;m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
 &lt;p&gt;If we want to mimic an existing dataset, it is desirable to&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Make sure that the simulated variables have the proper data type and comparable distribution of values and&lt;/li&gt;
 &lt;li&gt;correlations between the variables in the real dataset are taken into account.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;In addition, it would be nice if such functionality is available in a standard R package. After reviewing several R packages that can simulate data, I picked the &lt;a href=&#34;https://www.rdatagen.net/page/simstudy/&#34;&gt;simstudy&lt;/a&gt; package as most promising to explore in more detail. &lt;code&gt;simstudy&lt;/code&gt; is created by &lt;strong&gt;Keith Goldfeld&lt;/strong&gt; from New York University.&lt;/p&gt;
-&lt;p&gt;In this blog post, I explain how &lt;code&gt;simstudy&lt;/code&gt; is able to generate correlated variables, having either continuous or binary values. Along the way, we learn about fancy statistical slang such as copula’s and tetrachoric correlations. It turns out there is a close connection with psychometrics, which we’ll briefly discuss.&lt;/p&gt;
-&lt;p&gt;Let’s start with correlated continuous variables.&lt;/p&gt;
+&lt;p&gt;In this blog post, I explain how &lt;code&gt;simstudy&lt;/code&gt; is able to generate correlated variables, having either continuous or binary values. Along the way, we learn about fancy statistical slang such as copula&#39;s and tetrachoric correlations. It turns out there is a close connection with psychometrics, which we&#39;ll briefly discuss.&lt;/p&gt;
+&lt;p&gt;Let&#39;s start with correlated continuous variables.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Loading required packages
 library(simstudy)
 library(data.table)
 library(ggplot2)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;copulas-simulating-continuous-correlated-variables&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Copulas: Simulating continuous correlated variables&lt;/h1&gt;
-&lt;p&gt;Copulas are a fancy word for correlated (“coupled”) variables that each have a uniform distribution between 0 and 1.&lt;/p&gt;
+&lt;p&gt;Copulas are a fancy word for correlated (&amp;quot;coupled&amp;quot;) variables that each have a uniform distribution between 0 and 1.&lt;/p&gt;
 &lt;p&gt;Using copulas, we can convert correlated multivariate normal data to data from any known continuous probability distribution, while keeping exactly the same correlation matrix. The normal data is something we can easily simulate, and by choosing appropriate probability distributions, we can approximate the variables in real datasets.&lt;/p&gt;
-&lt;p&gt;Ok let’s do it!&lt;/p&gt;
+&lt;p&gt;Ok let&#39;s do it!&lt;/p&gt;
 &lt;div id=&#34;step-1-correlated-multivariate-normal-data&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Step 1: correlated multivariate normal data&lt;/h2&gt;
-&lt;p&gt;The workhorse for our simulated data is a function to simulate multivariate normal data. We’ll use the &lt;code&gt;MASS&lt;/code&gt; package function &lt;code&gt;mvrnorm()&lt;/code&gt;. Other slightly faster (factor 3-4) implementations exist, see e.g. &lt;code&gt;mvnfast&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The workhorse for our simulated data is a function to simulate multivariate normal data. We&#39;ll use the &lt;code&gt;MASS&lt;/code&gt; package function &lt;code&gt;mvrnorm()&lt;/code&gt;. Other slightly faster (factor 3-4) implementations exist, see e.g. &lt;code&gt;mvnfast&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;The trick is to first generate multivariate normal data with the required correlation structure, with mean 0 and standard deviation 1. This gives us correlated data, where each variable is marginally (by itself) normal distributed.&lt;/p&gt;
 &lt;p&gt;Here I simulate two variables, but the same procedure holds for N variables. The Pearson correlation is set at &lt;code&gt;0.7&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
@@ -237,14 +467,14 @@ ggplot(df, aes(x = X1_U)) + geom_histogram(boundary = 0)&lt;/code&gt;&lt;/pre&gt
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_U, y = X2_U)) +
   geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;And here’s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!&lt;/p&gt;
+&lt;p&gt;And here&#39;s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_U, df$X2_U)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.677868&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;step-3-from-uniform-to-any-standard-probability-distribution-we-like&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Step 3: from uniform to any standard probability distribution we like&lt;/h2&gt;
 &lt;p&gt;Now, if we plug in uniformly distributed data in a &lt;strong&gt;quantile function&lt;/strong&gt; of any arbitrary (known) probability distribution, we can make the variables have any distribution we like.&lt;/p&gt;
-&lt;p&gt;Let’s pick for example a &lt;strong&gt;Gamma&lt;/strong&gt; distribution (Continuous, positive) with shape 4 and rate 1 for X1, and Let’s pick a &lt;strong&gt;Normal&lt;/strong&gt; distribution (Continuous, symmetric) with mean 10 and sd 2 for X2.&lt;/p&gt;
+&lt;p&gt;Let&#39;s pick for example a &lt;strong&gt;Gamma&lt;/strong&gt; distribution (Continuous, positive) with shape 4 and rate 1 for X1, and Let&#39;s pick a &lt;strong&gt;Normal&lt;/strong&gt; distribution (Continuous, symmetric) with mean 10 and sd 2 for X2.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_GAM &amp;lt;- qgamma(df$X1_U, shape = 4, rate =1)
 df$X2_NORM &amp;lt;- qnorm(df$X2_U, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_GAM)) + 
@@ -265,9 +495,9 @@ df$X2_NORM &amp;lt;- qnorm(df$X2_U, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;simstudy-in-action&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Simstudy in action&lt;/h1&gt;
-&lt;p&gt;Now let’s see how &lt;code&gt;simstudy&lt;/code&gt; helps us generating this type of simulated data. Simstudy works with “definition tables” that allow us to specify, for each variable, which distribution and parameters to use, as well as the desired correlations between the variables.&lt;/p&gt;
+&lt;p&gt;Now let&#39;s see how &lt;code&gt;simstudy&lt;/code&gt; helps us generating this type of simulated data. Simstudy works with &amp;quot;definition tables&amp;quot; that allow us to specify, for each variable, which distribution and parameters to use, as well as the desired correlations between the variables.&lt;/p&gt;
 &lt;p&gt;After specifing a definition table, we can call one of its workhorse functions &lt;code&gt;genCorFlex()&lt;/code&gt; to generate the data.&lt;/p&gt;
-&lt;p&gt;N.b. Simstudy uses different parameters for the Gamma distribution, compared to R’s &lt;code&gt;rgamma()&lt;/code&gt; function. Under water, it uses the &lt;code&gt;gammaGetShapeRate()&lt;/code&gt; to transform the “mean” and “variance/ dispersion” to the more conventional “shape” and “rate” parameters.&lt;/p&gt;
+&lt;p&gt;N.b. Simstudy uses different parameters for the Gamma distribution, compared to R&#39;s &lt;code&gt;rgamma()&lt;/code&gt; function. Under water, it uses the &lt;code&gt;gammaGetShapeRate()&lt;/code&gt; to transform the &amp;quot;mean&amp;quot; and &amp;quot;variance/ dispersion&amp;quot; to the more conventional &amp;quot;shape&amp;quot; and &amp;quot;rate&amp;quot; parameters.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
 
 corr &amp;lt;- 0.7
@@ -305,8 +535,8 @@ cor(dt[,-&amp;quot;id&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Come to think of it: two binary variables cannot have all the correlations we like. To see why, check this out.&lt;/p&gt;
 &lt;div id=&#34;feasible-correlations-for-two-binary-variables&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Feasible correlations for two binary variables&lt;/h2&gt;
-&lt;p&gt;Let’s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.&lt;/p&gt;
-&lt;p&gt;To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1’s, and let’s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:&lt;/p&gt;
+&lt;p&gt;Let&#39;s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.&lt;/p&gt;
+&lt;p&gt;To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1&#39;s, and let&#39;s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# maximal correlation
 x1 &amp;lt;- c(0, 0, 0, 0, 1)
 x2 &amp;lt;- c(0, 1, 1, 1, 1)
@@ -323,7 +553,7 @@ x2 &amp;lt;- c(0, 1, 1, 1, 1)
 
 cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;To get these vectors to be maximally correlated, we need to match &lt;code&gt;1&lt;/code&gt;’s in &lt;code&gt;x1&lt;/code&gt; as much as possible with &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;. To get these vectors to be maximally anti-correlated, we need to match &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x1&lt;/code&gt; with as many &lt;code&gt;0&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To get these vectors to be maximally correlated, we need to match &lt;code&gt;1&lt;/code&gt;&#39;s in &lt;code&gt;x1&lt;/code&gt; as much as possible with &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;. To get these vectors to be maximally anti-correlated, we need to match &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x1&lt;/code&gt; with as many &lt;code&gt;0&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;In this example, we conclude that the feasible correlation range is &lt;code&gt;{-1, 0.25}&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;simstudy&lt;/code&gt; package contains a function to check for feasible boundaries, that contains this piece of code:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p1 &amp;lt;- 0.2
@@ -344,13 +574,13 @@ min(sqrt(u), sqrt(1/u))&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;a-model-for-two-correlated-binary-variables&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;A model for two correlated binary variables&lt;/h2&gt;
-&lt;p&gt;Ok let’s suppose we want a two binary vectors &lt;code&gt;B1&lt;/code&gt; and &lt;code&gt;B2&lt;/code&gt; , with means &lt;code&gt;p1 = 0.2&lt;/code&gt; and &lt;code&gt;p2 = 0.8&lt;/code&gt; and (feasible) Pearson correlation 0.1.&lt;/p&gt;
+&lt;p&gt;Ok let&#39;s suppose we want a two binary vectors &lt;code&gt;B1&lt;/code&gt; and &lt;code&gt;B2&lt;/code&gt; , with means &lt;code&gt;p1 = 0.2&lt;/code&gt; and &lt;code&gt;p2 = 0.8&lt;/code&gt; and (feasible) Pearson correlation 0.1.&lt;/p&gt;
 &lt;p&gt;How? How?&lt;/p&gt;
-&lt;p&gt;The idea is that to get two binary variables to have an exact particular correlation, we imagine an underlying (“latent”) bivariate (2D) normal distribution. This normal distribution has the means fixed to 0, and the standard deviations fixed to 1.&lt;/p&gt;
+&lt;p&gt;The idea is that to get two binary variables to have an exact particular correlation, we imagine an underlying (&amp;quot;latent&amp;quot;) bivariate (2D) normal distribution. This normal distribution has the means fixed to 0, and the standard deviations fixed to 1.&lt;/p&gt;
 &lt;p&gt;Why? Because a) we know it very well theoretically and b) we know how to simulate efficiently from such a distribution, using &lt;code&gt;mvrnorm()&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;In this bivariate normal distribution, we draw a quadrant (i.e. two thresholds). The thresholds define transformations to binary variables. Below the threshold, the binary value is 0, above it is 1. We have to pick the thresholds such that the resulting binary variables have the desired mean (i.e. percentage of 1’s).&lt;/p&gt;
+&lt;p&gt;In this bivariate normal distribution, we draw a quadrant (i.e. two thresholds). The thresholds define transformations to binary variables. Below the threshold, the binary value is 0, above it is 1. We have to pick the thresholds such that the resulting binary variables have the desired mean (i.e. percentage of 1&#39;s).&lt;/p&gt;
 &lt;p&gt;This approach reduces the problem to finding the right values of three parameters: multivariate normal correlation, and the two thresholds (above, we already fixed the means and variance to zero and one respectively).&lt;/p&gt;
-&lt;p&gt;For now, we’ll just pick some value for the correlation in the bivariate normal, say 0.5, and focus on where to put the threshholds.&lt;/p&gt;
+&lt;p&gt;For now, we&#39;ll just pick some value for the correlation in the bivariate normal, say 0.5, and focus on where to put the threshholds.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
 
 corr &amp;lt;- 0.5
@@ -365,7 +595,7 @@ df &amp;lt;- data.frame(MASS::mvrnorm(n = 10000,
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
   geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Ok, where to put the thresholds? That’s simple, we just need to use the &lt;code&gt;quantile distribution function&lt;/code&gt; to partition the marginal normal variables into 0 and 1 portions.&lt;/p&gt;
+&lt;p&gt;Ok, where to put the thresholds? That&#39;s simple, we just need to use the &lt;code&gt;quantile distribution function&lt;/code&gt; to partition the marginal normal variables into 0 and 1 portions.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
 df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
 
@@ -373,7 +603,7 @@ mean(df$B1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.197&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(df$B2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.7988&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Let’s check it out visually:&lt;/p&gt;
+&lt;p&gt;Let&#39;s check it out visually:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
   geom_point(alpha = 0.3) + 
   geom_vline(xintercept = qnorm(0.2), col = &amp;quot;red&amp;quot;) +
@@ -391,7 +621,7 @@ mean(df$B1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;simstudy:::.findRhoBin(p1 = 0.2, 
                        p2 = 0.8, d = 0.1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Let’s see if it works:&lt;/p&gt;
+&lt;p&gt;Let&#39;s see if it works:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
 
 corr &amp;lt;- 0.2218018
@@ -414,9 +644,9 @@ cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;relation-to-psychometrics&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Relation to psychometrics&lt;/h1&gt;
 &lt;p&gt;So what has psychometrics to do with all this simulation of correlated binary vector stuff?&lt;/p&gt;
-&lt;p&gt;Well, psychometrics is all about theorizing about unobserved, latent, imaginary “constructs”, such as &lt;strong&gt;attitude&lt;/strong&gt;, &lt;strong&gt;general intelligence&lt;/strong&gt; or a &lt;strong&gt;personality trait&lt;/strong&gt;. To measure these constructs, questionnaires are used. The questions are called &lt;strong&gt;items&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Well, psychometrics is all about theorizing about unobserved, latent, imaginary &amp;quot;constructs&amp;quot;, such as &lt;strong&gt;attitude&lt;/strong&gt;, &lt;strong&gt;general intelligence&lt;/strong&gt; or a &lt;strong&gt;personality trait&lt;/strong&gt;. To measure these constructs, questionnaires are used. The questions are called &lt;strong&gt;items&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Now imagine a situation where we are interested in a particular construct, say &lt;strong&gt;general intelligence&lt;/strong&gt;, and we design two questions to measure (hope to learn more about) the construct. Furthermore, assume that one question is more difficult than the other question. The answers to both questions can either be wrong or right.&lt;/p&gt;
-&lt;p&gt;We can model this by assuming that the (imaginary) variable “intelligence” of each respondent is located on a two-dimensional plane, with the distribution of the respondents determined by a bivariate normal distribution. Dividing this plane into four quadrants then gives us the measurable answers (right or wrong) to both questions. Learning the answers to both questions then gives us an approximate location of a respondent on our “intelligence” plane!&lt;/p&gt;
+&lt;p&gt;We can model this by assuming that the (imaginary) variable &amp;quot;intelligence&amp;quot; of each respondent is located on a two-dimensional plane, with the distribution of the respondents determined by a bivariate normal distribution. Dividing this plane into four quadrants then gives us the measurable answers (right or wrong) to both questions. Learning the answers to both questions then gives us an approximate location of a respondent on our &amp;quot;intelligence&amp;quot; plane!&lt;/p&gt;
 &lt;div id=&#34;phi-tetrachoric-correlation-and-the-psych-package&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Phi, tetrachoric correlation and the psych package&lt;/h2&gt;
 &lt;p&gt;Officially, the Pearson correlation between two binary vectors is called the &lt;a href=&#34;https://en.wikipedia.org/wiki/Phi_coefficient&#34;&gt;Phi coefficient&lt;/a&gt;. This name was actually chosen by Karl Pearson himself.&lt;/p&gt;
@@ -435,7 +665,7 @@ phi(twobytwo, digits = 6)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# both give the same result&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We can use &lt;strong&gt;phi2tetra&lt;/strong&gt; to find the tetrachoric correlation that corresponds to the combination of a “Phi coefficient”, i.e. the correlation between the two binary vectors, as well as their marginals. This is a wrapper that builds the two by two frequency table and then calls &lt;code&gt;tetrachoric()&lt;/code&gt; . This in turn uses &lt;code&gt;optimize&lt;/code&gt; (Maximum Likelihood method?) to find the tetrachoric correlation.&lt;/p&gt;
+&lt;p&gt;We can use &lt;strong&gt;phi2tetra&lt;/strong&gt; to find the tetrachoric correlation that corresponds to the combination of a &amp;quot;Phi coefficient&amp;quot;, i.e. the correlation between the two binary vectors, as well as their marginals. This is a wrapper that builds the two by two frequency table and then calls &lt;code&gt;tetrachoric()&lt;/code&gt; . This in turn uses &lt;code&gt;optimize&lt;/code&gt; (Maximum Likelihood method?) to find the tetrachoric correlation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;phi2tetra(0.1, c(0.2, 0.8))&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.2217801&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# compare with EP method
@@ -446,8 +676,8 @@ simstudy:::.findRhoBin(0.2, 0.8, 0.1)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;simstudy-in-action-ii&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Simstudy in action II&lt;/h1&gt;
-&lt;p&gt;Now that we feel confident in our methods and assumptions, let’s see &lt;code&gt;simstudy&lt;/code&gt; in action.&lt;/p&gt;
-&lt;p&gt;Let’s generate two binary variables, that have marginals of 20% and 80% respectively, and a Pearson correlation coefficient of 0.1.&lt;/p&gt;
+&lt;p&gt;Now that we feel confident in our methods and assumptions, let&#39;s see &lt;code&gt;simstudy&lt;/code&gt; in action.&lt;/p&gt;
+&lt;p&gt;Let&#39;s generate two binary variables, that have marginals of 20% and 80% respectively, and a Pearson correlation coefficient of 0.1.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
 corr &amp;lt;- 0.1
 
@@ -473,8 +703,8 @@ cor(res[, -c(&amp;quot;id&amp;quot;)])&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;So are we there yet? Well, we made some progress. We now can handle correlated continuous data, as well as correlated binary data.&lt;/p&gt;
 &lt;p&gt;But we need to solve two more problems:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;To simulate a particular dataset, we still need to determine for each variable its data type (binary or continuous), and if it’s continuous, what is the most appropriate probability distribution (Normal, Gamma, Log-normal, etc).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;we haven’t properly solved correlation between dissimilar data types, e.g. a correlation between a continuous and a binary variable.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To simulate a particular dataset, we still need to determine for each variable its data type (binary or continuous), and if it&#39;s continuous, what is the most appropriate probability distribution (Normal, Gamma, Log-normal, etc).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;we haven&#39;t properly solved correlation between dissimilar data types, e.g. a correlation between a continuous and a binary variable.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Judging from the literature (Amatya &amp;amp; Demirtas 2016) and packages such as &lt;code&gt;SimMultiCorrData&lt;/code&gt; by Allison Fialkowski, these are both solved, and I only need to learn about them! So, to be continued.&lt;/p&gt;
 &lt;/div&gt;
@@ -489,11 +719,11 @@ cor(res[, -c(&amp;quot;id&amp;quot;)])&lt;/code&gt;&lt;/pre&gt;
       <description>
 
 
-&lt;p&gt;In this post, we’ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
-&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an “Artifical eventlog about patients”.&lt;/p&gt;
+&lt;p&gt;In this post, we&#39;ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
+&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an &amp;quot;Artifical eventlog about patients&amp;quot;.&lt;/p&gt;
 &lt;div id=&#34;getting-started&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Getting started&lt;/h1&gt;
-&lt;p&gt;After installing all required packages, we can load the whole “bupaverse” by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
+&lt;p&gt;After installing all required packages, we can load the whole &amp;quot;bupaverse&amp;quot; by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
 library(bupaR)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
@@ -503,7 +733,7 @@ library(bupaR)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
 ## logical.return = TRUE, : there is no package called &amp;#39;petrinetR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(processmapR)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case. Here’s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case. Here&#39;s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;patients &amp;lt;- eventdataR::patients
 
 df &amp;lt;- eventlog(patients,
@@ -513,7 +743,11 @@ df &amp;lt;- eventlog(patients,
                lifecycle_id = &amp;quot;registration_type&amp;quot;,
                timestamp = &amp;quot;time&amp;quot;,
                resource_id = &amp;quot;employee&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Let’s check it out.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: The `add` argument of `group_by()` is deprecated as of dplyr 1.0.0.
+## Please use the `.add` argument instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s check it out.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Number of events:  5442
 ## Number of cases:  500
@@ -539,8 +773,8 @@ df &amp;lt;- eventlog(patients,
 ##                    3rd Qu.:2017-12-22 15:44:11   3rd Qu.:4082  
 ##                    Max.   :2018-05-05 07:16:02   Max.   :5442  
 ## &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;So we learn that there are 500 “cases”, i.e. patients. There are 7 different activities.&lt;/p&gt;
-&lt;p&gt;Let’s check out the data for a single patient:&lt;/p&gt;
+&lt;p&gt;So we learn that there are 500 &amp;quot;cases&amp;quot;, i.e. patients. There are 7 different activities.&lt;/p&gt;
+&lt;p&gt;Let&#39;s check out the data for a single patient:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% filter(patient == 1) %&amp;gt;% 
   arrange(handling_id) #%&amp;gt;% &lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Log of 12 events consisting of:
@@ -575,13 +809,17 @@ df &amp;lt;- eventlog(patients,
 ## 12 Triage … 1       r2       501         complete         2017-01-02 22:32:25
 ## # … with 1 more variable: .order &amp;lt;int&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt; # select(handling, handling_id, registration_type) # does not work&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We learn that each “handling” has a separate start and complete timestamp.&lt;/p&gt;
+&lt;p&gt;We learn that each &amp;quot;handling&amp;quot; has a separate start and complete timestamp.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;traces&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Traces&lt;/h1&gt;
-&lt;p&gt;The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.&lt;/p&gt;
+&lt;p&gt;The summary info of the event log also counts so-called &amp;quot;traces&amp;quot;. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let&#39;s visualize them.&lt;/p&gt;
 &lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% processmapR::trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `rename_()` is deprecated as of dplyr 0.7.0.
+## Please use `rename()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Cases that get an X-ray&lt;/li&gt;
@@ -590,7 +828,7 @@ df &amp;lt;- eventlog(patients,
 &lt;/div&gt;
 &lt;div id=&#34;the-dotted-chart&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The dotted chart&lt;/h1&gt;
-&lt;p&gt;A really powerful visualization in process mining comes in the form of a “dotted chart”. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
+&lt;p&gt;A really powerful visualization in process mining comes in the form of a &amp;quot;dotted chart&amp;quot;. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
 &lt;p&gt;It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
   theme_gray()&lt;/code&gt;&lt;/pre&gt;
@@ -634,14 +872,14 @@ df &amp;lt;- eventlog(patients,
 &lt;li&gt;are low on math and high on simulation / programming in R&lt;/li&gt;
 &lt;li&gt;are fun / well written&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;For Bayesian statistical modeling, we have the awesome textbook &lt;a href=&#34;https://xcelab.net/rm/statistical-rethinking/&#34;&gt;“Statistical Rethinking”&lt;/a&gt; by Richard mcElreath.&lt;/p&gt;
-&lt;p&gt;For Machine Learning, we have the (free) book &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;“Introduction to Statistical Learning”&lt;/a&gt; by James, Witten, Hastie &amp;amp; Tibshirani.&lt;/p&gt;
+&lt;p&gt;For Bayesian statistical modeling, we have the awesome textbook &lt;a href=&#34;https://xcelab.net/rm/statistical-rethinking/&#34;&gt;&amp;quot;Statistical Rethinking&amp;quot;&lt;/a&gt; by Richard mcElreath.&lt;/p&gt;
+&lt;p&gt;For Machine Learning, we have the (free) book &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;Introduction to Statistical Learning&amp;quot;&lt;/a&gt; by James, Witten, Hastie &amp;amp; Tibshirani.&lt;/p&gt;
 &lt;p&gt;However, for Causal Inference, such a book does not exist yet AFAIK. Therefore, I tried to piece together a Causal Inference course based on the criteria mentioned above.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;designing-an-introductory-causal-inference-course&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Designing an introductory causal inference course&lt;/h1&gt;
-&lt;p&gt;Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call “Quasi-experimental designs”, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).&lt;/p&gt;
-&lt;p&gt;In the end, I decided to combine the two causal chapters from Gelman &amp;amp; Hill (2007) &lt;a href=&#34;https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/&#34;&gt;(freely available on Gelman’s website)&lt;/a&gt; with the introductory chapter on Causal Graphical Models by Felix Elwert &lt;a href=&#34;https://www.ssc.wisc.edu/~felwert/causality/&#34;&gt;(freely available on Elwert’s website)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Explicit goal was to contrast/combine the causal graph (DAG) approach with what some call &amp;quot;Quasi-experimental designs&amp;quot;, i.e. the econometric causal effects toolkit (Regression Discontinuity Design, matching, instrumental variables etc).&lt;/p&gt;
+&lt;p&gt;In the end, I decided to combine the two causal chapters from Gelman &amp;amp; Hill (2007) &lt;a href=&#34;https://statmodeling.stat.columbia.edu/2007/12/08/causal_inferenc_2/&#34;&gt;(freely available on Gelman&#39;s website)&lt;/a&gt; with the introductory chapter on Causal Graphical Models by Felix Elwert &lt;a href=&#34;https://www.ssc.wisc.edu/~felwert/causality/&#34;&gt;(freely available on Elwert&#39;s website)&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The Gelman &amp;amp; Hill chapters already come with a set of exercises. However, for DAGs, i could not find a suitable set of exercises.&lt;/p&gt;
 &lt;p&gt;So I created two R markdown notebooks with exercises in R, that make use of the &lt;a href=&#34;http://dagitty.net/&#34;&gt;DAGitty tool&lt;/a&gt;, created by Johannes Textor and freely available as R package.&lt;/p&gt;
 &lt;p&gt;Some exercises are taken from &lt;a href=&#34;http://bayes.cs.ucla.edu/PRIMER/&#34;&gt;Causal inference in statistics: A Primer&lt;/a&gt; by Pearl, Glymour &amp;amp; Jewell. (I probably should own this book. So I just ordered it :))&lt;/p&gt;
@@ -652,19 +890,19 @@ df &amp;lt;- eventlog(patients,
 &lt;p&gt;The course has four parts.&lt;/p&gt;
 &lt;div id=&#34;general-introduction&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;General introduction&lt;/h2&gt;
-&lt;p&gt;The course starts with the first causal chapter of Gelman &amp;amp; Hill’s book, “Causal inference using regression on the treatment variable”. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.&lt;/p&gt;
+&lt;p&gt;The course starts with the first causal chapter of Gelman &amp;amp; Hill&#39;s book, &amp;quot;Causal inference using regression on the treatment variable&amp;quot;. This creates a first complete experience with identifying and estimating causal effects. However, there are no causal diagrams, which is unfortunate.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;identification-of-causal-effects-using-dags&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Identification of Causal effects using DAGs&lt;/h2&gt;
-&lt;p&gt;Next we dive into causal identification using the causal diagram approach. For this we use the chapter “Causal Graphical Models” by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.&lt;/p&gt;
+&lt;p&gt;Next we dive into causal identification using the causal diagram approach. For this we use the chapter &amp;quot;Causal Graphical Models&amp;quot; by Felix Elwert. Two R markdown Notebooks with exercises using Dagitty complete this part.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;identification-and-estimation-strategies&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Identification and estimation strategies&lt;/h2&gt;
-&lt;p&gt;We then continue with the second causal chapter of Gelman &amp;amp; Hill “Causal inference using more advanced models”. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.&lt;/p&gt;
+&lt;p&gt;We then continue with the second causal chapter of Gelman &amp;amp; Hill &amp;quot;Causal inference using more advanced models&amp;quot;. This covers matching, regression discontinuity design, and instrumental variables. This material is combined with a paper by Scheiner et al, that contains DAGs for these methods. In our study group DAGs greatly facilitated discussion of the various designs.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;varying-treatment-effects-using-machine-learning&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Varying treatment effects using Machine Learning&lt;/h2&gt;
-&lt;p&gt;Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp;amp; mcCullough) and non-bayesian (GRF, Athey &amp;amp; Wager) methods.&lt;/p&gt;
+&lt;p&gt;Finally, and this part of the course has yet to take place, is the topic of estimating heterogeneous (i.e. subgroup, or even individual) treatment effects. This covers recent developements based on (forests of) regression trees. The plan is to cover both bayesian (BART, Chipman &amp;amp; mcCullough) and non-bayesian (GRF, Athey &amp;amp; Wager) methods.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;looking-back-so-far&#34; class=&#34;section level1&#34;&gt;
@@ -675,7 +913,7 @@ df &amp;lt;- eventlog(patients,
 &lt;li&gt;Formalize identification of causal effects&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Thus, it is separate from, and complements statistical estimation. The distinction between identification and estimation is not so explicitly made in the Gelman &amp;amp; Hill chapters, at least this is my impression. It would really benefit from adding DAGs, as Richard mcElreath is doing in his upcoming second edition of Statistical Rethinking.&lt;/p&gt;
-&lt;p&gt;After having worked through these materials, I think reading Shalizi’s chapters on Causal Effects would be a smart move. This is part III of his book &lt;a href=&#34;https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/&#34;&gt;“Advanced Data Analysis from an Elementary Point of View”&lt;/a&gt;, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.&lt;/p&gt;
+&lt;p&gt;After having worked through these materials, I think reading Shalizi&#39;s chapters on Causal Effects would be a smart move. This is part III of his book &lt;a href=&#34;https://www.stat.cmu.edu/~cshalizi/ADAfaEPoV/&#34;&gt;&amp;quot;Advanced Data Analysis from an Elementary Point of View&amp;quot;&lt;/a&gt;, which is awesome in its clarity, practical remarks a.k.a. normative statements by the author, and breadth.&lt;/p&gt;
 &lt;p&gt;If you have a question, would like to comment or share ideas feel free to &lt;a href=&#34;https://gsverhoeven.github.io/#contact&#34;&gt;contact me&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 </description>
@@ -689,8 +927,8 @@ df &amp;lt;- eventlog(patients,
       <description>
 
 
-&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;“An introduction to Statistical Learning”&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
-&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;’s preset methods.&lt;/p&gt;
+&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
+&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;&#39;s preset methods.&lt;/p&gt;
 &lt;p&gt;But for teaching purposes it would be very nice to have a &lt;code&gt;caret&lt;/code&gt; implementation.&lt;/p&gt;
 &lt;p&gt;This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.&lt;/p&gt;
 &lt;p&gt;We pick the &lt;code&gt;BostonHousing&lt;/code&gt; dataset for our example code.&lt;/p&gt;
@@ -818,7 +1056,7 @@ knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;stratified-sampling-vs-random-sampling&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Stratified sampling vs random sampling&lt;/h1&gt;
 &lt;p&gt;To check if we understand what &lt;code&gt;caret&lt;/code&gt; does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the &lt;code&gt;caret&lt;/code&gt; approach. As &lt;code&gt;caret&lt;/code&gt; requires a particular format (a named list of sets of train indices) we conform to this standard. However, all &lt;code&gt;caret&lt;/code&gt; partitioning functions seem to perform &lt;strong&gt;stratified random sampling&lt;/strong&gt;. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random &lt;strong&gt;within those groups&lt;/strong&gt; to partitions that have similar distributions for the outcome variable.&lt;/p&gt;
-&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
+&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
 &lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
 prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
@@ -839,10 +1077,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 9 1 2 4 8
+## [1] 8 3 1 2 7
 ## 
 ## $Resample2
-## [1] 3 9 5 4 2&lt;/code&gt;&lt;/pre&gt;
+## [1]  1  6 10  8  9&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -861,7 +1099,7 @@ preds &amp;lt;- predict(lm.fit, newdata = Boston[-train,])
 # calculate RMSE validation error
 sqrt(mean((preds - Boston[-train,]$medv)^2))&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 7.930076&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let’s find out!&lt;/p&gt;
+&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let&#39;s find out!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-in-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach in caret&lt;/h1&gt;
@@ -940,7 +1178,7 @@ mean(resamples$values$`MOD1~RMSE`)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;validation-set-approach-stratified-sampling-versus-random-sampling&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Validation set approach: stratified sampling versus random sampling&lt;/h1&gt;
-&lt;p&gt;Since we now know what we are doing, let’s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
+&lt;p&gt;Since we now know what we are doing, let&#39;s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# simulation settings
 n_repeats &amp;lt;- 3000
 train_fraction &amp;lt;- 0.8&lt;/code&gt;&lt;/pre&gt;
@@ -1081,7 +1319,7 @@ lgocv_res&lt;/code&gt;&lt;/pre&gt;
 
 
 &lt;p&gt;In this post, I show how to create a Arduino-based atmospheric sensor circuit capable of storing large amounts of data on a microSD card.&lt;/p&gt;
-&lt;p&gt;Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. &lt;a href=&#34;https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger&#34; class=&#34;uri&#34;&gt;https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger&lt;/a&gt;). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!&lt;/p&gt;
+&lt;p&gt;Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. &lt;a href=&#34;https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger&#34; class=&#34;uri&#34;&gt;https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger&lt;/a&gt;). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!&lt;/p&gt;
 &lt;div id=&#34;components&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Components&lt;/h1&gt;
 &lt;p&gt;After some research I ordered:&lt;/p&gt;
@@ -1151,7 +1389,7 @@ mdf &amp;lt;- mdf[, value := as.numeric(value)]&lt;/code&gt;&lt;/pre&gt;
   facet_grid(~ trace_name) + geom_smooth(size = 1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;The basement, which is the lowest, has the highest pressure. But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let’s move on to the temperature!&lt;/p&gt;
+&lt;p&gt;The basement, which is the lowest, has the highest pressure. But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let&#39;s move on to the temperature!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;temperature&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Temperature&lt;/h2&gt;
@@ -1170,7 +1408,7 @@ mdf &amp;lt;- mdf[, value := as.numeric(value)]&lt;/code&gt;&lt;/pre&gt;
            group = variable)) +
   geom_point() + facet_grid(~ trace_name)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Here we see that the living room is at a agreeable 45% RH. The basement has a higher RH percentage, expected because it’s colder.&lt;/p&gt;
+&lt;p&gt;Here we see that the living room is at a agreeable 45% RH. The basement has a higher RH percentage, expected because it&#39;s colder.&lt;/p&gt;
 &lt;p&gt;According to Wikipedia:&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Humans can be comfortable within a wide range of humidities depending on the temperature—from 30% to 70%[14]—but ideally between 50%[15] and 60%.[16] Very low humidity can create discomfort, respiratory problems, and aggravate allergies in some individuals.&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;The bedroom is also at a nice humidity level of 55% RH. The bathroom floor was being heated, and this unsurprisingly reduces the local RH to below 40%.&lt;/p&gt;
@@ -1200,10 +1438,10 @@ library(dbarts)
 library(ggplot2)
 library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ✔ tibble  2.1.3     ✔ dplyr   0.8.4
-## ✔ tidyr   1.0.2     ✔ stringr 1.4.0
-## ✔ readr   1.3.1     ✔ forcats 0.4.0
-## ✔ purrr   0.3.3&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## ✔ tibble  3.0.3     ✔ dplyr   1.0.2
+## ✔ tidyr   1.1.2     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.5.0
+## ✔ purrr   0.3.4&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ tidyr::extract() masks dbarts::extract()
 ## ✖ dplyr::filter()  masks stats::filter()
@@ -1288,14 +1526,14 @@ ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col =
   geom_point() + 
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;This is pretty bad compared to BART. What’s wrong here?&lt;/p&gt;
-&lt;p&gt;From reference.md: &lt;strong&gt;GRF isn’t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is pretty bad compared to BART. What&#39;s wrong here?&lt;/p&gt;
+&lt;p&gt;From reference.md: &lt;strong&gt;GRF isn&#39;t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Disabling honesty. As noted in the section on honesty above, when honesty is enabled, the training subsample is further split in half before performing splitting. This may not leave enough information for the algorithm to determine high-quality splits.&lt;/li&gt;
 &lt;li&gt;Skipping the variance estimate computation, by setting ci.group.size to 1 during training, then increasing sample.fraction. Because of how variance estimation is implemented, sample.fraction cannot be greater than 0.5 when it is enabled. If variance estimates are not needed, it may help to disable this computation and use a larger subsample size for training.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI’s&lt;/p&gt;
+&lt;p&gt;Dataset is pretty small (n=100). Maybe turn of honesty? We cannot turn off variance estimate computation, because we want the CI&#39;s&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if(fullrun){
   reg.forest2 = regression_forest(x, y, num.trees = 2000,
                                  honesty = FALSE)
@@ -1362,7 +1600,7 @@ head(aciccomp2017:::transformedData_2017)&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;fit-bart-to-acic-2017-dataset&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Fit BART to ACIC 2017 dataset&lt;/h2&gt;
 &lt;p&gt;Need also counterfactual predictions. Most efficient seems to create x.test with Z reversed. This will give use a y.test as well as y.train in the output. We expect draws for both. Plotting a histogram of the difference gives us the treatment effect with uncertainty.&lt;/p&gt;
-&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more “burn in” samples.&lt;/p&gt;
+&lt;p&gt;From the MCMC draws for sigma we infer that we need to drop more &amp;quot;burn in&amp;quot; samples.&lt;/p&gt;
 &lt;p&gt;Prepare data for BART, including x.test with treatment reversed:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# combine x and y
 y &amp;lt;- sim$y
@@ -1494,7 +1732,7 @@ if(fullrun){
 &lt;pre&gt;&lt;code&gt;For each tree, the test example is &amp;#39;pushed down&amp;#39; to determine what leaf it falls in.
 Given this information, we create a list of neighboring training examples, weighted by how many times the example fell in the same leaf as the test example.
 A prediction is made using this weighted list of neighbors, using the relevant approach for the type of forest. In causal prediction, we calculate the treatment effect using the outcomes and treatment status of the neighbor examples.&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through ‘majority voting’. It’s worth noting that for regression forests, the GRF algorithm described above is identical this ‘ensemble’ approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
+&lt;p&gt;Those familiar with classic random forests might note that this approach differs from the way forest prediction is usually described. The traditional view is that to predict for a test example, each tree makes a prediction on that example. To make a final prediction, the tree predictions are combined in some way, for example through averaging or through &#39;majority voting&#39;. It&#39;s worth noting that for regression forests, the GRF algorithm described above is identical this &#39;ensemble&#39; approach, where each tree predicts by averaging the outcomes in each leaf, and predictions are combined through a weighted average.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Estimate treatment effects for the training data using out-of-bag prediction.
 tau.hat.oob = predict(tau.forest)
 
@@ -1523,7 +1761,7 @@ average_treatment_effect(tau.forest, target.sample = &amp;quot;treated&amp;quot;
 &lt;pre&gt;&lt;code&gt;## [1] 0.5010723&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-more-trees-for-cis&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Fit more trees for CI’s&lt;/h2&gt;
+&lt;h2&gt;Fit more trees for CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Add confidence intervals for heterogeneous treatment effects; growing more
 # trees is now recommended.
 if(fullrun){
@@ -1532,7 +1770,7 @@ if(fullrun){
 } else {tau.forest_big &amp;lt;- readRDS(&amp;quot;s5.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;plot-cis&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Plot CI’s&lt;/h2&gt;
+&lt;h2&gt;Plot CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## PM
 #source(&amp;quot;CalcPosteriors.R&amp;quot;)
 df_res &amp;lt;- CalcPredictionsGRF(df, tau.forest_big)
@@ -1561,7 +1799,7 @@ plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
+&lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(df, bartFit, treatname = &amp;quot;W&amp;quot;)
 
@@ -1641,7 +1879,7 @@ tau.forest2 = causal_forest(X[, selected.vars], Y, W,
 } else {tau.forest2 &amp;lt;- readRDS(&amp;quot;s8.rds&amp;quot;)}&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;grf-check-fit-and-cis&#34; class=&#34;section level3&#34;&gt;
-&lt;h3&gt;Grf: Check fit and CI’s&lt;/h3&gt;
+&lt;h3&gt;Grf: Check fit and CI&#39;s&lt;/h3&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_sep2 &amp;lt;- CalcPredictionsGRF(df_sep4[,selected.vars], tau.forest2)
 
 grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
@@ -1668,7 +1906,7 @@ plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;BART: Check fit and CI’s&lt;/h2&gt;
+&lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#source(&amp;quot;calcPosteriors.R&amp;quot;)
 sim &amp;lt;- CalcPosteriorsBART(df_sep4, bartFit, treatname = &amp;quot;W&amp;quot;)
 
@@ -1769,9 +2007,9 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.212004 
-## R squared (OOB):                  0.6575567&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
+## OOB prediction error (MSE):       5.355079 
+## R squared (OOB):                  0.6550466&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1860,8 +2098,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.401101 
-## R squared (OOB):                  0.4528993&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.767179 
+## R squared (OOB):                  0.4279085&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1923,8 +2161,8 @@ summary(my_glm_int2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We conclude that the second interaction also results in significant model improvement.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;a-more-ambitious-goal-try-and-improve-harrison-rubinfelds-model-formula-for-boston-housing&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld’s model formula for Boston housing&lt;/h1&gt;
-&lt;p&gt;So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let’s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
+&lt;h1&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld&#39;s model formula for Boston housing&lt;/h1&gt;
+&lt;p&gt;So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let&#39;s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Harrison and Rubinfeld (1978) model
 my_glm_hr &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2), data = Boston, 
@@ -1998,9 +2236,9 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009213626 
-## R squared (OOB):                  0.534747&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
+## OOB prediction error (MSE):       0.009032278 
+## R squared (OOB):                  0.5343749&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -2093,8 +2331,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008909949 
-## R squared (OOB):                  0.5171111&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008521645 
+## R squared (OOB):                  0.5301491&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -2176,6 +2414,24 @@ summary(my_glm_hr_int2)&lt;/code&gt;&lt;/pre&gt;
 &lt;h1&gt;Conclusion&lt;/h1&gt;
 &lt;p&gt;We conclude that this appears a fruitfull approach to at least discovering where a regression model can be improved.&lt;/p&gt;
 &lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Cooperatives and payment schemes</title>
+      <link>https://gsverhoeven.github.io/post/bogetoft_rl/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/bogetoft_rl/</guid>
+      <description>&lt;h1 id=&#34;summary&#34;&gt;Summary&lt;/h1&gt;
+&lt;p&gt;We review the book by Bogetoft and Olesen on Cooperatives and payment schemes.
+We investigate the potential for using its material to explore the ability of reinforcement learning to solve games. The idea is to start with games that can be easily solved using standard game theoretic analysis, and then add complexity that makes them hard to solve using the standard techniques.&lt;/p&gt;
+&lt;h1 id=&#34;game-theory-vs-reinforcement-learning&#34;&gt;Game theory vs Reinforcement learning&lt;/h1&gt;
+&lt;p&gt;If we take a simple game such as the Prisoners dilemma, we see that we have two players, that have access to the same action sets (confess or not confess), and perform their action simultaneously.&lt;/p&gt;
+&lt;p&gt;Each players outcome (the Reward) depends on the action of the other player.&lt;/p&gt;
+&lt;p&gt;If they both remain silent, i.e. do not confess, they both get -1. However, if one of them cooperates and confesses, and the other remains silent, the prisoner that confesses gets 0, and the one remaining silent gets -10. If both of them confess, they both get a penalty of -5.&lt;/p&gt;
+&lt;p&gt;The games is played only once: so it does not make sense to &amp;ldquo;act nice&amp;rdquo; for future reward. Now we look for a strategy that is a Nash equilibrium. This means that no player wants to change its action, given the other players action. If both remain silent, then a player is better of to switch to confess. If both confess, then no player is better of remain silent. So both confessing is the Nash equilibrium for this game. We can also call this the rational or optimal solution of the game.&lt;/p&gt;
+&lt;p&gt;If we translate this to a reinforcement learning setting, we end up in what is called a Multi Agent Reinforcement learning (MARL) setting.
+We immediately spot a difference with GT: in RL, players play the game repeatedly. So could it be possible to reach the optimal solution of both remaining silent? And: does this difference mean that we cannot use MARL to solve one shot static games? And: if so, is this a problem? The real life systems we wish to model are typically dynamic (i.e. repeat) games as well.&lt;/p&gt;
 </description>
     </item>
     

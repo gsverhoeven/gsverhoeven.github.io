@@ -20,8 +20,8 @@
       <description>
 
 
-&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;“An introduction to Statistical Learning”&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
-&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;’s preset methods.&lt;/p&gt;
+&lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
+&lt;p&gt;In practice, one likes to use k-fold Cross validation, or Leave-one-out cross validation, as they make better use of the data. This is probably the reason that the validation set approach is not one of &lt;code&gt;caret&lt;/code&gt;&#39;s preset methods.&lt;/p&gt;
 &lt;p&gt;But for teaching purposes it would be very nice to have a &lt;code&gt;caret&lt;/code&gt; implementation.&lt;/p&gt;
 &lt;p&gt;This would allow for an easy demonstration of the variability one gets when choosing different partionings. It also allows direct demonstration of why k-fold CV is superior to the validation set approach with respect to bias/variance.&lt;/p&gt;
 &lt;p&gt;We pick the &lt;code&gt;BostonHousing&lt;/code&gt; dataset for our example code.&lt;/p&gt;
@@ -149,7 +149,7 @@ knitr::kable(head(Boston))&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;stratified-sampling-vs-random-sampling&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Stratified sampling vs random sampling&lt;/h1&gt;
 &lt;p&gt;To check if we understand what &lt;code&gt;caret&lt;/code&gt; does, we first implement the validation set approach ourselves. To be able to compare, we need exactly the same data partitions for our manual approach and the &lt;code&gt;caret&lt;/code&gt; approach. As &lt;code&gt;caret&lt;/code&gt; requires a particular format (a named list of sets of train indices) we conform to this standard. However, all &lt;code&gt;caret&lt;/code&gt; partitioning functions seem to perform &lt;strong&gt;stratified random sampling&lt;/strong&gt;. This means that it first partitions the data in equal sized groups based on the outcome variable, and then samples at random &lt;strong&gt;within those groups&lt;/strong&gt; to partitions that have similar distributions for the outcome variable.&lt;/p&gt;
-&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
+&lt;p&gt;This not desirable for teaching, as it adds more complexity. In addition, it would be nice to be able to compare stratified vs. random sampling.&lt;/p&gt;
 &lt;p&gt;We therefore write a function that generates truly random partitions of the data. We let it generate partitions in the format that &lt;code&gt;trainControl&lt;/code&gt; likes.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# internal function from caret package, needed to play nice with resamples()
 prettySeq &amp;lt;- function(x) paste(&amp;quot;Resample&amp;quot;, gsub(&amp;quot; &amp;quot;, &amp;quot;0&amp;quot;, format(seq(along = x))), sep = &amp;quot;&amp;quot;)
@@ -170,10 +170,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 9 1 2 4 8
+## [1] 7 9 2 8 4
 ## 
 ## $Resample2
-## [1] 3 9 5 4 2&lt;/code&gt;&lt;/pre&gt;
+## [1]  7  8 10  6  2&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -192,7 +192,7 @@ preds &amp;lt;- predict(lm.fit, newdata = Boston[-train,])
 # calculate RMSE validation error
 sqrt(mean((preds - Boston[-train,]$medv)^2))&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 7.930076&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let’s find out!&lt;/p&gt;
+&lt;p&gt;If we feed &lt;code&gt;caret&lt;/code&gt; the same data partition, we expect &lt;em&gt;exactly&lt;/em&gt; the same test error for the held-out data. Let&#39;s find out!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-in-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach in caret&lt;/h1&gt;
@@ -271,7 +271,7 @@ mean(resamples$values$`MOD1~RMSE`)&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;validation-set-approach-stratified-sampling-versus-random-sampling&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Validation set approach: stratified sampling versus random sampling&lt;/h1&gt;
-&lt;p&gt;Since we now know what we are doing, let’s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
+&lt;p&gt;Since we now know what we are doing, let&#39;s perform a simulation study to compare stratified random sampling with truly random sampling, using the validation set approach, and repeating this proces say a few thousand times to get a nice distribution of test errors.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# simulation settings
 n_repeats &amp;lt;- 3000
 train_fraction &amp;lt;- 0.8&lt;/code&gt;&lt;/pre&gt;

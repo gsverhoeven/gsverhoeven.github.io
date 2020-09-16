@@ -6,9 +6,12 @@ summary: In this post, we test both `Bayesian Additive Regression Trees (BART)` 
 slug: bart-vs-grf-showdown
 draft: FALSE
 categories:
-  - R
+  - causal inference
+  - machine learning
 tags:
-  - causal inference, BART, grf
+  - causal inference
+  - BART
+  - grf
 header:
   image: "headers/actor-adult-ancient-236171.jpg"
   preview: FALSE

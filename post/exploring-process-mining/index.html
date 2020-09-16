@@ -559,7 +559,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/r/">R</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/data-science/">Data science</a></span>
   
 
 </div>
@@ -590,11 +590,11 @@
       
 
 
-<p>In this post, we’ll explore the <a href="https://www.bupar.net">BupaR</a> suite of <em>Process Mining</em> packages created by <em>Gert Janssenswillen</em> from Hasselt University.</p>
-<p>We start with exploring the <code>patients</code> dataset contained in the <code>eventdataR</code> package. According to the documentation, this is an “Artifical eventlog about patients”.</p>
+<p>In this post, we'll explore the <a href="https://www.bupar.net">BupaR</a> suite of <em>Process Mining</em> packages created by <em>Gert Janssenswillen</em> from Hasselt University.</p>
+<p>We start with exploring the <code>patients</code> dataset contained in the <code>eventdataR</code> package. According to the documentation, this is an &quot;Artifical eventlog about patients&quot;.</p>
 <div id="getting-started" class="section level1">
 <h1>Getting started</h1>
-<p>After installing all required packages, we can load the whole “bupaverse” by loading the <code>bupaR</code> package.</p>
+<p>After installing all required packages, we can load the whole &quot;bupaverse&quot; by loading the <code>bupaR</code> package.</p>
 <pre class="r"><code>library(ggplot2)
 library(bupaR)</code></pre>
 <pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
@@ -604,7 +604,7 @@ library(bupaR)</code></pre>
 <pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
 ## logical.return = TRUE, : there is no package called &#39;petrinetR&#39;</code></pre>
 <pre class="r"><code>library(processmapR)</code></pre>
-<p>Now, our dataset is already in <code>eventlog</code> format, but typically this not the case. Here’s how to turn a data.frame into an object of class <code>eventlog</code>:</p>
+<p>Now, our dataset is already in <code>eventlog</code> format, but typically this not the case. Here's how to turn a data.frame into an object of class <code>eventlog</code>:</p>
 <pre class="r"><code>patients &lt;- eventdataR::patients
 
 df &lt;- eventlog(patients,
@@ -614,7 +614,11 @@ df &lt;- eventlog(patients,
                lifecycle_id = &quot;registration_type&quot;,
                timestamp = &quot;time&quot;,
                resource_id = &quot;employee&quot;)</code></pre>
-<p>Let’s check it out.</p>
+<pre><code>## Warning: The `add` argument of `group_by()` is deprecated as of dplyr 1.0.0.
+## Please use the `.add` argument instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<p>Let's check it out.</p>
 <pre class="r"><code>summary(df)</code></pre>
 <pre><code>## Number of events:  5442
 ## Number of cases:  500
@@ -640,8 +644,8 @@ df &lt;- eventlog(patients,
 ##                    3rd Qu.:2017-12-22 15:44:11   3rd Qu.:4082  
 ##                    Max.   :2018-05-05 07:16:02   Max.   :5442  
 ## </code></pre>
-<p>So we learn that there are 500 “cases”, i.e. patients. There are 7 different activities.</p>
-<p>Let’s check out the data for a single patient:</p>
+<p>So we learn that there are 500 &quot;cases&quot;, i.e. patients. There are 7 different activities.</p>
+<p>Let's check out the data for a single patient:</p>
 <pre class="r"><code>df %&gt;% filter(patient == 1) %&gt;% 
   arrange(handling_id) #%&gt;% </code></pre>
 <pre><code>## Log of 12 events consisting of:
@@ -676,13 +680,17 @@ df &lt;- eventlog(patients,
 ## 12 Triage … 1       r2       501         complete         2017-01-02 22:32:25
 ## # … with 1 more variable: .order &lt;int&gt;</code></pre>
 <pre class="r"><code> # select(handling, handling_id, registration_type) # does not work</code></pre>
-<p>We learn that each “handling” has a separate start and complete timestamp.</p>
+<p>We learn that each &quot;handling&quot; has a separate start and complete timestamp.</p>
 </div>
 <div id="traces" class="section level1">
 <h1>Traces</h1>
-<p>The summary info of the event log also counts so-called “traces”. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let’s visualize them.</p>
+<p>The summary info of the event log also counts so-called &quot;traces&quot;. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let's visualize them.</p>
 <p>To visualize all traces, we set <code>coverage</code> to 1.0.</p>
 <pre class="r"><code>df %&gt;% processmapR::trace_explorer(type = &quot;frequent&quot;, coverage = 1.0)</code></pre>
+<pre><code>## Warning: `rename_()` is deprecated as of dplyr 0.7.0.
+## Please use `rename()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
 <p><img src="/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png" width="672" /> So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:</p>
 <ul>
 <li>Cases that get an X-ray</li>
@@ -691,7 +699,7 @@ df &lt;- eventlog(patients,
 </div>
 <div id="the-dotted-chart" class="section level1">
 <h1>The dotted chart</h1>
-<p>A really powerful visualization in process mining comes in the form of a “dotted chart”. The dotted chart function produces a <code>ggplot</code> graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.</p>
+<p>A really powerful visualization in process mining comes in the form of a &quot;dotted chart&quot;. The dotted chart function produces a <code>ggplot</code> graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.</p>
 <p>It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.</p>
 <pre class="r"><code>df %&gt;% dotted_chart(x = &quot;absolute&quot;, sort = &quot;start&quot;) + ggtitle(&quot;All cases&quot;) +
   theme_gray()</code></pre>
@@ -721,6 +729,8 @@ df &lt;- eventlog(patients,
 <div class="article-tags">
   
   <a class="badge badge-light" href="/tags/process-mining/">process mining</a>
+  
+  <a class="badge badge-light" href="/tags/r/">R</a>
   
 </div>
 
@@ -943,6 +953,17 @@ df &lt;- eventlog(patients,
 
 
   
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/causal-inference-course/">Designing an introductory course on Causal Inference</a></li>
+      
+      <li><a href="/post/validation-set-approach-in-caret/">The validation set approach in caret</a></li>
+      
+    </ul>
+  </div>
   
 
 

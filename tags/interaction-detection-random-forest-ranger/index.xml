@@ -87,9 +87,9 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.212004 
-## R squared (OOB):                  0.6575567&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It turns out the RF can “explain” 67% of these discrepancies.&lt;/p&gt;
+## OOB prediction error (MSE):       5.19353 
+## R squared (OOB):                  0.6608739&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -178,8 +178,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.401101 
-## R squared (OOB):                  0.4528993&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.733557 
+## R squared (OOB):                  0.4248449&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -241,8 +241,8 @@ summary(my_glm_int2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We conclude that the second interaction also results in significant model improvement.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;a-more-ambitious-goal-try-and-improve-harrison-rubinfelds-model-formula-for-boston-housing&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld’s model formula for Boston housing&lt;/h1&gt;
-&lt;p&gt;So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let’s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
+&lt;h1&gt;A more ambitious goal: Try and improve Harrison &amp;amp; Rubinfeld&#39;s model formula for Boston housing&lt;/h1&gt;
+&lt;p&gt;So far, we assumed that all relationships are linear. Harrison and Rubinfeld have created a model without interactions, but with transformations to correct for skewness, heteroskedasticity etc. Let&#39;s see if we can improve upon this model equation by applying our method to search for interactions. Their formula predicts &lt;code&gt;log(medv)&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Harrison and Rubinfeld (1978) model
 my_glm_hr &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2), data = Boston, 
@@ -316,9 +316,9 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009213626 
-## R squared (OOB):                  0.534747&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The RF indicates that 54% of the discrepancy can be “explained” by RF.&lt;/p&gt;
+## OOB prediction error (MSE):       0.009208193 
+## R squared (OOB):                  0.5320397&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -411,8 +411,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008909949 
-## R squared (OOB):                  0.5171111&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.00882153 
+## R squared (OOB):                  0.5200712&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)

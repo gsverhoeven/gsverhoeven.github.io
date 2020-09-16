@@ -559,7 +559,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/r/">R</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/machine-learning/">Machine learning</a>, <a href="/categories/deep-learning/">Deep learning</a></span>
   
 
 </div>
@@ -596,12 +596,12 @@
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>I don’t change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. <a href="http://www.picotux.com/" class="uri">http://www.picotux.com/</a>), as well as huge supercomputers (<a href="https://itsfoss.com/linux-runs-top-supercomputers/" class="uri">https://itsfoss.com/linux-runs-top-supercomputers/</a>). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.</p>
+<p>I don't change computers often. The fun for me is to make the most out of sparse resources. Linux fits nicely into this philosophy, because it can be adapted to run on really tiny computers (e.g. <a href="http://www.picotux.com/" class="uri">http://www.picotux.com/</a>), as well as huge supercomputers (<a href="https://itsfoss.com/linux-runs-top-supercomputers/" class="uri">https://itsfoss.com/linux-runs-top-supercomputers/</a>). I do like to keep up with new tech developments. And with the commoditization of deep learning in the form of Keras, I felt it was about time that I finally jumped on the Deep Learning bandwagon.</p>
 <p>And the nice thing about lagging behind: The choice for deep learning is now extremely simple. I need <a href="https://keras.io/">Keras</a> with <a href="https://www.tensorflow.org/">TensorFlow</a> as a computational backend. Which nowadays means installing TensorFlow since the Keras API has been incorporated into the TensorFlow project.</p>
 </div>
 <div id="tensorflow-and-avx" class="section level1">
 <h1>TensorFlow and AVX</h1>
-<p>Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU’s and TPU’s to do the number crunching. But even for CPU’s, TensorFlow likes to make use of all the computational features that modern CPU’s offer. One of these is the “Advanced Vector Instruction Set” , aka <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX</a>. As most CPU’s from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.</p>
+<p>Then I ran into a problem: TensorFlow is all about FAST computation. And therefore it tries to exploit all hardware features that speed up computation. One obvious way to do so is utilizing specialized hardware such as GPU's and TPU's to do the number crunching. But even for CPU's, TensorFlow likes to make use of all the computational features that modern CPU's offer. One of these is the &quot;Advanced Vector Instruction Set&quot; , aka <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX</a>. As most CPU's from 2011 or later support AVX, the TensorFlow folks decided to only make binaries available that require a CPU with AVX. Bummer for me: as my CPU is from 2010, I needed to compile TensorFlow myself.</p>
 <p>But come to think of it: What better rite of passage into the Deep Learning AI age is to compile TensorFlow from source on your own machine??? (Opening music of Space Odyssey 2001 in the background)</p>
 </div>
 <div id="building-tensorflow-on-a-really-old-computer" class="section level1">
@@ -611,9 +611,9 @@
 <ul>
 <li>Creating a virtual environment for Python 3.6.9</li>
 <li>Checking my GCC version (7.5.0, which is greater than 7.3 that is used for the official TF packages)</li>
-<li>Install <a href="https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu">Bazel</a> (Google’s Make program), version 3.1</li>
 <li>Clone the <a href="https://github.com/tensorflow/tensorflow">TensorFlow repository</a> from GitHub</li>
 <li>Git checkout the latest official TensorFlow release (v2.2)</li>
+<li>Installed the latest release of <a href="https://docs.bazel.build/versions/master/install-ubuntu.html#install-with-installer-ubuntu">Bazel</a> (Google's Make program), version 3.1. Then install exactly the right version needed for TF2.2 (2.0.0, as specified by MIN_BAZEL_VERSION in <code>tensorflow/configure.py</code>, use <code>.baselversion</code> to easily install multiple bazel versions side by side)</li>
 </ul>
 <p>Then came the hard part, the final step:</p>
 <ul>
@@ -697,6 +697,14 @@ for (idx in 1:12) {
 library(magrittr)
 
 model %&gt;% plot_model()</code></pre>
+<pre><code>## Warning: `select_()` is deprecated as of dplyr 0.7.0.
+## Please use `select()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<pre><code>## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
+## Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
 <div id="htmlwidget-1" style="width:672px;height:480px;" class="grViz html-widget"></div>
 <script type="application/json" data-for="htmlwidget-1">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"flatten\nFlatten\n\", shape = \"rectangle\", fixedsize = \"FALSE\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0,4!\"] \n  \"2\" [label = \"dense\nDense\nrelu\", shape = \"rectangle\", fixedsize = \"FALSE\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0,3!\"] \n  \"3\" [label = \"dropout\nDropout\n\", shape = \"rectangle\", fixedsize = \"FALSE\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0,2!\"] \n  \"4\" [label = \"dense_1\nDense\nsoftmax\", shape = \"rectangle\", fixedsize = \"FALSE\", fillcolor = \"#F0F8FF\", fontcolor = \"#000000\", pos = \"0,1!\"] \n  \"1\"->\"2\" \n  \"2\"->\"3\" \n  \"3\"->\"4\" \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
@@ -738,7 +746,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 <pre class="r"><code>model %&gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)</code></pre>
 <pre><code>##       loss   accuracy 
-## 0.08137871 0.97570002</code></pre>
+## 0.08484858 0.97289997</code></pre>
 <p>Our model achieved ~98% accuracy on the test set.</p>
 <p>Awesome.</p>
 </div>
@@ -753,7 +761,13 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/tensorflow-keras-neural-networks-deep-learning/">tensorflow, keras, neural networks, deep learning</a>
+  <a class="badge badge-light" href="/tags/tensorflow/">tensorflow</a>
+  
+  <a class="badge badge-light" href="/tags/keras/">keras</a>
+  
+  <a class="badge badge-light" href="/tags/neural-networks/">neural networks</a>
+  
+  <a class="badge badge-light" href="/tags/deep-learning/">deep learning</a>
   
 </div>
 

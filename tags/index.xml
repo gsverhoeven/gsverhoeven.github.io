@@ -5,7 +5,7 @@
     <link>https://gsverhoeven.github.io/tags/</link>
       <atom:link href="https://gsverhoeven.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 04 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
@@ -13,18 +13,114 @@
     </image>
     
     <item>
-      <title>tensorflow, keras, neural networks, deep learning</title>
-      <link>https://gsverhoeven.github.io/tags/tensorflow-keras-neural-networks-deep-learning/</link>
-      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/tags/tensorflow-keras-neural-networks-deep-learning/</guid>
+      <title>bayesian statistics</title>
+      <link>https://gsverhoeven.github.io/tags/bayesian-statistics/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/bayesian-statistics/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>R, fake data, simulation, copula, tetrachoric correlation</title>
-      <link>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</link>
+      <title>brms</title>
+      <link>https://gsverhoeven.github.io/tags/brms/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/brms/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>causal inference</title>
+      <link>https://gsverhoeven.github.io/tags/causal-inference/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/causal-inference/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rstan</title>
+      <link>https://gsverhoeven.github.io/tags/rstan/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/rstan/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Stan</title>
+      <link>https://gsverhoeven.github.io/tags/stan/</link>
+      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/stan/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>deep learning</title>
+      <link>https://gsverhoeven.github.io/tags/deep-learning/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/deep-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>keras</title>
+      <link>https://gsverhoeven.github.io/tags/keras/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/keras/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>neural networks</title>
+      <link>https://gsverhoeven.github.io/tags/neural-networks/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/neural-networks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tensorflow</title>
+      <link>https://gsverhoeven.github.io/tags/tensorflow/</link>
+      <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/tensorflow/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>copula</title>
+      <link>https://gsverhoeven.github.io/tags/copula/</link>
       <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/tags/r-fake-data-simulation-copula-tetrachoric-correlation/</guid>
+      <guid>https://gsverhoeven.github.io/tags/copula/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>fake data</title>
+      <link>https://gsverhoeven.github.io/tags/fake-data/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/fake-data/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>https://gsverhoeven.github.io/tags/r/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>simulation</title>
+      <link>https://gsverhoeven.github.io/tags/simulation/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/simulation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tetrachoric correlation</title>
+      <link>https://gsverhoeven.github.io/tags/tetrachoric-correlation/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/tetrachoric-correlation/</guid>
       <description></description>
     </item>
     
@@ -37,23 +133,31 @@
     </item>
     
     <item>
-      <title>R, causal inference, DAG, causal graph</title>
-      <link>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</link>
+      <title>causal graph</title>
+      <link>https://gsverhoeven.github.io/tags/causal-graph/</link>
       <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/tags/r-causal-inference-dag-causal-graph/</guid>
+      <guid>https://gsverhoeven.github.io/tags/causal-graph/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>R, caret</title>
-      <link>https://gsverhoeven.github.io/tags/r-caret/</link>
+      <title>DAG</title>
+      <link>https://gsverhoeven.github.io/tags/dag/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/dag/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>caret</title>
+      <link>https://gsverhoeven.github.io/tags/caret/</link>
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/tags/r-caret/</guid>
+      <guid>https://gsverhoeven.github.io/tags/caret/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>arduino</title>
+      <title>Arduino</title>
       <link>https://gsverhoeven.github.io/tags/arduino/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/tags/arduino/</guid>
@@ -61,18 +165,42 @@
     </item>
     
     <item>
-      <title>causal inference, BART, grf</title>
-      <link>https://gsverhoeven.github.io/tags/causal-inference-bart-grf/</link>
+      <title>BART</title>
+      <link>https://gsverhoeven.github.io/tags/bart/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/tags/causal-inference-bart-grf/</guid>
+      <guid>https://gsverhoeven.github.io/tags/bart/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>interaction detection, random forest, ranger</title>
-      <link>https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/</link>
+      <title>grf</title>
+      <link>https://gsverhoeven.github.io/tags/grf/</link>
+      <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/grf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>interaction detection</title>
+      <link>https://gsverhoeven.github.io/tags/interaction-detection/</link>
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/tags/interaction-detection-random-forest-ranger/</guid>
+      <guid>https://gsverhoeven.github.io/tags/interaction-detection/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>random forest</title>
+      <link>https://gsverhoeven.github.io/tags/random-forest/</link>
+      <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/random-forest/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ranger</title>
+      <link>https://gsverhoeven.github.io/tags/ranger/</link>
+      <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/ranger/</guid>
       <description></description>
     </item>
     
