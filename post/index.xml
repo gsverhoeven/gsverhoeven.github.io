@@ -20,6 +20,8 @@
       <description>
 
 
+&lt;div id=&#34;gertjan-verhoeven-misja-mikkers&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Gertjan Verhoeven &amp;amp; Misja Mikkers&lt;/h2&gt;
 &lt;p&gt;Here we show how to use &lt;a href=&#34;https://mc-stan.org&#34;&gt;Stan&lt;/a&gt; with the &lt;a href=&#34;https://github.com/paul-buerkner/brms&#34;&gt;brms&lt;/a&gt; R-package to calculate the posterior predictive distribution of a covariate-adjusted average treatment effect. We fit a model on simulated data that mimics a (very clean) experiment with random treatment assignment.&lt;/p&gt;
 &lt;div id=&#34;introduction&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Introduction&lt;/h3&gt;
@@ -231,6 +233,7 @@ mean(TTE$counter) * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;Take home message: PPD with brms is easy and powerful&lt;/h3&gt;
 &lt;p&gt;We hope to have demonstrated that when doing a full bayesian analysis with &lt;code&gt;brms&lt;/code&gt; and &lt;code&gt;Stan&lt;/code&gt;, it is very easy to create Posterior Predictive Distributions using &lt;code&gt;posterior_predict()&lt;/code&gt;. And that if we &lt;em&gt;have&lt;/em&gt; a posterior predictive distribution, incorporating uncertainty in various &amp;quot;marginal effects&amp;quot; type analyses becomes dead-easy. These analyses include what-if scenarios using the original data, or scenarios using new data with different covariate distributions (for example if we have an RCT that is enriched in young students, and we want to apply it to the general population). Ok, that it is for today, happy modelling!&lt;/p&gt;
 &lt;/div&gt;
+&lt;/div&gt;
 </description>
     </item>
     
@@ -398,7 +401,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       loss   accuracy 
-## 0.08484858 0.97289997&lt;/code&gt;&lt;/pre&gt;
+## 0.08376268 0.97469997&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;
@@ -1077,10 +1080,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 8 3 1 2 7
+## [1]  1 10  4  6  7
 ## 
 ## $Resample2
-## [1]  1  6 10  8  9&lt;/code&gt;&lt;/pre&gt;
+## [1] 5 3 2 1 7&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -2007,8 +2010,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.355079 
-## R squared (OOB):                  0.6550466&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.036276 
+## R squared (OOB):                  0.6698162&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -2098,8 +2101,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.767179 
-## R squared (OOB):                  0.4279085&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.569622 
+## R squared (OOB):                  0.4348793&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -2236,8 +2239,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009032278 
-## R squared (OOB):                  0.5343749&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008999277 
+## R squared (OOB):                  0.5351876&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -2331,8 +2334,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008521645 
-## R squared (OOB):                  0.5301491&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008787765 
+## R squared (OOB):                  0.5146271&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)

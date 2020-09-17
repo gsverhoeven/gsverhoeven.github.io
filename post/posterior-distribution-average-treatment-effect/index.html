@@ -590,6 +590,8 @@
       
 
 
+<div id="gertjan-verhoeven-misja-mikkers" class="section level2">
+<h2>Gertjan Verhoeven &amp; Misja Mikkers</h2>
 <p>Here we show how to use <a href="https://mc-stan.org">Stan</a> with the <a href="https://github.com/paul-buerkner/brms">brms</a> R-package to calculate the posterior predictive distribution of a covariate-adjusted average treatment effect. We fit a model on simulated data that mimics a (very clean) experiment with random treatment assignment.</p>
 <div id="introduction" class="section level3">
 <h3>Introduction</h3>
@@ -800,6 +802,7 @@ mean(TTE$counter) * 100</code></pre>
 <div id="take-home-message-ppd-with-brms-is-easy-and-powerful" class="section level3">
 <h3>Take home message: PPD with brms is easy and powerful</h3>
 <p>We hope to have demonstrated that when doing a full bayesian analysis with <code>brms</code> and <code>Stan</code>, it is very easy to create Posterior Predictive Distributions using <code>posterior_predict()</code>. And that if we <em>have</em> a posterior predictive distribution, incorporating uncertainty in various &quot;marginal effects&quot; type analyses becomes dead-easy. These analyses include what-if scenarios using the original data, or scenarios using new data with different covariate distributions (for example if we have an RCT that is enriched in young students, and we want to apply it to the general population). Ok, that it is for today, happy modelling!</p>
+</div>
 </div>
 
     </div>

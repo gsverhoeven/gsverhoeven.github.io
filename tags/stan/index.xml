@@ -20,6 +20,8 @@
       <description>
 
 
+&lt;div id=&#34;gertjan-verhoeven-misja-mikkers&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Gertjan Verhoeven &amp;amp; Misja Mikkers&lt;/h2&gt;
 &lt;p&gt;Here we show how to use &lt;a href=&#34;https://mc-stan.org&#34;&gt;Stan&lt;/a&gt; with the &lt;a href=&#34;https://github.com/paul-buerkner/brms&#34;&gt;brms&lt;/a&gt; R-package to calculate the posterior predictive distribution of a covariate-adjusted average treatment effect. We fit a model on simulated data that mimics a (very clean) experiment with random treatment assignment.&lt;/p&gt;
 &lt;div id=&#34;introduction&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Introduction&lt;/h3&gt;
@@ -230,6 +232,7 @@ mean(TTE$counter) * 100&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;take-home-message-ppd-with-brms-is-easy-and-powerful&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Take home message: PPD with brms is easy and powerful&lt;/h3&gt;
 &lt;p&gt;We hope to have demonstrated that when doing a full bayesian analysis with &lt;code&gt;brms&lt;/code&gt; and &lt;code&gt;Stan&lt;/code&gt;, it is very easy to create Posterior Predictive Distributions using &lt;code&gt;posterior_predict()&lt;/code&gt;. And that if we &lt;em&gt;have&lt;/em&gt; a posterior predictive distribution, incorporating uncertainty in various &amp;quot;marginal effects&amp;quot; type analyses becomes dead-easy. These analyses include what-if scenarios using the original data, or scenarios using new data with different covariate distributions (for example if we have an RCT that is enriched in young students, and we want to apply it to the general population). Ok, that it is for today, happy modelling!&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 </description>
     </item>

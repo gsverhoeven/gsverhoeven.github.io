@@ -657,8 +657,8 @@ my_ranger_diff</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.355079 
-## R squared (OOB):                  0.6550466</code></pre>
+## OOB prediction error (MSE):       5.036276 
+## R squared (OOB):                  0.6698162</code></pre>
 <p>It turns out the RF can &quot;explain&quot; 67% of these discrepancies.</p>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_diff)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -748,8 +748,8 @@ my_ranger_diff2</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.767179 
-## R squared (OOB):                  0.4279085</code></pre>
+## OOB prediction error (MSE):       5.569622 
+## R squared (OOB):                  0.4348793</code></pre>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_diff2)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)
@@ -886,8 +886,8 @@ my_ranger_log_diff</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009032278 
-## R squared (OOB):                  0.5343749</code></pre>
+## OOB prediction error (MSE):       0.008999277 
+## R squared (OOB):                  0.5351876</code></pre>
 <p>The RF indicates that 54% of the discrepancy can be &quot;explained&quot; by RF.</p>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_log_diff)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -981,8 +981,8 @@ my_ranger_log_diff2</code></pre>
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008521645 
-## R squared (OOB):                  0.5301491</code></pre>
+## OOB prediction error (MSE):       0.008787765 
+## R squared (OOB):                  0.5146271</code></pre>
 <pre class="r"><code>myres_tmp &lt;- ranger::importance(my_ranger_log_diff2)
 myres &lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &lt;- row.names(myres)

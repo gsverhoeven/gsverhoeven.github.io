@@ -176,7 +176,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       loss   accuracy 
-## 0.08484858 0.97289997&lt;/code&gt;&lt;/pre&gt;
+## 0.08376268 0.97469997&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;

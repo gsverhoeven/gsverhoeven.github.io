@@ -176,7 +176,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       loss   accuracy 
-## 0.08484858 0.97289997&lt;/code&gt;&lt;/pre&gt;
+## 0.08376268 0.97469997&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;
@@ -341,10 +341,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1] 8 3 1 2 7
+## [1]  1 10  4  6  7
 ## 
 ## $Resample2
-## [1]  1  6 10  8  9&lt;/code&gt;&lt;/pre&gt;
+## [1] 5 3 2 1 7&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -1159,8 +1159,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.355079 
-## R squared (OOB):                  0.6550466&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.036276 
+## R squared (OOB):                  0.6698162&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1250,8 +1250,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.767179 
-## R squared (OOB):                  0.4279085&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.569622 
+## R squared (OOB):                  0.4348793&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1388,8 +1388,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.009032278 
-## R squared (OOB):                  0.5343749&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008999277 
+## R squared (OOB):                  0.5351876&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1483,8 +1483,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008521645 
-## R squared (OOB):                  0.5301491&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008787765 
+## R squared (OOB):                  0.5146271&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
