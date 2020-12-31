@@ -18,6 +18,8 @@
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;In this post, I show how to create a Arduino-based atmospheric sensor circuit capable of storing large amounts of data on a microSD card.&lt;/p&gt;

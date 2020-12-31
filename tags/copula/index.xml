@@ -18,6 +18,8 @@
       <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/simulating-fake-data/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;This blog post is on simulating fake data. I&#39;m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;

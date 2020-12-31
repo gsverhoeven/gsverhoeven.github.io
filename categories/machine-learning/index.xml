@@ -5,7 +5,7 @@
     <link>https://gsverhoeven.github.io/categories/machine-learning/</link>
       <atom:link href="https://gsverhoeven.github.io/categories/machine-learning/index.xml" rel="self" type="application/rss+xml" />
     <description>Machine learning</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Wed, 30 Dec 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Machine learning</title>
@@ -13,11 +13,178 @@
     </image>
     
     <item>
+      <title>Jacks Car Rental as a Gym Environment</title>
+      <link>https://gsverhoeven.github.io/post/jacks-car-rental-gym/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/post/jacks-car-rental-gym/</guid>
+      <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This blogpost is about &lt;a href=&#34;https://en.wikipedia.org/wiki/Reinforcement_learning&#34;&gt;reinforcement learning&lt;/a&gt;, part of the Machine Learning (ML) / AI family of computer algorithms and techniques.
+Reinforcement learning is all about agents taking decisions in complex environments. The decisions (&lt;strong&gt;actions&lt;/strong&gt;) take the agent from a current &lt;strong&gt;state&lt;/strong&gt; or situation, to a new &lt;strong&gt;state&lt;/strong&gt;. When the probability of ending up in a new state is only dependent on the current state and the action the agent takes in that state, we are facing a so-called &lt;strong&gt;Markov Decision Problem&lt;/strong&gt;, or &lt;strong&gt;MDP&lt;/strong&gt; for short.&lt;/p&gt;
+&lt;p&gt;Back in 2016, people at OpenAI, a startup company that specializes in AI/ML, created a Python library called &lt;strong&gt;Gym&lt;/strong&gt; that provides standardized access to a range of MDP environments. Using Gym means keeping a sharp separation between the RL algorithm (“The agent”) and the environment (or task) it tries to solve / optimize / control / achieve. Gym allows us to easily benchmark RL algorithms on a range of different environments. It also allows us to more easily build on others work, and share our own work (i.e. on Github). Because when I implement something as a Gym Environment, others can then immediately apply their algorithms on it, and vice versa.&lt;/p&gt;
+&lt;p&gt;In this blogpost, we solve a famous decision problem called “Jack’s Car Rental” by first turning it into a Gym environment and then use a RL algorithm called “Policy Iteration” (a form of “Dynamic Programming”) to solve for the optimal decisions to take in this environment.&lt;/p&gt;
+&lt;p&gt;The Gym environment for Jack’s Car Rental is called &lt;code&gt;gym_jcr&lt;/code&gt; and can be installed from &lt;a href=&#34;https://github.com/gsverhoeven/gym_jcr&#34;&gt;https://github.com/gsverhoeven/gym_jcr&lt;/a&gt;.&lt;/p&gt;
+&lt;div id=&#34;jacks-car-rental-problem&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Jack’s Car Rental problem&lt;/h1&gt;
+&lt;p&gt;Learning Reinforcement learning (RL) as a student, means working through the famous &lt;a href=&#34;http://incompleteideas.net/book/the-book.html&#34;&gt;book on RL by Sutton and Barto&lt;/a&gt;. In chapter 4, Example 4.2 (2018 edition), Jack’s Car Rental problem is presented:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Jack’s Car Rental 
+
+Jack manages two locations for a nationwide car rental company. 
+Each day, some number of customers arrive at each location to rent cars. 
+If Jack has a car available, he rents it out and is credited $10 by 
+the national company. If he is out of cars at that location, then the 
+business is lost. Cars become available for renting the day after they 
+are returned. To help ensure that cars are available where they are 
+needed, Jack can move them between the two locations overnight, at a cost 
+of $2 per car moved. We assume that the number of cars requested and 
+returned at each location are Poisson random variables. Suppose Lambda is
+3 and 4 for rental requests at the first and second locations and 
+3 and 2 for returns. 
+
+To simplify the problem slightly, we assume that there can be no more than
+20 cars at each location (any additional cars are returned to the 
+nationwide company, and thus disappear from the problem) and a maximum 
+of five cars can be moved from one location to the other in one night. 
+
+We take the discount rate to be gamma = 0.9 and formulate this as a 
+continuing finite MDP, where the time steps are days, the state is the 
+number of cars at each location at the end of the day, and the actions 
+are the net numbers of cars moved between the two locations overnight.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to implement this MDP in Gym and solving it using DP (Dynamic Programming), we need to calculate for each state - action combination the probability of transitioning to all other states. Here a state is defined as the number of cars at the two locations A and B. Since there can be between 0 and 20 cars at each location, we have in total 21 x 21 = 441 states. We have 11 actions, moving up to five cars from A to B, moving up to five cars from B to A, or moving no cars at all. We also need the rewards &lt;strong&gt;R&lt;/strong&gt; for taking action &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; in state &lt;span class=&#34;math inline&#34;&gt;\(s\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Luckily for us, Christian Herta and Patrick Baumann, as part of their project &lt;a href=&#34;https://www.deep-teaching.org/&#34;&gt;“Deep.Teaching”&lt;/a&gt;, created a Jupyter Notebook containing a well explained Python code solution for calculating &lt;strong&gt;P&lt;/strong&gt;, and &lt;strong&gt;R&lt;/strong&gt;, and published it as open source under the MIT license. I extracted their functions and put them in &lt;code&gt;jcr_mdp.py&lt;/code&gt;, containing two top level functions &lt;code&gt;create_P_matrix()&lt;/code&gt; and &lt;code&gt;create_R_matrix()&lt;/code&gt;, these are used when the Gym environment is initialized.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;jackscarrentalenv&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;JacksCarRentalEnv&lt;/h1&gt;
+&lt;p&gt;My approach to creating the Gym environment for Jack’s Car Rental was to take the &lt;a href=&#34;https://gym.openai.com/envs/FrozenLake-v0/&#34;&gt;Frozen Lake Gym environment&lt;/a&gt;, and rework it to become JacksCarRentalEnv. I chose this environment because it has a similar structure as JCR, having discrete states and discrete actions. In addition, it is one of the few environments that create and expose the complete transition matrix &lt;strong&gt;P&lt;/strong&gt; needed for the DP algorithm.&lt;/p&gt;
+&lt;p&gt;There is actually not much to it at this point, as most functionality is provided by the &lt;code&gt;DiscreteEnv&lt;/code&gt; class that our environment builds on. We need only to specify four objects:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;nS: number of states&lt;/li&gt;
+&lt;li&gt;nA: number of actions&lt;/li&gt;
+&lt;li&gt;P: transitions&lt;/li&gt;
+&lt;li&gt;isd: initial state distribution (list or array of length nS)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;nS&lt;/code&gt; and &lt;code&gt;nA&lt;/code&gt; were already discussed above, there are 441 and 11 respectively.
+For the &lt;code&gt;isd&lt;/code&gt; we simply choose an equal probability to start in any of the 441 states.&lt;/p&gt;
+&lt;p&gt;This leaves us with the transitions &lt;strong&gt;P&lt;/strong&gt;. This needs to be in a particular format, a &lt;code&gt;dictionary dict of dicts of lists, where P[s][a] == [(probability, nextstate, reward, done), ...]&lt;/code&gt; according to the help of this class. So we take the &lt;strong&gt;P&lt;/strong&gt; and &lt;strong&gt;R&lt;/strong&gt; arrays created by the python code in &lt;code&gt;jcr_mdp.py&lt;/code&gt; and use these to fill the dictionary in the proper way (drawing inspiration from the Frozen Lake &lt;strong&gt;P&lt;/strong&gt; object :)).&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;P = {s : {a : [] for a in range(nA)} for s in range(nS)}
+
+# prob, next_state, reward, done
+for s in range(nS):
+    # need a state vec to extract correct probs from Ptrans
+    state_vec = np.zeros(nS)
+    state_vec[s] = 1
+    for a in range(nA):
+        prob_vec = np.dot(Ptrans[:,:,a], state_vec)
+        li = P[s][a]
+        # add rewards for all transitions
+        for ns in range(nS):
+            li.append((prob_vec[ns], ns, R[s][a], False))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And were done! Let’s try it out.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import matplotlib.pyplot as plt
+import numpy as np
+import pickle
+
+# Gym environment
+import gym
+import gym_jcr
+# RL algorithm
+from dp import *&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# n.b. can take up to 15 s
+env = gym.make(&amp;quot;JacksCarRentalEnv-v0&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So what we have?&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# print the state space and action space
+print(env.observation_space)
+print(env.action_space)
+
+# print the total number of states and actions
+print(env.nS)
+print(env.nA)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Discrete(441)
+Discrete(11)
+441
+11&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let us check for state &lt;code&gt;s= 0&lt;/code&gt;, for each action &lt;code&gt;a&lt;/code&gt;, if the probabilities of transitioning to a new state &lt;code&gt;new_state&lt;/code&gt; sum to one (we need to end up somewhere right?).&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# from state 0, for each action the probs for going to new state
+s = 0
+
+for a in range(env.nA):
+    prob = 0.0
+    for new_state in range(env.nS):
+        prob += env.P[s][a][new_state][0]
+    print(prob, end = &amp;#39; &amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 0.9999999999999992 &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Close enough. Let’s run our Dynamic Programming algorithm on it!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;policy-iteration-on-jcr&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Policy iteration on JCR&lt;/h1&gt;
+&lt;p&gt;The &lt;code&gt;policy_iteration()&lt;/code&gt; function used below is from &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/blob/master/content/post/dp.py&#34;&gt;dp.py&lt;/a&gt;. This exact same code was used in a Jupyter tutorial notebook to solve the &lt;a href=&#34;https://gym.openai.com/envs/FrozenLake-v0/&#34;&gt;Frozen-Lake Gym environment&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We reproduce the results from the Sutton &amp;amp; Barto book (p81), where the algorithm converges after four iterations. This takes about 30 min on my computer.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fullrun = False
+
+if fullrun == True:
+    policy, V = policy_iteration(env, gamma = 0.9)
+    with open(&amp;#39;policy.bin&amp;#39;, &amp;#39;wb&amp;#39;) as f:
+        pickle.dump(policy, f)
+    with open(&amp;#39;values.bin&amp;#39;, &amp;#39;wb&amp;#39;) as f:
+        pickle.dump(V, f)
+else:
+    with open(&amp;#39;policy.bin&amp;#39;, &amp;#39;rb&amp;#39;) as f:
+        policy = pickle.load(f)
+    with open(&amp;#39;values.bin&amp;#39;, &amp;#39;rb&amp;#39;) as f:
+        V = pickle.load(f)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;plot-optimal-policy-as-a-contour-map&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Plot optimal policy as a contour map&lt;/h1&gt;
+&lt;p&gt;For easy plotting, we need to transform the policy from a 2d state-action matrix to a 2d state-A, state-B matrix with the action values in the cells.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;MAX_CARS = 20
+
+def get_state_vector(a, b):
+    s = np.zeros((MAX_CARS+1)**2)
+    s[a*(MAX_CARS+1)+b] = 1
+    return s
+
+policy_map = np.zeros([MAX_CARS+1, MAX_CARS+1])
+
+for a in range(MAX_CARS+1):
+    for b in range(MAX_CARS+1):
+        state = get_state_vector(a, b)
+        s = state.argmax()
+        policy_map[a, b] = np.argmax(policy[s,:]) - 5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We visualize the optimal policy as a 2d heatmap using &lt;code&gt;matplotlib.pyplot.imshow()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;plt.figure(figsize=(7,6))
+hmap = plt.imshow(policy_map, cmap=&amp;#39;viridis&amp;#39;, origin=&amp;#39;lower&amp;#39;)
+cbar = plt.colorbar(hmap)
+cbar.ax.set_ylabel(&amp;#39;actions&amp;#39;)
+plt.title(&amp;#39;Policy&amp;#39;)
+plt.xlabel(&amp;quot;cars at B&amp;quot;)
+plt.ylabel(&amp;quot;cars at A&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-12-30-jacks_car_rental_gym_files/2020-12-30-jacks_car_rental_gym_13_1.png&#34; alt=&#34;png&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion-and-outlook&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion and outlook&lt;/h1&gt;
+&lt;p&gt;Conclusion: yes we can turn JCR into a Gym environment and solve it using the exact same code we used to solve the Frozen Lake environment!&lt;/p&gt;
+&lt;p&gt;So now what? One obvious area of improvement is speed: It takes too long to load the environment. Also the DP algorithm is slow, because it uses for loops instead of matrix operations.&lt;/p&gt;
+&lt;p&gt;Another thing is that currently the rewards that the environment returns are &lt;strong&gt;average expected rewards&lt;/strong&gt; that are received when taking action &lt;em&gt;a&lt;/em&gt; in state &lt;em&gt;s&lt;/em&gt; . However, they do not match the actual amount of cars rented when transitioning from a particular state &lt;em&gt;s&lt;/em&gt; to a new state &lt;em&gt;s’&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Finally, adding the modifications to the problem from Exercise 4.7 could also be implemented, but this complicates the calculation of &lt;strong&gt;P&lt;/strong&gt; and &lt;strong&gt;R&lt;/strong&gt; even further.
+For me, this is the real takeaway from this exercise: it is really hard to compute the complete set of proper transition probabilities and rewards for an MDP, but it is much easier if we just need to simulate single transitions according to the MDP specification. Wikipedia has a nice paragraph on it under &lt;a href=&#34;https://en.wikipedia.org/wiki/Markov_decision_process#Simulator_models&#34;&gt;simulator models for MDPs&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Building TensorFlow 2.2 on an old PC</title>
       <link>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</link>
       <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 &lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
 &lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
 &lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
@@ -110,11 +277,11 @@ for (idx in 1:12) {
 ## ================================================================================
 ## flatten (Flatten)                   (None, 784)                     0           
 ## ________________________________________________________________________________
-## dense (Dense)                       (None, 128)                     100480      
+## dense_1 (Dense)                     (None, 128)                     100480      
 ## ________________________________________________________________________________
 ## dropout (Dropout)                   (None, 128)                     0           
 ## ________________________________________________________________________________
-## dense_1 (Dense)                     (None, 10)                      1290        
+## dense (Dense)                       (None, 10)                      1290        
 ## ================================================================================
 ## Total params: 101,770
 ## Trainable params: 101,770
@@ -136,7 +303,7 @@ model %&amp;gt;% plot_model()&lt;/code&gt;&lt;/pre&gt;
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:672px;height:480px;&#34; class=&#34;grViz html-widget&#34;&gt;&lt;/div&gt;
-&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [layout = \&#34;neato\&#34;,\n       outputorder = \&#34;edgesfirst\&#34;,\n       bgcolor = \&#34;white\&#34;]\n\nnode [fontname = \&#34;Helvetica\&#34;,\n      fontsize = \&#34;10\&#34;,\n      shape = \&#34;circle\&#34;,\n      fixedsize = \&#34;true\&#34;,\n      width = \&#34;0.5\&#34;,\n      style = \&#34;filled\&#34;,\n      fillcolor = \&#34;aliceblue\&#34;,\n      color = \&#34;gray70\&#34;,\n      fontcolor = \&#34;gray50\&#34;]\n\nedge [fontname = \&#34;Helvetica\&#34;,\n     fontsize = \&#34;8\&#34;,\n     len = \&#34;1.5\&#34;,\n     color = \&#34;gray80\&#34;,\n     arrowsize = \&#34;0.5\&#34;]\n\n  \&#34;1\&#34; [label = \&#34;flatten\nFlatten\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,4!\&#34;] \n  \&#34;2\&#34; [label = \&#34;dense\nDense\nrelu\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,3!\&#34;] \n  \&#34;3\&#34; [label = \&#34;dropout\nDropout\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,2!\&#34;] \n  \&#34;4\&#34; [label = \&#34;dense_1\nDense\nsoftmax\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,1!\&#34;] \n  \&#34;1\&#34;-&gt;\&#34;2\&#34; \n  \&#34;2\&#34;-&gt;\&#34;3\&#34; \n  \&#34;3\&#34;-&gt;\&#34;4\&#34; \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [layout = \&#34;neato\&#34;,\n       outputorder = \&#34;edgesfirst\&#34;,\n       bgcolor = \&#34;white\&#34;]\n\nnode [fontname = \&#34;Helvetica\&#34;,\n      fontsize = \&#34;10\&#34;,\n      shape = \&#34;circle\&#34;,\n      fixedsize = \&#34;true\&#34;,\n      width = \&#34;0.5\&#34;,\n      style = \&#34;filled\&#34;,\n      fillcolor = \&#34;aliceblue\&#34;,\n      color = \&#34;gray70\&#34;,\n      fontcolor = \&#34;gray50\&#34;]\n\nedge [fontname = \&#34;Helvetica\&#34;,\n     fontsize = \&#34;8\&#34;,\n     len = \&#34;1.5\&#34;,\n     color = \&#34;gray80\&#34;,\n     arrowsize = \&#34;0.5\&#34;]\n\n  \&#34;1\&#34; [label = \&#34;flatten\nFlatten\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,4!\&#34;] \n  \&#34;2\&#34; [label = \&#34;dense_1\nDense\nrelu\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,3!\&#34;] \n  \&#34;3\&#34; [label = \&#34;dropout\nDropout\n\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,2!\&#34;] \n  \&#34;4\&#34; [label = \&#34;dense\nDense\nsoftmax\&#34;, shape = \&#34;rectangle\&#34;, fixedsize = \&#34;FALSE\&#34;, fillcolor = \&#34;#F0F8FF\&#34;, fontcolor = \&#34;#000000\&#34;, pos = \&#34;0,1!\&#34;] \n  \&#34;1\&#34;-&gt;\&#34;2\&#34; \n  \&#34;2\&#34;-&gt;\&#34;3\&#34; \n  \&#34;3\&#34;-&gt;\&#34;4\&#34; \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compile-the-model&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Compile the model&lt;/h1&gt;
@@ -176,7 +343,7 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model %&amp;gt;% 
   evaluate(mnist$test$x, mnist$test$y, verbose = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##       loss   accuracy 
-## 0.08376268 0.97469997&lt;/code&gt;&lt;/pre&gt;
+## 0.08686701 0.97399998&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Our model achieved ~98% accuracy on the test set.&lt;/p&gt;
 &lt;p&gt;Awesome.&lt;/p&gt;
 &lt;/div&gt;
@@ -189,6 +356,8 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
@@ -341,10 +510,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1]  1 10  4  6  7
+## [1]  4  3  7  9 10
 ## 
 ## $Resample2
-## [1] 5 3 2 1 7&lt;/code&gt;&lt;/pre&gt;
+## [1]  8  6  1  7 10&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;
@@ -580,6 +749,8 @@ lgocv_res&lt;/code&gt;&lt;/pre&gt;
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
@@ -590,9 +761,9 @@ library(dbarts)
 library(ggplot2)
 library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ✔ tibble  3.0.3     ✔ dplyr   1.0.2
+&lt;pre&gt;&lt;code&gt;## ✔ tibble  3.0.4     ✔ dplyr   1.0.2
 ## ✔ tidyr   1.1.2     ✔ stringr 1.4.0
-## ✔ readr   1.3.1     ✔ forcats 0.5.0
+## ✔ readr   1.4.0     ✔ forcats 0.5.0
 ## ✔ purrr   0.3.4&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ tidyr::extract() masks dbarts::extract()
@@ -601,15 +772,9 @@ library(tidyverse)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(grf)
 #devtools::install_github(&amp;quot;vdorie/aciccomp/2017&amp;quot;)
 library(aciccomp2017)
-library(cowplot)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## 
-## ********************************************************&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## Note: As of version 1.0.0, cowplot does not change the&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   default ggplot2 theme anymore. To recover the previous&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   behavior, execute:
-##   theme_set(theme_cowplot())&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ********************************************************&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;CalcPosteriors.R&amp;quot;)
+library(cowplot)
+
+source(&amp;quot;CalcPosteriors.R&amp;quot;)
 
 fullrun &amp;lt;- 0&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -1090,6 +1255,8 @@ bartp&lt;/code&gt;&lt;/pre&gt;
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
@@ -1159,8 +1326,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.036276 
-## R squared (OOB):                  0.6698162&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.151991 
+## R squared (OOB):                  0.6674631&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1250,8 +1417,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.569622 
-## R squared (OOB):                  0.4348793&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.604118 
+## R squared (OOB):                  0.4399596&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -1388,8 +1555,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008999277 
-## R squared (OOB):                  0.5351876&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009132647 
+## R squared (OOB):                  0.5268126&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -1483,8 +1650,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008787765 
-## R squared (OOB):                  0.5146271&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008653356 
+## R squared (OOB):                  0.5201821&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)

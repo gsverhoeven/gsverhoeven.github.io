@@ -5,12 +5,44 @@
     <link>https://gsverhoeven.github.io/tags/</link>
       <atom:link href="https://gsverhoeven.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 04 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Wed, 30 Dec 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
       <link>https://gsverhoeven.github.io/tags/</link>
     </image>
+    
+    <item>
+      <title>AI</title>
+      <link>https://gsverhoeven.github.io/tags/ai/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/ai/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>OpenAI Gym</title>
+      <link>https://gsverhoeven.github.io/tags/openai-gym/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/openai-gym/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Python</title>
+      <link>https://gsverhoeven.github.io/tags/python/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Reinforcement learning</title>
+      <link>https://gsverhoeven.github.io/tags/reinforcement-learning/</link>
+      <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
+      <guid>https://gsverhoeven.github.io/tags/reinforcement-learning/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>bayesian statistics</title>

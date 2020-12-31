@@ -588,6 +588,8 @@
 
     <div class="article-style">
       
+<link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
 
 <p>In this blog post, we explore how to implement the <em>validation set approach</em> in <code>caret</code>. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook <a href="http://www-bcf.usc.edu/~gareth/ISL/">&quot;An introduction to Statistical Learning&quot;</a> uses the validation set approach to introduce resampling methods.</p>
@@ -740,10 +742,10 @@ createRandomDataPartition &lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)</code></pre>
 <pre><code>## $Resample1
-## [1]  1 10  4  6  7
+## [1]  4  3  7  9 10
 ## 
 ## $Resample2
-## [1] 5 3 2 1 7</code></pre>
+## [1]  8  6  1  7 10</code></pre>
 </div>
 <div id="the-validation-set-approach-without-caret" class="section level1">
 <h1>The validation set approach without caret</h1>

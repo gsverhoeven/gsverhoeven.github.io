@@ -18,6 +18,8 @@
       <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/exploring-process-mining/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;In this post, we&#39;ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;

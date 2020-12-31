@@ -18,6 +18,8 @@
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
@@ -170,10 +172,10 @@ createRandomDataPartition &amp;lt;- function(y, times, p) {
 
 createRandomDataPartition(1:10, times = 2, p = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## $Resample1
-## [1]  1 10  4  6  7
+## [1]  4  3  7  9 10
 ## 
 ## $Resample2
-## [1] 5 3 2 1 7&lt;/code&gt;&lt;/pre&gt;
+## [1]  8  6  1  7 10&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-validation-set-approach-without-caret&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The validation set approach without caret&lt;/h1&gt;

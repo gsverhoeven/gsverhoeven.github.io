@@ -18,6 +18,8 @@
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
       <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
       <description>
+&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
@@ -87,8 +89,8 @@ my_ranger_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.036276 
-## R squared (OOB):                  0.6698162&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.151991 
+## R squared (OOB):                  0.6674631&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It turns out the RF can &amp;quot;explain&amp;quot; 67% of these discrepancies.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -178,8 +180,8 @@ my_ranger_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       5.569622 
-## R squared (OOB):                  0.4348793&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       5.604118 
+## R squared (OOB):                  0.4399596&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
@@ -316,8 +318,8 @@ my_ranger_log_diff&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008999277 
-## R squared (OOB):                  0.5351876&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.009132647 
+## R squared (OOB):                  0.5268126&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The RF indicates that 54% of the discrepancy can be &amp;quot;explained&amp;quot; by RF.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
@@ -411,8 +413,8 @@ my_ranger_log_diff2&lt;/code&gt;&lt;/pre&gt;
 ## Target node size:                 5 
 ## Variable importance mode:         permutation 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       0.008787765 
-## R squared (OOB):                  0.5146271&lt;/code&gt;&lt;/pre&gt;
+## OOB prediction error (MSE):       0.008653356 
+## R squared (OOB):                  0.5201821&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myres_tmp &amp;lt;- ranger::importance(my_ranger_log_diff2)
 myres &amp;lt;- cbind(names(myres_tmp), myres_tmp,  i = 1)
 #my_rownames &amp;lt;- row.names(myres)
