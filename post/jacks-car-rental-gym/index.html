@@ -600,7 +600,7 @@ Reinforcement learning is all about agents taking decisions in complex environme
 <div id="jacks-car-rental-problem" class="section level1">
 <h1>Jack’s Car Rental problem</h1>
 <p>Learning Reinforcement learning (RL) as a student, means working through the famous <a href="http://incompleteideas.net/book/the-book.html">book on RL by Sutton and Barto</a>. In chapter 4, Example 4.2 (2018 edition), Jack’s Car Rental problem is presented:</p>
-<pre><code>Jack’s Car Rental 
+<pre class="plaintext"><code>Jack’s Car Rental 
 
 Jack manages two locations for a nationwide car rental company. 
 Each day, some number of customers arrive at each location to rent cars. 
@@ -732,17 +732,17 @@ plt.title(&#39;Policy&#39;)
 plt.xlabel(&quot;cars at B&quot;)
 plt.ylabel(&quot;cars at A&quot;)</code></pre>
 <div class="figure">
-<img src="/post/2020-12-30-jacks_car_rental_gym_files/2020-12-30-jacks_car_rental_gym_13_1.png" alt="png" />
-<p class="caption">png</p>
+<img src="/post/2020-12-30-jacks_car_rental_gym_files/2020-12-30-jacks_car_rental_gym_13_1.png" alt="Optimal policy for all states of Jack’s Car Rental" />
+<p class="caption">Optimal policy for all states of Jack’s Car Rental</p>
 </div>
 </div>
 <div id="conclusion-and-outlook" class="section level1">
 <h1>Conclusion and outlook</h1>
-<p>Conclusion: yes we can turn JCR into a Gym environment and solve it using the exact same code we used to solve the Frozen Lake environment!</p>
+<p>Conclusion: yes we can turn JCR into a Gym environment and solve it using the exact same (policy iteration) code that I had earlier used to solve the Frozen-Lake Gym environment!</p>
 <p>So now what? One obvious area of improvement is speed: It takes too long to load the environment. Also the DP algorithm is slow, because it uses for loops instead of matrix operations.</p>
 <p>Another thing is that currently the rewards that the environment returns are <strong>average expected rewards</strong> that are received when taking action <em>a</em> in state <em>s</em> . However, they do not match the actual amount of cars rented when transitioning from a particular state <em>s</em> to a new state <em>s’</em>.</p>
-<p>Finally, adding the modifications to the problem from Exercise 4.7 could also be implemented, but this complicates the calculation of <strong>P</strong> and <strong>R</strong> even further.
-For me, this is the real takeaway from this exercise: it is really hard to compute the complete set of proper transition probabilities and rewards for an MDP, but it is much easier if we just need to simulate single transitions according to the MDP specification. Wikipedia has a nice paragraph on it under <a href="https://en.wikipedia.org/wiki/Markov_decision_process#Simulator_models">simulator models for MDPs</a>.</p>
+<p>Finally, adding the modifications to the problem from Exercise 4.7 in Sutton &amp; Barto could also be implemented, but this complicates the calculation of <strong>P</strong> and <strong>R</strong> even further.
+For me, this is the real takeaway from this exercise: it is really hard to (correctly) compute the complete set of transition probabilities and rewards for an MDP, but it is much easier if we just need to simulate single transitions according to the MDP specification. Wikipedia has a nice paragraph on it under <a href="https://en.wikipedia.org/wiki/Markov_decision_process#Simulator_models">simulator models for MDPs</a>.</p>
 </div>
 
     </div>
@@ -1010,6 +1010,8 @@ For me, this is the real takeaway from this exercise: it is really hard to compu
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/python.min.js"></script>
         
       
 
