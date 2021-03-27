@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>grf | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/tags/grf/</link>
-      <atom:link href="https://gsverhoeven.github.io/tags/grf/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/grf/</link>
+      <atom:link href="/tags/grf/index.xml" rel="self" type="application/rss+xml" />
     <description>grf</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 15 Dec 2018 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>grf</title>
-      <link>https://gsverhoeven.github.io/tags/grf/</link>
+      <link>/tags/grf/</link>
     </image>
     
     <item>
       <title>BART vs Causal forests showdown</title>
-      <link>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</link>
+      <link>/post/bart_vs_grf/bart-vs-grf-showdown/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
+      <guid>/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
@@ -77,7 +77,7 @@ df &amp;lt;- data.frame(x, y, y_true = Ey)&lt;/code&gt;&lt;/pre&gt;
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s1.rds&amp;quot;)}
 
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;MCMC or sigma looks ok.&lt;/p&gt;
 &lt;div id=&#34;compare-bart-fit-to-true-values&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;compare BART fit to true values&lt;/h3&gt;
@@ -93,7 +93,7 @@ bartp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, y
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks nice.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -111,7 +111,7 @@ df3 &amp;lt;- data.frame(df3, y)
 ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
   geom_point() + 
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This is pretty bad compared to BART. What&#39;s wrong here?&lt;/p&gt;
 &lt;p&gt;From reference.md: &lt;strong&gt;GRF isn&#39;t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
@@ -135,7 +135,7 @@ grfp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ym
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Ah! better now. But Grf still worse than BART. We ran with 2000 trees and turned of honesty. Perhaps dataset too small? Maybe check out the sample.fraction parameter? Sample.fraction is set by default at 0.5, so only half of data is used to grow tree. OR use tune.parameters = TRUE&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-methods&#34; class=&#34;section level2&#34;&gt;
@@ -144,7 +144,7 @@ grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dataset-2-simulated-data-from-acic-2017&#34; class=&#34;section level1&#34;&gt;
@@ -204,7 +204,7 @@ if(fullrun){
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s2.rds&amp;quot;)}
 
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;div id=&#34;extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit&lt;/h3&gt;
 &lt;p&gt;This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.&lt;/p&gt;
@@ -221,7 +221,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = 1:nrow(sim), qm))  +
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks sort of ok, but still weird. Some points it gets REALLY wrong.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;calculate-coverage&#34; class=&#34;section level3&#34;&gt;
@@ -274,7 +274,7 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = 1:nrow(df_sep2), y = qm))   +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This works ok now.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-both-methods&#34; class=&#34;section level2&#34;&gt;
@@ -284,7 +284,7 @@ grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dataset-3-simulated-data-used-by-grf-example&#34; class=&#34;section level1&#34;&gt;
@@ -327,7 +327,7 @@ res &amp;lt;- data.frame(df, pred = tau.hat.oob$predictions)
 ggplot(res, aes(x = X1, y = pred)) + geom_point() + geom_smooth() + geom_abline(intercept = 0, slope = 1) +
   geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;ate-att&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;ATE &amp;amp; ATT&lt;/h2&gt;
@@ -369,7 +369,7 @@ grfp &amp;lt;- ggplot(df_res, aes(x = X1, y = qm)) +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-bart-on-this-dataset&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
@@ -382,7 +382,7 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s10.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s10.rds&amp;quot;)}
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
@@ -396,7 +396,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = X1, qm)) + geom_linerange(aes(ymin = ql, yma
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Compare&lt;/h2&gt;
@@ -404,7 +404,7 @@ bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Here Grf appears more accurate. Mental note: Both W and TAU function of X1.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -475,7 +475,7 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-bart-on-this-dataset-1&#34; class=&#34;section level2&#34;&gt;
@@ -489,7 +489,7 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s9.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s9.rds&amp;quot;)}
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
@@ -503,7 +503,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = X3, qm)) + geom_linerange(aes(ymin = ql, yma
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-bart-and-grf&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Compare BART and grf&lt;/h2&gt;
@@ -511,7 +511,7 @@ bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Very similar results. BART appears slightly more accurate, especially for low values of X3.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;

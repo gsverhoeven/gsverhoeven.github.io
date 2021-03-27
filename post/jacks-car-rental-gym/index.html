@@ -31,7 +31,7 @@
   <meta name="description" content="In this blogpost, we solve a famous sequential decision problem called Jacks Car Rental by first turning it into a Gym environment and then use a RL algorithm called Policy Iteration (a form of Dynamic Programming) to solve for the optimal decisions to take in this environment.">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://gsverhoeven.github.io/post/jacks-car-rental-gym/">
+  <link rel="alternate" hreflang="en-us" href="/post/jacks-car-rental-gym/">
 
   
 
@@ -207,6 +207,42 @@
 
 
 
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
   
 
 
@@ -216,7 +252,7 @@
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://gsverhoeven.github.io/post/jacks-car-rental-gym/">
+  <link rel="canonical" href="/post/jacks-car-rental-gym/">
 
   
   
@@ -232,10 +268,10 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="https://gsverhoeven.github.io/post/jacks-car-rental-gym/">
+  <meta property="og:url" content="/post/jacks-car-rental-gym/">
   <meta property="og:title" content="Jacks Car Rental as a Gym Environment | Gertjan Verhoeven">
-  <meta property="og:description" content="In this blogpost, we solve a famous sequential decision problem called Jacks Car Rental by first turning it into a Gym environment and then use a RL algorithm called Policy Iteration (a form of Dynamic Programming) to solve for the optimal decisions to take in this environment."><meta property="og:image" content="https://gsverhoeven.github.io/img/headers/pexels-josh-sorenson-1054387.png">
-  <meta property="twitter:image" content="https://gsverhoeven.github.io/img/headers/pexels-josh-sorenson-1054387.png"><meta property="og:locale" content="en-us">
+  <meta property="og:description" content="In this blogpost, we solve a famous sequential decision problem called Jacks Car Rental by first turning it into a Gym environment and then use a RL algorithm called Policy Iteration (a form of Dynamic Programming) to solve for the optimal decisions to take in this environment."><meta property="og:image" content="/img/headers/pexels-josh-sorenson-1054387.png">
+  <meta property="twitter:image" content="/img/headers/pexels-josh-sorenson-1054387.png"><meta property="og:locale" content="en-us">
   
     
       <meta property="article:published_time" content="2020-12-30T00:00:00&#43;00:00">
@@ -266,7 +302,7 @@
   "@type": "BlogPosting",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://gsverhoeven.github.io/post/jacks-car-rental-gym/"
+    "@id": "/post/jacks-car-rental-gym/"
   },
   "headline": "Jacks Car Rental as a Gym Environment",
   
@@ -283,7 +319,7 @@
     "name": "Gertjan Verhoeven",
     "logo": {
       "@type": "ImageObject",
-      "url": "img/https://gsverhoeven.github.io/"
+      "url": "img//"
     }
   },
   "description": "In this blogpost, we solve a famous sequential decision problem called Jacks Car Rental by first turning it into a Gym environment and then use a RL algorithm called Policy Iteration (a form of Dynamic Programming) to solve for the optimal decisions to take in this environment."
@@ -778,7 +814,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://gsverhoeven.github.io/post/jacks-car-rental-gym/&amp;text=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=/post/jacks-car-rental-gym/&amp;text=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -791,7 +827,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://gsverhoeven.github.io/post/jacks-car-rental-gym/&amp;t=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=/post/jacks-car-rental-gym/&amp;t=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -804,7 +840,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
       
       
       <li>
-        <a href="mailto:?subject=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment&amp;body=https://gsverhoeven.github.io/post/jacks-car-rental-gym/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment&amp;body=/post/jacks-car-rental-gym/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -817,7 +853,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://gsverhoeven.github.io/post/jacks-car-rental-gym/&amp;title=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=/post/jacks-car-rental-gym/&amp;title=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -830,7 +866,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment%20https://gsverhoeven.github.io/post/jacks-car-rental-gym/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment%20/post/jacks-car-rental-gym/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -843,7 +879,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://gsverhoeven.github.io/post/jacks-car-rental-gym/&amp;title=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=/post/jacks-car-rental-gym/&amp;title=Jacks%20Car%20Rental%20as%20a%20Gym%20Environment" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
@@ -882,7 +918,7 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
     
 
     <div class="media-body">
-      <h5 class="card-title"><a href="https://gsverhoeven.github.io/">Gertjan Verhoeven</a></h5>
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
       <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
       <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods.</p>
       <ul class="network-icon" aria-hidden="true">

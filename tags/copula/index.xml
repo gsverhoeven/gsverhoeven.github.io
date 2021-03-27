@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>copula | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/tags/copula/</link>
-      <atom:link href="https://gsverhoeven.github.io/tags/copula/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/copula/</link>
+      <atom:link href="/tags/copula/index.xml" rel="self" type="application/rss+xml" />
     <description>copula</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>copula</title>
-      <link>https://gsverhoeven.github.io/tags/copula/</link>
+      <link>/tags/copula/</link>
     </image>
     
     <item>
       <title>Simulating Fake Data in R</title>
-      <link>https://gsverhoeven.github.io/post/simulating-fake-data/</link>
+      <link>/post/simulating-fake-data/</link>
       <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/simulating-fake-data/</guid>
+      <guid>/post/simulating-fake-data/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;This blog post is on simulating fake data. I&#39;m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
@@ -59,7 +59,7 @@ df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e4,
 &lt;p&gt;Did it work?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
   geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1, df$X2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.6985089&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Great!&lt;/p&gt;
@@ -72,10 +72,10 @@ df$X2_U &amp;lt;- pnorm(df$X2)
 
 ggplot(df, aes(x = X1_U)) + geom_histogram(boundary = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_U, y = X2_U)) +
   geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;And here&#39;s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_U, df$X2_U)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.677868&lt;/code&gt;&lt;/pre&gt;
@@ -90,12 +90,12 @@ df$X2_NORM &amp;lt;- qnorm(df$X2_U, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
   geom_histogram(boundary = 0) +
   geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X2_NORM)) + 
   geom_histogram(boundary = 0) +
   geom_vline(xintercept = 10, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Ok, that worked nicely. But what about their correlation?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_GAM, df$X2_NORM)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## [1] 0.682233&lt;/code&gt;&lt;/pre&gt;
@@ -136,7 +136,7 @@ cor(dt[,-&amp;quot;id&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
   geom_histogram(boundary = 0) +
   geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;generate-correlated-binary-variables&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Generate correlated binary variables&lt;/h1&gt;
@@ -203,7 +203,7 @@ df &amp;lt;- data.frame(MASS::mvrnorm(n = 10000,
 &lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
   geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Ok, where to put the thresholds? That&#39;s simple, we just need to use the &lt;code&gt;quantile distribution function&lt;/code&gt; to partition the marginal normal variables into 0 and 1 portions.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
 df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
@@ -217,7 +217,7 @@ mean(df$B1)&lt;/code&gt;&lt;/pre&gt;
   geom_point(alpha = 0.3) + 
   geom_vline(xintercept = qnorm(0.2), col = &amp;quot;red&amp;quot;) +
   geom_hline(yintercept = qnorm(0.8), col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Nice.&lt;/p&gt;
 &lt;p&gt;Ok, so now what is the correlation for these two binary variables?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;

@@ -2,28 +2,28 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>tensorflow | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/tags/tensorflow/</link>
-      <atom:link href="https://gsverhoeven.github.io/tags/tensorflow/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/tensorflow/</link>
+      <atom:link href="/tags/tensorflow/index.xml" rel="self" type="application/rss+xml" />
     <description>tensorflow</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 15 May 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>tensorflow</title>
-      <link>https://gsverhoeven.github.io/tags/tensorflow/</link>
+      <link>/tags/tensorflow/</link>
     </image>
     
     <item>
       <title>Building TensorFlow 2.2 on an old PC</title>
-      <link>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</link>
+      <link>/post/deep-learning-tensorflow-keras/</link>
       <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</guid>
+      <guid>/post/deep-learning-tensorflow-keras/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
@@ -96,7 +96,7 @@ for (idx in 1:12) {
     image(1:28, 1:28, im, col=gray((0:255)/255), 
           xaxt=&amp;#39;n&amp;#39;, main=paste(y_train[idx]))
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;keras-model&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Keras model&lt;/h1&gt;
@@ -171,7 +171,7 @@ id &amp;lt;- 9
 ggplot(data.frame(digit = 0:9, prob = predictions[id,]), 
        aes(x = factor(digit), y = prob)) + geom_col() +
   ggtitle(paste0(&amp;quot;prediction for true value of &amp;quot;, mnist$test$y[id]))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;check-model-performance-on-the-test-set&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Check model performance on the test set&lt;/h1&gt;

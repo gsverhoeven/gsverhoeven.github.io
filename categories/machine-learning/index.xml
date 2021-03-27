@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Machine learning | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/categories/machine-learning/</link>
-      <atom:link href="https://gsverhoeven.github.io/categories/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+    <link>/categories/machine-learning/</link>
+      <atom:link href="/categories/machine-learning/index.xml" rel="self" type="application/rss+xml" />
     <description>Machine learning</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sun, 07 Mar 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Machine learning</title>
-      <link>https://gsverhoeven.github.io/categories/machine-learning/</link>
+      <link>/categories/machine-learning/</link>
     </image>
     
     <item>
       <title>OpenAI Gym&#39;s FrozenLake: Converging on the true Q-values</title>
-      <link>https://gsverhoeven.github.io/post/frozenlake-qlearning-convergence/</link>
+      <link>/post/frozenlake-qlearning-convergence/</link>
       <pubDate>Sun, 07 Mar 2021 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/frozenlake-qlearning-convergence/</guid>
+      <guid>/post/frozenlake-qlearning-convergence/</guid>
       <description>
 
 
@@ -54,7 +54,7 @@ env = FrozenLakeEnv(is_slippery = True)&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;Frozen Lake Environment description&lt;/h2&gt;
 &lt;p&gt;&lt;em&gt;Winter is here. You and your friends were tossing around a frisbee at the park when you made a wild throw that left the frisbee out in the middle of the lake (G).
 The water is mostly frozen (F), but there are a few holes (H) where the ice has melted.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Frozen-Lake.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Frozen-Lake.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;If you step into one of those holes, you’ll fall into the freezing water. At this time, there’s an international frisbee shortage, so it’s absolutely imperative that you navigate across the lake and retrieve the disc. However, the ice is slippery, so you won’t always move in the direction you intend.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;The episode ends when you reach the goal or fall in a hole. You receive a reward of 1 if you reach the goal, and zero otherwise.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;The agent moves through a &lt;span class=&#34;math inline&#34;&gt;\(4 \times 4\)&lt;/span&gt; gridworld, with states numbered as follows:&lt;/p&gt;
@@ -83,7 +83,7 @@ The Q-value for the first state will then tell us the average episodic reward, w
 
 
 plot_values(V_pi)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_9_1.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_9_1.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The Q-value for state &lt;code&gt;s = 0&lt;/code&gt; is &lt;code&gt;0.824&lt;/code&gt;. This means that for &lt;code&gt;gamma = 1&lt;/code&gt; and following an optimal policy &lt;span class=&#34;math inline&#34;&gt;\(\pi^*\)&lt;/span&gt;, 82.4% of all episodes ends in succes.&lt;/p&gt;
 &lt;p&gt;As already mentioned above, for computational reasons we will apply Q-learning to the environment with &lt;code&gt;gamma = 0.95&lt;/code&gt;. So… lets solve FrozenLake for &lt;code&gt;gamma = 0.95&lt;/code&gt; as well:&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# obtain the optimal policy and optimal state-value function
@@ -95,7 +95,7 @@ Q_perfect = create_q_dict_from_v(env, V_pi_dc, gamma = 0.95)
 df_true = convert_vals_to_pd(V_pi_dc)
 
 plot_values(V_pi_dc)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_11_1.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_11_1.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now, comparing the optimal policies for &lt;code&gt;gamma = 0.95&lt;/code&gt; and for &lt;code&gt;gamma = 1&lt;/code&gt; (not shown here) we find that they are not the same. Therefore, 82.4% succes rate is likely an upper bound for &lt;code&gt;gamma = 0.95&lt;/code&gt;, since introducing discounting in this stochastic environment can (intuitively) either have no effect on the optimal policy, or favor more risky (lower succes rate) but faster (less discounting) policies, leading to a lower overall succes rate.&lt;/p&gt;
 &lt;p&gt;For example, for the undiscounted case, the Agent is indifferent in choosing direction in the first state. If it ends up going &lt;strong&gt;right&lt;/strong&gt; , it can choose UP and wander around at the top row at no cost until it reaches the starting state again. As soon as this wandering around gets a cost by discounting we see (not shown) that the Agent is no longer indifferent, and does NOT want to end up wandering in the top row, but chooses to play LEFT in state &lt;code&gt;s = 0&lt;/code&gt; instead.&lt;/p&gt;
 &lt;/div&gt;
@@ -147,7 +147,7 @@ else:
 epsilon_schedule = create_epsilon_schedule(100_000)
 
 plot_schedule(epsilon_schedule, ylab = &amp;#39;Epsilon&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_20_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_20_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;My version of the Q-learning algorithm has slowly evolved to include more and more lists of things to monitor during the execution of the algorithm. Every 100 episodes, a copy of &lt;span class=&#34;math inline&#34;&gt;\(Q^{*}_{s}\)&lt;/span&gt; and of &lt;span class=&#34;math inline&#34;&gt;\(Q_{s, a}\)&lt;/span&gt; is stored in a list, as well as the average reward over this episode, as well as the final &lt;span class=&#34;math inline&#34;&gt;\(Q_{s,a}\)&lt;/span&gt; table, and &lt;span class=&#34;math inline&#34;&gt;\(N_{s,a}\)&lt;/span&gt; that kept track of how often each state-action was chosen. The &lt;code&gt;dill&lt;/code&gt; package is used to store these datastructures on disk to avoid the need to rerun the algorithm every time the notebook is run.&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# K / N + K decay learning rate schedule
 # fully random policy
@@ -203,7 +203,7 @@ df_scores = pd.DataFrame(
     + p9.geom_hline(yintercept = 0.781, colour = &amp;quot;red&amp;quot;)
     + p9.geom_vline(xintercept = 60_000, color = &amp;quot;blue&amp;quot;))
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_24_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_24_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;But now comes the big question: did the &lt;span class=&#34;math inline&#34;&gt;\(Q^{*}_{a}\)&lt;/span&gt; estimates converge onto the true values as well?&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;q_showdown = pd.DataFrame(
     {&amp;#39;Q_es1_lasttable&amp;#39;: Q_es1_lasttable,
@@ -214,7 +214,7 @@ q_showdown = pd.melt(q_showdown, [&amp;#39;state&amp;#39;])
 
 (p9.ggplot(data = q_showdown, mapping = p9.aes(x = &amp;#39;state&amp;#39;, y = &amp;#39;value&amp;#39;, color = &amp;#39;factor(variable)&amp;#39;))
 + p9.geom_point(size = 5, shape = &amp;#39;x&amp;#39;))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_26_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_26_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Nope, they did not. Ok, most learned Q-values are close to their true values, but they clearly did not converge exactly to their true value.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;plotting-the-learning-curves-for-all-the-state-action-values&#34; class=&#34;section level1&#34;&gt;
@@ -231,7 +231,7 @@ dfm = list_of_tables_to_df(Qtable_list)&lt;/code&gt;&lt;/pre&gt;
     + p9.facet_wrap(&amp;quot;variable&amp;quot;, ncol = 4)
     + p9.theme(subplots_adjust={&amp;#39;wspace&amp;#39;:0.4}) # fix a displaying issue
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_30_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_30_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;First the main question: what about convergence of &lt;span class=&#34;math inline&#34;&gt;\(Q^{*}_{a}\)&lt;/span&gt;? For this we need only to look, for each state, at the action with the highest value, and compare that to the true value (red horizontal lines). Most of the values appear to have converged to a value close to the true value, but Q3 is clearly still way off. Note that we using smoothing here to average out the fluctuations around the true value.&lt;/p&gt;
 &lt;p&gt;We noted earlier that at around episode 60.000, the optimal policy emerges and the learning curve becomes flat. Now, the most obvious reason why performance increases is because the value of &lt;span class=&#34;math inline&#34;&gt;\(\epsilon\)&lt;/span&gt; is decaying, so the deleterious effects of exploration should go down, and performance should go up.&lt;/p&gt;
 &lt;p&gt;Another reason that performance goes up could be that the greedy policy is improving. It is interesting to examine whether at this point, meaningfull changes in the greedy policy still occur. Meaningfull changes in policy are caused by changes in the estimated state-action values. For example, we might expect two or more state-action value lines crossing, with the “right” action becoming dominant over the “wrong” action. Is this indeed the case?&lt;/p&gt;
@@ -245,7 +245,7 @@ dfm = list_of_tables_to_df(Qtable_list)&lt;/code&gt;&lt;/pre&gt;
     + p9.facet_wrap(&amp;quot;variable&amp;quot;, scales = &amp;#39;free_y&amp;#39;)
     + p9.theme(subplots_adjust={&amp;#39;wspace&amp;#39;:0.15})
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_33_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_33_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;From Q1, Q2 and Q3, we can see that exploration really goes down at around episode 500 (x 100) (&lt;span class=&#34;math inline&#34;&gt;\(\epsilon\)&lt;/span&gt; at this point is &lt;code&gt;0.007&lt;/code&gt;), and with the optimal action standing out already long before reaching this point.&lt;/p&gt;
 &lt;p&gt;Only with Q2 there is a portion of the learning curve where action 1 has the highest value, and is chosen for quite some time before switching back to action 0 again at around episode 60.000. Let’s compare with the true values for Q2:&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;Q_perfect[2]&lt;/code&gt;&lt;/pre&gt;
@@ -303,7 +303,7 @@ def create_alpha_schedule2(num_episodes,  \
 
 plot_schedule(alpha_schedule, ylab = &amp;#39;Alpha&amp;#39;)
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_44_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_44_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;round(min(alpha_schedule), 3)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;0.01&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This curve decays &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; in 500.000 episodes to &lt;code&gt;0.01&lt;/code&gt;.&lt;/p&gt;
@@ -312,7 +312,7 @@ plot_schedule(alpha_schedule, ylab = &amp;#39;Alpha&amp;#39;)
                                         alpha_decay = 0.99997)
 
 plot_schedule(alpha_schedule2, ylab = &amp;#39;Alpha&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_47_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_47_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;min(alpha_schedule2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;0.001&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -365,7 +365,7 @@ plt.show()
 
 print((&amp;#39;Best Average Reward over %d Episodes: &amp;#39; % plot_every), np.max(avg_scores))    
  &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_53_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_53_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Best Average Reward over 100 Episodes:  0.08&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Pretty awfull huh? Now let us check out the performance of the learned Q-table:&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fullrun = 0
@@ -403,7 +403,7 @@ dfm = list_to_df(Qlist)&lt;/code&gt;&lt;/pre&gt;
     + p9.facet_wrap(&amp;quot;variable&amp;quot;, scales = &amp;#39;free_y&amp;#39;)
     + p9.theme(subplots_adjust={&amp;#39;wspace&amp;#39;:0.4}) # fix plotting issue
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_60_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_60_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks good, lets zoom in at one of the more noisier Q-values, &lt;code&gt;Q14&lt;/code&gt;.
 In the learning schedule used, the lowest value for &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; is &lt;code&gt;0.01&lt;/code&gt;.
 At this value of the learning rate, there is still considerable variation around the true value.&lt;/p&gt;
@@ -412,7 +412,7 @@ At this value of the learning rate, there is still considerable variation around
     + p9.geom_smooth(method = &amp;quot;loess&amp;quot;, color = &amp;quot;yellow&amp;quot;)
     + p9.geom_hline(data = df_true[df_true.variable == &amp;#39;Q10&amp;#39;], mapping = p9.aes(yintercept = &amp;#39;value&amp;#39;), color = &amp;#39;red&amp;#39;)
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_62_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_62_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Suppose we did not know the true value of Q(S = 14), and wanted to estimate it using Q-learning. From the plot above, an obvious strategy is to average all the values in the tail of the learning rate schedule, say after episode 400.000.&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# drop burn-in, then average Q-vals by variable
 Q_est = (dfm.loc[dfm.episode &amp;gt; 4000]
@@ -442,7 +442,7 @@ q_showdown = pd.melt(q_showdown, [&amp;#39;state&amp;#39;])
 
 (p9.ggplot(data = q_showdown, mapping = p9.aes(x = &amp;#39;state&amp;#39;, y = &amp;#39;value&amp;#39;, color = &amp;#39;factor(variable)&amp;#39;))
 + p9.geom_point(size = 5, shape = &amp;#39;x&amp;#39;))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_66_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_66_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Pretty close! So here we see Q-learning finally delivering on its convergence promise.&lt;/p&gt;
 &lt;p&gt;And what about final values vs averaging? Averaging seems to have improved the estimates a bit. Note that we had to choose an averaging window based on eyeballing the learning curves for the separate Q-values.&lt;/p&gt;
 &lt;p&gt;Can we do even better? A learning rate schedule where alpha is lowered further would diminish the fluctuations around the true values, but at the risk of lowering it too fast and effectively freezing (or very slowly evolving) the Q-values at non-equilibrium values.&lt;/p&gt;
@@ -490,7 +490,7 @@ else:
     + p9.facet_wrap(&amp;quot;variable&amp;quot;, scales = &amp;#39;free_y&amp;#39;)
     + p9.theme(subplots_adjust={&amp;#39;wspace&amp;#39;:0.4})
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_70_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_70_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Cleary, the fluctuations are reduced compared to the previous schedule. AND all Q-values still fluctuate around their true values, so it seems that this schedule is better with respect to finding the true values.&lt;/p&gt;
 &lt;p&gt;Let’s see if the accuracy of the estimated Q-values is indeed higher:&lt;/p&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# drop burn-in, then average Q-vals by variable
@@ -518,7 +518,7 @@ q_showdown = pd.melt(q_showdown, [&amp;#39;state&amp;#39;])
 
 (p9.ggplot(data = q_showdown, mapping = p9.aes(x = &amp;#39;state&amp;#39;, y = &amp;#39;value&amp;#39;, color = &amp;#39;factor(variable)&amp;#39;))
 + p9.geom_point(size = 5, shape = &amp;#39;x&amp;#39;))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_73_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021-03-07-qlearning_frozenlake_convergence_files/Q_learning_FrozenLake_73_0.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Boom! Now our &lt;span class=&#34;math inline&#34;&gt;\(Q^{*}_{a}\)&lt;/span&gt; estimates are really getting close to the true values. Clearly, the second learning rate schedule is able to learn the true Q-values compared to the first rate schedule, given the fixed amount of computation, in this case 500.000 episodes each.&lt;/p&gt;
 &lt;p&gt;Averaging out does not do much anymore, except for states 10 and 14, where it improves the estimates a tiny bit.&lt;/p&gt;
 &lt;/div&gt;
@@ -531,12 +531,12 @@ q_showdown = pd.melt(q_showdown, [&amp;#39;state&amp;#39;])
     
     <item>
       <title>Jacks Car Rental as a Gym Environment</title>
-      <link>https://gsverhoeven.github.io/post/jacks-car-rental-gym/</link>
+      <link>/post/jacks-car-rental-gym/</link>
       <pubDate>Wed, 30 Dec 2020 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/jacks-car-rental-gym/</guid>
+      <guid>/post/jacks-car-rental-gym/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;This blogpost is about &lt;a href=&#34;https://en.wikipedia.org/wiki/Reinforcement_learning&#34;&gt;reinforcement learning&lt;/a&gt;, part of the Machine Learning (ML) / AI family of computer algorithms and techniques.
@@ -679,7 +679,7 @@ plt.title(&amp;#39;Policy&amp;#39;)
 plt.xlabel(&amp;quot;cars at B&amp;quot;)
 plt.ylabel(&amp;quot;cars at A&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-12-30-jacks_car_rental_gym_files/2020-12-30-jacks_car_rental_gym_13_1.png&#34; alt=&#34;Optimal policy for all states of Jack’s Car Rental&#34; /&gt;
+&lt;img src=&#34;/post/2020-12-30-jacks_car_rental_gym_files/2020-12-30-jacks_car_rental_gym_13_1.png&#34; alt=&#34;Optimal policy for all states of Jack’s Car Rental&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Optimal policy for all states of Jack’s Car Rental&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -696,16 +696,16 @@ For me, this is the real takeaway from this exercise: it is really hard to (corr
     
     <item>
       <title>Building TensorFlow 2.2 on an old PC</title>
-      <link>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</link>
+      <link>/post/deep-learning-tensorflow-keras/</link>
       <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/deep-learning-tensorflow-keras/</guid>
+      <guid>/post/deep-learning-tensorflow-keras/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/viz/viz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;
@@ -778,7 +778,7 @@ for (idx in 1:12) {
     image(1:28, 1:28, im, col=gray((0:255)/255), 
           xaxt=&amp;#39;n&amp;#39;, main=paste(y_train[idx]))
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;keras-model&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Keras model&lt;/h1&gt;
@@ -853,7 +853,7 @@ id &amp;lt;- 9
 ggplot(data.frame(digit = 0:9, prob = predictions[id,]), 
        aes(x = factor(digit), y = prob)) + geom_col() +
   ggtitle(paste0(&amp;quot;prediction for true value of &amp;quot;, mnist$test$y[id]))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-05-15-deep_learning_keras_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;check-model-performance-on-the-test-set&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Check model performance on the test set&lt;/h1&gt;
@@ -869,12 +869,12 @@ ggplot(data.frame(digit = 0:9, prob = predictions[id,]),
     
     <item>
       <title>The validation set approach in caret</title>
-      <link>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</link>
+      <link>/post/validation-set-approach-in-caret/</link>
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
+      <guid>/post/validation-set-approach-in-caret/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
@@ -1219,10 +1219,10 @@ strat_sampl_res&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# caret:::ggplot.resamples
 # t.test(resamples$values$`RAND~RMSE`)
 ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;My personal preference is to more directly display both distributions. This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bwplot(resamples, metric = &amp;quot;RMSE&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;
 &lt;p&gt;Based on these results, it seems like stratified sampling is indeed a reasonable default setting for &lt;code&gt;caret&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
@@ -1262,12 +1262,12 @@ lgocv_res&lt;/code&gt;&lt;/pre&gt;
     
     <item>
       <title>BART vs Causal forests showdown</title>
-      <link>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</link>
+      <link>/post/bart_vs_grf/bart-vs-grf-showdown/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
+      <guid>/post/bart_vs_grf/bart-vs-grf-showdown/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;load-packages&#34; class=&#34;section level1&#34;&gt;
@@ -1325,7 +1325,7 @@ df &amp;lt;- data.frame(x, y, y_true = Ey)&lt;/code&gt;&lt;/pre&gt;
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s1.rds&amp;quot;)}
 
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;MCMC or sigma looks ok.&lt;/p&gt;
 &lt;div id=&#34;compare-bart-fit-to-true-values&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;compare BART fit to true values&lt;/h3&gt;
@@ -1341,7 +1341,7 @@ bartp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, y
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks nice.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1359,7 +1359,7 @@ df3 &amp;lt;- data.frame(df3, y)
 ggplot(df3, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ymax = qu), col = &amp;quot;grey&amp;quot;) +
   geom_point() + 
   geom_abline(intercept = 0, slope = 1, col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This is pretty bad compared to BART. What&#39;s wrong here?&lt;/p&gt;
 &lt;p&gt;From reference.md: &lt;strong&gt;GRF isn&#39;t working well on a small dataset&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you observe poor performance on a dataset with a small number of examples, it may be worth trying out two changes:&lt;/p&gt;
@@ -1383,7 +1383,7 @@ grfp &amp;lt;- ggplot(df2, aes(x= y, y = qm)) + geom_linerange(aes(ymin = ql, ym
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Ah! better now. But Grf still worse than BART. We ran with 2000 trees and turned of honesty. Perhaps dataset too small? Maybe check out the sample.fraction parameter? Sample.fraction is set by default at 0.5, so only half of data is used to grow tree. OR use tune.parameters = TRUE&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-methods&#34; class=&#34;section level2&#34;&gt;
@@ -1392,7 +1392,7 @@ grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dataset-2-simulated-data-from-acic-2017&#34; class=&#34;section level1&#34;&gt;
@@ -1452,7 +1452,7 @@ if(fullrun){
 } else { bartFit &amp;lt;- readRDS(&amp;quot;s2.rds&amp;quot;)}
 
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;div id=&#34;extract-individual-treatment-effect-ite-cate-plus-uncertainty-from-bartfit&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Extract individual treatment effect (ITE / CATE) plus uncertainty from bartfit&lt;/h3&gt;
 &lt;p&gt;This means switching z from 0 to 1 and looking at difference in y + uncertainty in y.&lt;/p&gt;
@@ -1469,7 +1469,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = 1:nrow(sim), qm))  +
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This looks sort of ok, but still weird. Some points it gets REALLY wrong.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;calculate-coverage&#34; class=&#34;section level3&#34;&gt;
@@ -1522,7 +1522,7 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = 1:nrow(df_sep2), y = qm))   +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;This works ok now.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-both-methods&#34; class=&#34;section level2&#34;&gt;
@@ -1532,7 +1532,7 @@ grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning: Removed 1 rows containing missing values (geom_smooth).&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;dataset-3-simulated-data-used-by-grf-example&#34; class=&#34;section level1&#34;&gt;
@@ -1575,7 +1575,7 @@ res &amp;lt;- data.frame(df, pred = tau.hat.oob$predictions)
 ggplot(res, aes(x = X1, y = pred)) + geom_point() + geom_smooth() + geom_abline(intercept = 0, slope = 1) +
   geom_line(aes(y = TAU), col = &amp;quot;red&amp;quot;, size = 1)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-24-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;ate-att&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;ATE &amp;amp; ATT&lt;/h2&gt;
@@ -1617,7 +1617,7 @@ grfp &amp;lt;- ggplot(df_res, aes(x = X1, y = qm)) +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-28-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-bart-on-this-dataset&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Fit BART on this dataset&lt;/h2&gt;
@@ -1630,7 +1630,7 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s10.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s10.rds&amp;quot;)}
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-29-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
@@ -1644,7 +1644,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = X1, qm)) + geom_linerange(aes(ymin = ql, yma
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-30-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Compare&lt;/h2&gt;
@@ -1652,7 +1652,7 @@ bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-31-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Here Grf appears more accurate. Mental note: Both W and TAU function of X1.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1723,7 +1723,7 @@ grfp &amp;lt;- ggplot(df_sep2, aes(x = X3, y = qm))   +
 
 grfp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-37-1.png&#34; width=&#34;672&#34; /&gt; This looks ok.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-bart-on-this-dataset-1&#34; class=&#34;section level2&#34;&gt;
@@ -1737,7 +1737,7 @@ if(fullrun){
   saveRDS(bartFit, &amp;quot;s9.rds&amp;quot;)
 } else {bartFit &amp;lt;- readRDS(&amp;quot;s9.rds&amp;quot;)}
 plot(bartFit)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-38-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;bart-check-fit-and-cis-1&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;BART: Check fit and CI&#39;s&lt;/h2&gt;
@@ -1751,7 +1751,7 @@ bartp &amp;lt;- ggplot(sim, aes(x = X3, qm)) + geom_linerange(aes(ymin = ql, yma
 
 bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-39-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;compare-bart-and-grf&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Compare BART and grf&lt;/h2&gt;
@@ -1759,7 +1759,7 @@ bartp&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;
 ## `geom_smooth()` using method = &amp;#39;gam&amp;#39; and formula &amp;#39;y ~ s(x, bs = &amp;quot;cs&amp;quot;)&amp;#39;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gp&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/bart_vs_grf/BART-vs-grf_files/figure-html/unnamed-chunk-40-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Very similar results. BART appears slightly more accurate, especially for low values of X3.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1768,12 +1768,12 @@ bartp&lt;/code&gt;&lt;/pre&gt;
     
     <item>
       <title>Improving a parametric regression model using machine learning</title>
-      <link>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</link>
+      <link>/post/interaction_detection/interaction-detection/</link>
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
+      <guid>/post/interaction_detection/interaction-detection/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
@@ -1807,7 +1807,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-an-ols-to-the-boston-housing&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Fit an OLS to the Boston Housing&lt;/h1&gt;
@@ -1822,7 +1822,7 @@ pred_GLM &amp;lt;- predict(my_glm, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
 &lt;p&gt;Discrepancy is defined as the difference between the predictions of both models for each observation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
@@ -1858,7 +1858,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It turns out that &lt;code&gt;rm&lt;/code&gt; and &lt;code&gt;lstat&lt;/code&gt; are the variables that best predict the discrepancy.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int &amp;lt;- glm(medv ~. + rm:lstat, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
@@ -1914,7 +1914,7 @@ pred_GLM &amp;lt;- predict(my_glm_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -1948,7 +1948,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now the variables that best predict the discrepancy are &lt;code&gt;lstat&lt;/code&gt; and &lt;code&gt;dis&lt;/code&gt;. Add these two variables as an interaction.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int2 &amp;lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
@@ -2051,7 +2051,7 @@ pred_GLM &amp;lt;- predict(my_glm_hr, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;For low predicted values both models differ in a systematic way. This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
@@ -2087,7 +2087,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Add the top 2 vars as an interaction to their model equation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
@@ -2147,7 +2147,7 @@ pred_GLM &amp;lt;- predict(my_glm_hr_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_log_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -2181,7 +2181,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now we add lstat and dis as an interaction.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int2 &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +

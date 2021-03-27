@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>interaction detection | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/tags/interaction-detection/</link>
-      <atom:link href="https://gsverhoeven.github.io/tags/interaction-detection/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/interaction-detection/</link>
+      <atom:link href="/tags/interaction-detection/index.xml" rel="self" type="application/rss+xml" />
     <description>interaction detection</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 01 Sep 2017 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>interaction detection</title>
-      <link>https://gsverhoeven.github.io/tags/interaction-detection/</link>
+      <link>/tags/interaction-detection/</link>
     </image>
     
     <item>
       <title>Improving a parametric regression model using machine learning</title>
-      <link>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</link>
+      <link>/post/interaction_detection/interaction-detection/</link>
       <pubDate>Fri, 01 Sep 2017 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/</guid>
+      <guid>/post/interaction_detection/interaction-detection/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;The idea is that comparing the predictions of an RF model with the predictions of an OLS model can inform us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors. Subsequently, using partial dependence plots of the RF model can guide the modelling of the non-linearities in the OLS model. After this step, the discrepancies between the RF predictions and the OLS predictions should be caused by non-modeled interactions. Using an RF to predict the discrepancy itself can then be used to discover which predictors are involved in these interactions. We test this method on the classic &lt;code&gt;Boston Housing&lt;/code&gt; dataset to predict median house values (&lt;code&gt;medv&lt;/code&gt;). We indeed recover interactions that, as it turns, have already been found and documented in the literature.&lt;/p&gt;
@@ -53,7 +53,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-an-ols-to-the-boston-housing&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Fit an OLS to the Boston Housing&lt;/h1&gt;
@@ -68,7 +68,7 @@ pred_GLM &amp;lt;- predict(my_glm, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt; # Run a RF on the discrepancy&lt;/p&gt;
 &lt;p&gt;Discrepancy is defined as the difference between the predictions of both models for each observation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
@@ -104,7 +104,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It turns out that &lt;code&gt;rm&lt;/code&gt; and &lt;code&gt;lstat&lt;/code&gt; are the variables that best predict the discrepancy.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int &amp;lt;- glm(medv ~. + rm:lstat, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
@@ -160,7 +160,7 @@ pred_GLM &amp;lt;- predict(my_glm_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -194,7 +194,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now the variables that best predict the discrepancy are &lt;code&gt;lstat&lt;/code&gt; and &lt;code&gt;dis&lt;/code&gt;. Add these two variables as an interaction.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_int2 &amp;lt;- glm(medv ~. + rm:lstat + lstat:dis, data = Boston, 
               family = &amp;quot;gaussian&amp;quot;)
@@ -297,7 +297,7 @@ pred_GLM &amp;lt;- predict(my_glm_hr, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;For low predicted values both models differ in a systematic way. This suggests that there exists a remaining pattern that is picked up by RF but not by the OLS model.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
@@ -333,7 +333,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Add the top 2 vars as an interaction to their model equation.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +
@@ -393,7 +393,7 @@ pred_GLM &amp;lt;- predict(my_glm_hr_int, data = Boston)
 
 plot(pred_RF$predictions, pred_GLM)
 abline(0, 1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred_diff &amp;lt;- pred_RF$predictions - pred_GLM
 
 my_ranger_log_diff2 &amp;lt;- ranger(Ydiff ~ . - medv, data = data.table(Ydiff = pred_diff, Boston),
@@ -427,7 +427,7 @@ myres &amp;lt;- myres[, i := as.integer(i)]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(myres, 
        aes(x = reorder(factor(varname), MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) + 
   geom_point() + coord_flip()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/interaction_detection/interaction-detection_files/figure-html/unnamed-chunk-26-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now we add lstat and dis as an interaction.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;my_glm_hr_int2 &amp;lt;- glm(log(medv) ~ I(rm^2) + age + log(dis) + log(rad) + tax + ptratio + 
                      black + I(black^2) + log(lstat) + crim + zn + indus + chas + I(nox^2) +

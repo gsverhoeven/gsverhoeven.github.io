@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>DAG | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/tags/dag/</link>
-      <atom:link href="https://gsverhoeven.github.io/tags/dag/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/dag/</link>
+      <atom:link href="/tags/dag/index.xml" rel="self" type="application/rss+xml" />
     <description>DAG</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 11 May 2019 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>DAG</title>
-      <link>https://gsverhoeven.github.io/tags/dag/</link>
+      <link>/tags/dag/</link>
     </image>
     
     <item>
       <title>Designing an introductory course on Causal Inference</title>
-      <link>https://gsverhoeven.github.io/post/causal-inference-course/</link>
+      <link>/post/causal-inference-course/</link>
       <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/causal-inference-course/</guid>
+      <guid>/post/causal-inference-course/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;introduction&#34; class=&#34;section level1&#34;&gt;

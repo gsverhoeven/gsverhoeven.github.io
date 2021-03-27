@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Statistics | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/categories/statistics/</link>
-      <atom:link href="https://gsverhoeven.github.io/categories/statistics/index.xml" rel="self" type="application/rss+xml" />
+    <link>/categories/statistics/</link>
+      <atom:link href="/categories/statistics/index.xml" rel="self" type="application/rss+xml" />
     <description>Statistics</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Fri, 04 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Statistics</title>
-      <link>https://gsverhoeven.github.io/categories/statistics/</link>
+      <link>/categories/statistics/</link>
     </image>
     
     <item>
       <title>Using posterior predictive distributions to get the Average Treatment Effect (ATE) with uncertainty</title>
-      <link>https://gsverhoeven.github.io/post/posterior-distribution-average-treatment-effect/</link>
+      <link>/post/posterior-distribution-average-treatment-effect/</link>
       <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/posterior-distribution-average-treatment-effect/</guid>
+      <guid>/post/posterior-distribution-average-treatment-effect/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;div id=&#34;gertjan-verhoeven-misja-mikkers&#34; class=&#34;section level2&#34;&gt;
@@ -88,14 +88,14 @@ mutate(Admissions = rpois(n_obs, lambda = Lambda))&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(data = df_sim, aes(x = Admissions)) +
   geom_histogram(stat=&amp;quot;count&amp;quot;) +
   facet_wrap(~ Treatment) &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The effect of the treatment on reducing admissions is clearly visible.&lt;/p&gt;
 &lt;p&gt;We can also visualize the relationship between &lt;code&gt;Admissions&lt;/code&gt; and &lt;code&gt;Age&lt;/code&gt;, for both treated and untreated patients. We use the &lt;code&gt;viridis&lt;/code&gt; scales to provide colour maps that are designed to be perceived by viewers with common forms of colour blindness.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(data = df_sim, aes(x = Age, y = Admissions, color = as.factor(Treatment))) +
   geom_point() +
   scale_color_viridis_d(labels = c(&amp;quot;No Treatment&amp;quot;, &amp;quot;Treatment&amp;quot;)) +
   labs(color = &amp;quot;Treatment&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now lets fit our Bayesian Poisson regression model to it.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fit-model&#34; class=&#34;section level3&#34;&gt;
@@ -136,7 +136,7 @@ mutate(Admissions = rpois(n_obs, lambda = Lambda))&lt;/code&gt;&lt;/pre&gt;
 ## scale reduction factor on split chains (at convergence, Rhat = 1).&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We see that the posterior dists for &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Age}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Treatment}\)&lt;/span&gt; cover the true values, so looking good. To get a fuller glimpse into the (correlated) uncertainty of the model parameters we make a pairs plot:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pairs(model1)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;As expected, the coefficients &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Intercept}\)&lt;/span&gt; (added by &lt;code&gt;brms&lt;/code&gt;) and &lt;span class=&#34;math inline&#34;&gt;\(\beta_{Age}\)&lt;/span&gt; are highly correlated.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;first-attempt-calculate-individual-treatment-effects-using-the-model-fit-object&#34; class=&#34;section level3&#34;&gt;
@@ -154,7 +154,7 @@ ggplot(data.frame(ites), aes(x = ites)) +
   geom_vline(xintercept = mean(ites), col = &amp;quot;red&amp;quot;) +
   ggtitle(&amp;quot;Effect of treatment on Admissions for each observation&amp;quot;) +
    expand_limits(x = 0) &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Averaging the ITEs gives us the ATE, displayed in red.&lt;/p&gt;
 &lt;p&gt;Ok, so &lt;strong&gt;on average&lt;/strong&gt;, our treatment reduces the number of Admissions by -1.9.&lt;/p&gt;
 &lt;p&gt;You may wonder: why do we even have a distribution of treatment effects here? Should it not be the same for each patient? Here a peculiarity of the Poisson regression model comes to surface: The effect of changing &lt;code&gt;Treatment&lt;/code&gt; from 0 to 1 on the outcome depends on the value of &lt;code&gt;Age&lt;/code&gt; of the patient. This is because we &lt;strong&gt;exponentiate&lt;/strong&gt; the linear model before we plug it into the Poisson distribution.&lt;/p&gt;
@@ -209,7 +209,7 @@ length(ATE_per_draw)&lt;/code&gt;&lt;/pre&gt;
   geom_histogram() + 
   geom_vline(xintercept = mean(ites), col = &amp;quot;red&amp;quot;) +
   ggtitle(&amp;quot;Posterior distribution of the Average Treatment Effect (ATE)&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;We can compare this distribution with the point estimate of the ATE we obtained above using the model coefficients. It sits right in the middle (red line), just as it should be!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;demonstrating-the-versatility-uncertainty-in-the-sum-of-treatment-effects&#34; class=&#34;section level3&#34;&gt;
@@ -222,7 +222,7 @@ ggplot(data.frame(TTE_per_draw), aes(x = TTE_per_draw)) +
   geom_histogram() + 
   geom_vline(xintercept = sum(ites), col = &amp;quot;red&amp;quot;) +
   ggtitle(&amp;quot;Posterior distribution of the Total Treatment Effect (TTE)&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-09-04-brms_posterior_pred_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;So our model predicts for the aggregate reduction of patient Admissions a value in the range of -500 to -250.&lt;/p&gt;
 &lt;p&gt;This distribution can then be used to answer questions such as &amp;quot;what is the probability that our treatment reduces Admissions by at least 400&amp;quot;?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;TTE &amp;lt;- data.frame(TTE_per_draw) %&amp;gt;%

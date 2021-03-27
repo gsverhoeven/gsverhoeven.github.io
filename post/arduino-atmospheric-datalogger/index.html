@@ -31,7 +31,7 @@
   <meta name="description" content="In this post, I show how to create a Arduino-based atmospheric sensor prototype capable of storing large amounts of data on a microSD card.">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/">
+  <link rel="alternate" hreflang="en-us" href="/post/arduino-atmospheric-datalogger/">
 
   
 
@@ -207,6 +207,42 @@
 
 
 
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
   
 
 
@@ -216,7 +252,7 @@
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/">
+  <link rel="canonical" href="/post/arduino-atmospheric-datalogger/">
 
   
   
@@ -232,10 +268,10 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/">
+  <meta property="og:url" content="/post/arduino-atmospheric-datalogger/">
   <meta property="og:title" content="Arduino Weather Station with datalogging | Gertjan Verhoeven">
-  <meta property="og:description" content="In this post, I show how to create a Arduino-based atmospheric sensor prototype capable of storing large amounts of data on a microSD card."><meta property="og:image" content="https://gsverhoeven.github.io/img/headers/IMG_2960.jpg">
-  <meta property="twitter:image" content="https://gsverhoeven.github.io/img/headers/IMG_2960.jpg"><meta property="og:locale" content="en-us">
+  <meta property="og:description" content="In this post, I show how to create a Arduino-based atmospheric sensor prototype capable of storing large amounts of data on a microSD card."><meta property="og:image" content="/img/headers/IMG_2960.jpg">
+  <meta property="twitter:image" content="/img/headers/IMG_2960.jpg"><meta property="og:locale" content="en-us">
   
     
       <meta property="article:published_time" content="2019-03-05T00:00:00&#43;00:00">
@@ -266,7 +302,7 @@
   "@type": "BlogPosting",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/"
+    "@id": "/post/arduino-atmospheric-datalogger/"
   },
   "headline": "Arduino Weather Station with datalogging",
   
@@ -283,7 +319,7 @@
     "name": "Gertjan Verhoeven",
     "logo": {
       "@type": "ImageObject",
-      "url": "img/https://gsverhoeven.github.io/"
+      "url": "img//"
     }
   },
   "description": "In this post, I show how to create a Arduino-based atmospheric sensor prototype capable of storing large amounts of data on a microSD card."
@@ -721,7 +757,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/&amp;text=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=/post/arduino-atmospheric-datalogger/&amp;text=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -734,7 +770,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/&amp;t=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=/post/arduino-atmospheric-datalogger/&amp;t=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -747,7 +783,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
       
       
       <li>
-        <a href="mailto:?subject=Arduino%20Weather%20Station%20with%20datalogging&amp;body=https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Arduino%20Weather%20Station%20with%20datalogging&amp;body=/post/arduino-atmospheric-datalogger/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -760,7 +796,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/&amp;title=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=/post/arduino-atmospheric-datalogger/&amp;title=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -773,7 +809,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Arduino%20Weather%20Station%20with%20datalogging%20https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Arduino%20Weather%20Station%20with%20datalogging%20/post/arduino-atmospheric-datalogger/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -786,7 +822,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://gsverhoeven.github.io/post/arduino-atmospheric-datalogger/&amp;title=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=/post/arduino-atmospheric-datalogger/&amp;title=Arduino%20Weather%20Station%20with%20datalogging" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
@@ -825,7 +861,7 @@ mdf &lt;- mdf[, value := as.numeric(value)]</code></pre>
     
 
     <div class="media-body">
-      <h5 class="card-title"><a href="https://gsverhoeven.github.io/">Gertjan Verhoeven</a></h5>
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
       <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
       <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods.</p>
       <ul class="network-icon" aria-hidden="true">

@@ -32,7 +32,7 @@
 Game theory vs Reinforcement learning If we take a simple game such as the Prisoners dilemma, we see that we have two players, that have access to the same action sets (confess or not confess), and perform their action simultaneously.">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://gsverhoeven.github.io/post/bogetoft_rl/">
+  <link rel="alternate" hreflang="en-us" href="/post/bogetoft_rl/">
 
   
 
@@ -208,6 +208,42 @@ Game theory vs Reinforcement learning If we take a simple game such as the Priso
 
 
 
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
   
 
 
@@ -217,7 +253,7 @@ Game theory vs Reinforcement learning If we take a simple game such as the Priso
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://gsverhoeven.github.io/post/bogetoft_rl/">
+  <link rel="canonical" href="/post/bogetoft_rl/">
 
   
   
@@ -234,7 +270,7 @@ Game theory vs Reinforcement learning If we take a simple game such as the Priso
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="https://gsverhoeven.github.io/post/bogetoft_rl/">
+  <meta property="og:url" content="/post/bogetoft_rl/">
   <meta property="og:title" content="Cooperatives and payment schemes | Gertjan Verhoeven">
   <meta property="og:description" content="Summary We review the book by Bogetoft and Olesen on Cooperatives and payment schemes. We investigate the potential for using its material to explore the ability of reinforcement learning to solve games. The idea is to start with games that can be easily solved using standard game theoretic analysis, and then add complexity that makes them hard to solve using the standard techniques.
 Game theory vs Reinforcement learning If we take a simple game such as the Prisoners dilemma, we see that we have two players, that have access to the same action sets (confess or not confess), and perform their action simultaneously."><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
@@ -267,7 +303,7 @@ Game theory vs Reinforcement learning If we take a simple game such as the Priso
   "@type": "BlogPosting",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://gsverhoeven.github.io/post/bogetoft_rl/"
+    "@id": "/post/bogetoft_rl/"
   },
   "headline": "Cooperatives and payment schemes",
   
@@ -284,7 +320,7 @@ Game theory vs Reinforcement learning If we take a simple game such as the Priso
     "name": "Gertjan Verhoeven",
     "logo": {
       "@type": "ImageObject",
-      "url": "img/https://gsverhoeven.github.io/"
+      "url": "img//"
     }
   },
   "description": "Summary We review the book by Bogetoft and Olesen on Cooperatives and payment schemes. We investigate the potential for using its material to explore the ability of reinforcement learning to solve games. The idea is to start with games that can be easily solved using standard game theoretic analysis, and then add complexity that makes them hard to solve using the standard techniques.\nGame theory vs Reinforcement learning If we take a simple game such as the Prisoners dilemma, we see that we have two players, that have access to the same action sets (confess or not confess), and perform their action simultaneously."
@@ -607,7 +643,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://gsverhoeven.github.io/post/bogetoft_rl/&amp;text=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=/post/bogetoft_rl/&amp;text=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -620,7 +656,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://gsverhoeven.github.io/post/bogetoft_rl/&amp;t=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=/post/bogetoft_rl/&amp;t=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -633,7 +669,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
       
       
       <li>
-        <a href="mailto:?subject=Cooperatives%20and%20payment%20schemes&amp;body=https://gsverhoeven.github.io/post/bogetoft_rl/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Cooperatives%20and%20payment%20schemes&amp;body=/post/bogetoft_rl/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -646,7 +682,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://gsverhoeven.github.io/post/bogetoft_rl/&amp;title=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=/post/bogetoft_rl/&amp;title=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -659,7 +695,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Cooperatives%20and%20payment%20schemes%20https://gsverhoeven.github.io/post/bogetoft_rl/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Cooperatives%20and%20payment%20schemes%20/post/bogetoft_rl/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -672,7 +708,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://gsverhoeven.github.io/post/bogetoft_rl/&amp;title=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=/post/bogetoft_rl/&amp;title=Cooperatives%20and%20payment%20schemes" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
@@ -711,7 +747,7 @@ We immediately spot a difference with GT: in RL, players play the game repeatedl
     
 
     <div class="media-body">
-      <h5 class="card-title"><a href="https://gsverhoeven.github.io/">Gertjan Verhoeven</a></h5>
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
       <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
       <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods.</p>
       <ul class="network-icon" aria-hidden="true">

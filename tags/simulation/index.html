@@ -31,7 +31,7 @@
   <meta name="description" content="Personal website of Gertjan Verhoeven">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://gsverhoeven.github.io/tags/simulation/">
+  <link rel="alternate" hreflang="en-us" href="/tags/simulation/">
 
   
 
@@ -207,6 +207,42 @@
 
 
 
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
   
 
 
@@ -218,7 +254,7 @@
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://gsverhoeven.github.io/tags/simulation/">
+  <link rel="canonical" href="/tags/simulation/">
 
   
   
@@ -235,7 +271,7 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="https://gsverhoeven.github.io/tags/simulation/">
+  <meta property="og:url" content="/tags/simulation/">
   <meta property="og:title" content="simulation | Gertjan Verhoeven">
   <meta property="og:description" content="Personal website of Gertjan Verhoeven"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
   <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="en-us">

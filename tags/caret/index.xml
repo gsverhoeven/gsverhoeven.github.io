@@ -2,24 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>caret | Gertjan Verhoeven</title>
-    <link>https://gsverhoeven.github.io/tags/caret/</link>
-      <atom:link href="https://gsverhoeven.github.io/tags/caret/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/caret/</link>
+      <atom:link href="/tags/caret/index.xml" rel="self" type="application/rss+xml" />
     <description>caret</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Thu, 21 Mar 2019 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>caret</title>
-      <link>https://gsverhoeven.github.io/tags/caret/</link>
+      <link>/tags/caret/</link>
     </image>
     
     <item>
       <title>The validation set approach in caret</title>
-      <link>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</link>
+      <link>/post/validation-set-approach-in-caret/</link>
       <pubDate>Thu, 21 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://gsverhoeven.github.io/post/validation-set-approach-in-caret/</guid>
+      <guid>/post/validation-set-approach-in-caret/</guid>
       <description>
-&lt;link href=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
-&lt;script src=&#34;https://gsverhoeven.github.io/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;In this blog post, we explore how to implement the &lt;em&gt;validation set approach&lt;/em&gt; in &lt;code&gt;caret&lt;/code&gt;. This is the most basic form of the train/test machine learning concept. For example, the classic machine learning textbook &lt;a href=&#34;http://www-bcf.usc.edu/~gareth/ISL/&#34;&gt;&amp;quot;An introduction to Statistical Learning&amp;quot;&lt;/a&gt; uses the validation set approach to introduce resampling methods.&lt;/p&gt;
@@ -364,10 +364,10 @@ strat_sampl_res&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# caret:::ggplot.resamples
 # t.test(resamples$values$`RAND~RMSE`)
 ggplot(resamples, metric = &amp;quot;RMSE&amp;quot;) &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;My personal preference is to more directly display both distributions. This is done by &lt;code&gt;bwplot()&lt;/code&gt; (&lt;code&gt;caret&lt;/code&gt; does not have ggplot version of this function).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bwplot(resamples, metric = &amp;quot;RMSE&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://gsverhoeven.github.io/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-21-caret_validation_set_approach_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;It does seems that stratified sampling paints a slightly more optimistic picture of the test error when compared to truly random sampling. However, we can also see that random sampling has somewhat higher variance when compared to stratified sampling.&lt;/p&gt;
 &lt;p&gt;Based on these results, it seems like stratified sampling is indeed a reasonable default setting for &lt;code&gt;caret&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;

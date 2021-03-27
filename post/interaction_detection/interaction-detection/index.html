@@ -31,7 +31,7 @@
   <meta name="description" content="In this post, I explore how we can improve a parametric regression model by comparing its predictions to those of a Random Forest model. This might informs us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors.">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/">
+  <link rel="alternate" hreflang="en-us" href="/post/interaction_detection/interaction-detection/">
 
   
 
@@ -207,6 +207,42 @@
 
 
 
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
   
 
 
@@ -216,7 +252,7 @@
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/">
+  <link rel="canonical" href="/post/interaction_detection/interaction-detection/">
 
   
   
@@ -232,10 +268,10 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/">
+  <meta property="og:url" content="/post/interaction_detection/interaction-detection/">
   <meta property="og:title" content="Improving a parametric regression model using machine learning | Gertjan Verhoeven">
-  <meta property="og:description" content="In this post, I explore how we can improve a parametric regression model by comparing its predictions to those of a Random Forest model. This might informs us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors."><meta property="og:image" content="https://gsverhoeven.github.io/img/headers/abstract-black-and-white-dark-230659.jpg">
-  <meta property="twitter:image" content="https://gsverhoeven.github.io/img/headers/abstract-black-and-white-dark-230659.jpg"><meta property="og:locale" content="en-us">
+  <meta property="og:description" content="In this post, I explore how we can improve a parametric regression model by comparing its predictions to those of a Random Forest model. This might informs us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors."><meta property="og:image" content="/img/headers/abstract-black-and-white-dark-230659.jpg">
+  <meta property="twitter:image" content="/img/headers/abstract-black-and-white-dark-230659.jpg"><meta property="og:locale" content="en-us">
   
     
       <meta property="article:published_time" content="2017-09-01T00:00:00&#43;00:00">
@@ -266,7 +302,7 @@
   "@type": "BlogPosting",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/"
+    "@id": "/post/interaction_detection/interaction-detection/"
   },
   "headline": "Improving a parametric regression model using machine learning",
   
@@ -283,7 +319,7 @@
     "name": "Gertjan Verhoeven",
     "logo": {
       "@type": "ImageObject",
-      "url": "img/https://gsverhoeven.github.io/"
+      "url": "img//"
     }
   },
   "description": "In this post, I explore how we can improve a parametric regression model by comparing its predictions to those of a Random Forest model. This might informs us in what ways the OLS model fails to capture all non-linearities and interactions between the predictors."
@@ -1098,7 +1134,7 @@ summary(my_glm_hr_int2)</code></pre>
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/&amp;text=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=/post/interaction_detection/interaction-detection/&amp;text=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -1111,7 +1147,7 @@ summary(my_glm_hr_int2)</code></pre>
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/&amp;t=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=/post/interaction_detection/interaction-detection/&amp;t=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -1124,7 +1160,7 @@ summary(my_glm_hr_int2)</code></pre>
       
       
       <li>
-        <a href="mailto:?subject=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning&amp;body=https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning&amp;body=/post/interaction_detection/interaction-detection/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -1137,7 +1173,7 @@ summary(my_glm_hr_int2)</code></pre>
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/&amp;title=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=/post/interaction_detection/interaction-detection/&amp;title=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -1150,7 +1186,7 @@ summary(my_glm_hr_int2)</code></pre>
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning%20https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning%20/post/interaction_detection/interaction-detection/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -1163,7 +1199,7 @@ summary(my_glm_hr_int2)</code></pre>
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://gsverhoeven.github.io/post/interaction_detection/interaction-detection/&amp;title=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=/post/interaction_detection/interaction-detection/&amp;title=Improving%20a%20parametric%20regression%20model%20using%20machine%20learning" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
@@ -1202,7 +1238,7 @@ summary(my_glm_hr_int2)</code></pre>
     
 
     <div class="media-body">
-      <h5 class="card-title"><a href="https://gsverhoeven.github.io/">Gertjan Verhoeven</a></h5>
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
       <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
       <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods.</p>
       <ul class="network-icon" aria-hidden="true">
