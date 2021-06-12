@@ -3,27 +3,42 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/tags/better-bibtex/</loc>
-    <lastmod>2021-05-02T00:00:00+00:00</lastmod>
+    <loc>/categories/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/categories/</loc>
-    <lastmod>2021-05-02T00:00:00+00:00</lastmod>
+    <loc>/tags/covid-19-dag-causal-graph-bayesian-statistics/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/</loc>
-    <lastmod>2021-05-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/zotero-rmarkdown-csl/</loc>
-    <lastmod>2021-05-02T00:00:00+00:00</lastmod>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/post/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/statistics-r-measurement/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/covid_antigen_test_reliability/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/better-bibtex/</loc>
     <lastmod>2021-05-02T00:00:00+00:00</lastmod>
   </url>
   
@@ -38,7 +53,7 @@
   </url>
   
   <url>
-    <loc>/tags/</loc>
+    <loc>/post/zotero-rmarkdown-csl/</loc>
     <lastmod>2021-05-02T00:00:00+00:00</lastmod>
   </url>
   
@@ -281,6 +296,10 @@
   </url>
   
   <url>
+    <loc>/post/2021-02-01-azure_cloud/</loc>
+  </url>
+  
+  <url>
     <loc>/post/bogetoft_rl/</loc>
   </url>
   
@@ -294,6 +313,10 @@
   
   <url>
     <loc>/talk/</loc>
+  </url>
+  
+  <url>
+    <loc>/post/sars_test/nasal_vs_nasopharyngeal/</loc>
   </url>
   
 </urlset>
