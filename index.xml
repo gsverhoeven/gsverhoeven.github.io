@@ -203,7 +203,7 @@ Given that the difference is very small, I decided to not look into this any fur
 &lt;p&gt;Ok, so the rapid antigen test is less sensitive than PCR.
 What about the effect of using self-administered nasal swabs, versus professional health workers taking a nasopharyngeal swab (and often a swab in the back of the throat as well)?&lt;/p&gt;
 &lt;p&gt;Interestingly, the three Berlin studies all contain a head-to-head comparison of &lt;strong&gt;nasal&lt;/strong&gt; versus &lt;strong&gt;nasopharygeal (NP)&lt;/strong&gt; swabs. Lets have a look, shall we?&lt;/p&gt;
-&lt;p&gt;The dataset &lt;code&gt;df_pcr_pos_np&lt;/code&gt; is identical to &lt;code&gt;df_pcr_pos_np&lt;/code&gt;, but contains the measurement results for the &lt;strong&gt;nasopharygeal&lt;/strong&gt; swabs.&lt;/p&gt;
+&lt;p&gt;The dataset &lt;code&gt;df_pcr_pos_np&lt;/code&gt; is identical to &lt;code&gt;df_pcr_pos&lt;/code&gt;, but contains the measurement results for the &lt;strong&gt;nasopharygeal&lt;/strong&gt; swabs.&lt;/p&gt;
 &lt;p&gt;To compare both measurement methods, we can plot the relationship between the probability of obtaining a positive result versus viral load. If one method gathers systematically more viral load from the patient, we expect that method to detect infection at lower patient viral loads, and the curves (nasal vs NP) would be shifted relative to each other.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
 
@@ -220,14 +220,14 @@ ggplot(df_pcr_pos_np , aes(x = viral_load, y = mm_value)) +
 &lt;li&gt;The sensitivity of a test is strongly dependent on the distribution of viral loads in the population the measurement was conducted in&lt;/li&gt;
 &lt;li&gt;There is no evidence for any differences in sensitivity between nasal and nasopharyngeal swabs&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;This last conclusion came as a surprise for me, as nasopharygeal swabs are long considered to be the golden standard for obtaining samples for PCR detection of respiratory viruses, such as influenza and COVID-19 (Seaman &lt;em&gt;et al.&lt;/em&gt; (2019), (Lee &lt;span class=&#34;math inline&#34;&gt;\(et al.\)&lt;/span&gt; 2021) ). So let’s look a bit deeper still.&lt;/p&gt;
+&lt;p&gt;This last conclusion came as a surprise for me, as nasopharygeal swabs are long considered to be the golden standard for obtaining samples for PCR detection of respiratory viruses, such as influenza and COVID-19 (Seaman &lt;em&gt;et al.&lt;/em&gt; (2019), (Lee &lt;em&gt;et al.&lt;/em&gt; 2021) ). So let’s look a bit deeper still.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;double-check-rotterdam-vs-berlin&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Double-check: Rotterdam vs Berlin&lt;/h1&gt;
-&lt;p&gt;We can compare the results from the three Berlin studies with a recent Dutch study that also used the Roche antigen test (ref: Igloi et al 2021). The study was conducted in Rotterdam, and used nasopharygeal swabs to obtain the sample for the antigen test.&lt;/p&gt;
+&lt;p&gt;We can compare the results from the three Berlin studies with a recent Dutch study that also used the Roche antigen test (ref: Igloi &lt;em&gt;et al.&lt;/em&gt; 2021). The study was conducted in Rotterdam, and used nasopharygeal swabs to obtain the sample for the antigen test.&lt;/p&gt;
 &lt;p&gt;Cool! Lets try and create two comparable groups in both studies so we can compare the sensitivity.&lt;/p&gt;
 &lt;p&gt;The Igloi et al. paper reports results for a particular subset that we can also create in the Berlin dataset.
-They report that for the subset of samples with high viral load (viral load &lt;span class=&#34;math inline&#34;&gt;\(2.17 \cdot 10^5\)&lt;/span&gt; particles / ml = 5.35 on the log10 scale, ct_value &amp;lt;= 30) &lt;strong&gt;AND&lt;/strong&gt; who presented within 7 days of symptom onset, they found a sensitivity of 95.8% (CI95% 90.5-98.2). The percentage is based on N = 640 persons.&lt;/p&gt;
+They report that for the subset of samples with high viral load (viral load &lt;span class=&#34;math inline&#34;&gt;\(2.17 \cdot 10^5\)&lt;/span&gt; particles / ml = 5.35 on the log10 scale, ct_value &amp;lt;= 30) &lt;strong&gt;AND&lt;/strong&gt; who presented within 7 days of symptom onset, they found a sensitivity of 95.8% (CI95% 90.5-98.2). The percentage is based on N = 159 persons (or slightly less because of not subsetting on &amp;lt;= 7 days of symptoms, the paper is not very clear here).&lt;/p&gt;
 &lt;p&gt;We can check what the sensitivity is for this subgroup in the Berlin dataset:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos %&amp;gt;% filter(viral_load &amp;gt;= 5.35 &amp;amp; days_of_symptoms &amp;lt;= 7) %&amp;gt;%
   summarize(sensitivity = mean(mm_value), 
@@ -238,7 +238,7 @@ They report that for the subset of samples with high viral load (viral load &lt;
 ## 1       0.898    88&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In the same subgroup of high viral load, sensitivity of the nasal swab test is 6% lower than the nasopharyngeal swab test, across the two studies. But how do we have to weigh this evidence? N = 88 is not so much data, and the studies are not identical in design.&lt;/p&gt;
 &lt;p&gt;Importantly, since the threshold to be included in this comparison (ct value &amp;lt;= 30, viral_load &amp;gt; 5.35) contains a large part of the region where the probability of a positive result is between 0 and 1, we need to compare the distributions of viral loads for both studies to make an apples to apples comparison.&lt;/p&gt;
-&lt;p&gt;The Igloi study reports their distribution of viral loads for PCR-positive samples (N=186) in five bins:&lt;/p&gt;
+&lt;p&gt;The Igloi study reports their distribution of viral loads for PCR-positive samples (N=186) in five bins (Table 1 in their paper):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cat &amp;lt;- c(&amp;quot;ct &amp;lt;= 20&amp;quot;, &amp;quot;ct 20-25&amp;quot;, &amp;quot;ct 25-30&amp;quot;, &amp;quot;ct 30-35&amp;quot;, &amp;quot;ct 35+&amp;quot;)
 counts &amp;lt;- c(31, 82, 46, 27, 1)
 
