@@ -81,7 +81,7 @@ In these experiments, this deep nose swab was combined with a swab from the thro
 &lt;h1&gt;The dataset: results from the three Berlin studies&lt;/h1&gt;
 &lt;p&gt;Now that we have some background info, we are ready to check the data!&lt;/p&gt;
 &lt;p&gt;As mentioned above, this data came from three experiments on samples from in total 547 persons.&lt;/p&gt;
-&lt;p&gt;After googling a bit, I found out that the experiments were performed by independent researchers in a famous University hospital in Berlin, &lt;a href=&#34;https://de.wikipedia.org/wiki/Charit%C3%A9&#34;&gt;Charité&lt;/a&gt;. After googling a bit more and mailing with one of the researchers involved, Prof. Andreas Lindner, I received a list of papers that describe the research mentioned in the leaflet (References at the end of this post).&lt;/p&gt;
+&lt;p&gt;After googling a bit, I found out that the experiments were performed by independent researchers in a famous University hospital in Berlin, &lt;a href=&#34;https://de.wikipedia.org/wiki/Charit%C3%A9&#34;&gt;Charité&lt;/a&gt;. After googling a bit more and mailing with one of the researchers involved, Dr. Andreas Lindner, I received a list of papers that describe the research mentioned in the leaflet (References at the end of this post).&lt;/p&gt;
 &lt;p&gt;The dataset for the blog post compares &lt;strong&gt;nasal&lt;/strong&gt; samples tested with the Roche Antigen test kit, to PCR-tested &lt;strong&gt;nasopharyngeal&lt;/strong&gt; plus &lt;strong&gt;oropharyngeal&lt;/strong&gt; samples taken by professionals.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;This blog post is possible because the three papers by Lindner and co-workers all contain the raw data as a table in the paper. Cool!&lt;/strong&gt;
 Unfortunately, this means the data is not &lt;strong&gt;machine readable&lt;/strong&gt;. However, with a combination of manual tweaking / find-replace and some coding, I tidied the data of the three studies into a single &lt;code&gt;tibble&lt;/code&gt; data frame. You can grab the code and data from my &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
@@ -98,7 +98,7 @@ source(&amp;quot;sars_test/bootstrap_conf_intervals.R&amp;quot;)&lt;/code&gt;&lt
 &lt;li&gt;&lt;code&gt;ct_value&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;viral_load&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;days_of_symptoms&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;mm_value&lt;/code&gt; (Result of the antigen test measurement, 1 is positive, 0 is negative)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mm_value&lt;/code&gt; (Result of a &lt;strong&gt;nasal&lt;/strong&gt; antigen test measurement, 1 is positive, 0 is negative)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;To understand the PCR data, we need to know a bit more about the PCR method.&lt;/p&gt;
 &lt;div id=&#34;the-pcr-method&#34; class=&#34;section level2&#34;&gt;
@@ -137,13 +137,18 @@ This means that, on average, if we would use the antigen test kit, we have a one
 &lt;p&gt;This value is slightly lower, but close to what is mentioned in the Roche kit’s leaflet.&lt;/p&gt;
 &lt;p&gt;Let’s postpone evaluation of this fact for a moment and look a bit closer at the data.
 For example, we can example the relationship between &lt;code&gt;viral_load&lt;/code&gt; and a positive antigen test result (&lt;code&gt;mm_value&lt;/code&gt; = 1):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;table(df_pcr_pos$mm_value, df_pcr_pos_np$mm_value)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    
+##      0  1
+##   0 20  5
+##   1  5 90&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
 ggplot(df_pcr_pos, aes(x = viral_load, y = mm_value)) + 
   geom_jitter(height = 0.1) +
   geom_smooth() + 
   geom_vline(xintercept = c(5.7, 7), col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;
-From this plot, we can see that the probability of obtaining a false negative result (&lt;code&gt;mm_value&lt;/code&gt; of 0) on the antigen test decreases as the viral load &lt;strong&gt;of the PCR sample&lt;/strong&gt; increases.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From this plot, we can see that the probability of obtaining a false negative result (&lt;code&gt;mm_value&lt;/code&gt; of 0) on the antigen test decreases as the viral load &lt;strong&gt;of the PCR sample&lt;/strong&gt; increases.&lt;/p&gt;
 &lt;p&gt;From the data we also see that before the antigen test to work about half of the time (blue line at 0.5), the PCR sample needs to contain around &lt;span class=&#34;math inline&#34;&gt;\(5 \cdot 10^5\)&lt;/span&gt; viral particles (log10 scale 5.7), and for it to work reliably, we need around &lt;span class=&#34;math inline&#34;&gt;\(10^7\)&lt;/span&gt; particles (“high” viral load) in the PCR sample (which is a combination of &lt;strong&gt;oropharyngeal and nasopharyngeal swab&lt;/strong&gt;). This last bit is important: the researchers did not measure the viral load in the nasal swabs used for the antigen test, these are likely different.&lt;/p&gt;
 &lt;p&gt;For really high viral loads, above &lt;span class=&#34;math inline&#34;&gt;\(10^7\)&lt;/span&gt; particles in the &lt;strong&gt;NP/OP sample&lt;/strong&gt;, the probability of a false negative result is only a few percent:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos %&amp;gt;% filter(viral_load &amp;gt;= 7) %&amp;gt;%
@@ -164,7 +169,7 @@ From this plot, we can see that the probability of obtaining a false negative re
   geom_smooth() + expand_limits(x = -4) + geom_vline(xintercept = 1, linetype = &amp;quot;dashed&amp;quot;) +
   geom_vline(xintercept = c(3, 7), col = &amp;quot;red&amp;quot;) + geom_hline(yintercept = 7, col = &amp;quot;grey&amp;quot;, linetype = &amp;quot;dashed&amp;quot;) +
   geom_jitter(height = 0, width = 0.2) &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;
 From this plot, we learn that the viral load is highest on the onset of symptoms day (typically 5 days after infection) and decreases afterwards.&lt;/p&gt;
 &lt;p&gt;Above, we saw that the sensitivity in the whole sample was not equal to the sensitivity mentioned in the leaflet.
 When evaluating rapid antigen tests, sometimes thresholds for days of symptoms are used, for example &amp;lt;= 3 days or &amp;lt;= 7 days (plotted in red).&lt;/p&gt;
@@ -193,15 +198,36 @@ Now only 1 in 7 cases is missed by the antigen test.
 This sensitivity is now very close to that in the leaflet. The dataset in the leaflet has N = 102, whereas here we have N = 100.
 Given that the difference is very small, I decided to not look into this any further.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;the-swab-effect-going-bayesian&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;The swab effect: going Bayesian&lt;/h1&gt;
+&lt;div id=&#34;is-there-a-swab-effect&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Is there a swab effect?&lt;/h1&gt;
 &lt;p&gt;Ok, so the rapid antigen test is less sensitive than PCR.
 What about the effect of using self-administered nasal swabs, versus professional health workers taking a nasopharyngeal swab (and often a swab in the back of the throat as well)?&lt;/p&gt;
-&lt;p&gt;Lucky for us, there exists also a version of the Roche rapid antigen kit that comes with nasopharyngeal swabs.
-And a recent Dutch study, with samples from a test center in Rotterdam, used this kit (ref: Igloi et al 2021).&lt;/p&gt;
-&lt;p&gt;Cool! This allows us to get an estimate of the “swab” effect. Lets try and create two comparable groups in both studies so we can compare the sensitivity.&lt;/p&gt;
+&lt;p&gt;Interestingly, the three Berlin studies all contain a head-to-head comparison of &lt;strong&gt;nasal&lt;/strong&gt; versus &lt;strong&gt;nasopharygeal (NP)&lt;/strong&gt; swabs. Lets have a look, shall we?&lt;/p&gt;
+&lt;p&gt;The dataset &lt;code&gt;df_pcr_pos_np&lt;/code&gt; is identical to &lt;code&gt;df_pcr_pos_np&lt;/code&gt;, but contains the measurement results for the &lt;strong&gt;nasopharygeal&lt;/strong&gt; swabs.&lt;/p&gt;
+&lt;p&gt;To compare both measurement methods, we can plot the relationship between the probability of obtaining a positive result versus viral load. If one method gathers systematically more viral load from the patient, we expect that method to detect infection at lower patient viral loads, and the curves (nasal vs NP) would be shifted relative to each other.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+ggplot(df_pcr_pos_np , aes(x = viral_load, y = mm_value)) + 
+  geom_jitter(data = df_pcr_pos, height = 0.05, col = &amp;quot;blue&amp;quot;) +
+  geom_jitter(height = 0.05, col = &amp;quot;orange&amp;quot;) +
+  geom_smooth(data = df_pcr_pos , col = &amp;quot;blue&amp;quot;) + 
+  geom_smooth(col = &amp;quot;orange&amp;quot;) +
+  ggtitle(&amp;quot;nasal (blue) versus nasopharyngeal (orange) swabs&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;By fitting a smoother through the binary data, we obtain an estimate of the relationship between the probability of obtaining a positive result, and the viral load of the patient as measured by PCR on a combined NP/OP swab.&lt;/p&gt;
+&lt;p&gt;From this plot, I conclude that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The sensitivity of a test is strongly dependent on the distribution of viral loads in the population the measurement was conducted in&lt;/li&gt;
+&lt;li&gt;There is no evidence for any differences in sensitivity between nasal and nasopharyngeal swabs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This last conclusion came as a surprise for me, as nasopharygeal swabs are long considered to be the golden standard for obtaining samples for PCR detection of respiratory viruses, such as influenza and COVID-19 (Seaman &lt;em&gt;et al.&lt;/em&gt; (2019), (Lee &lt;span class=&#34;math inline&#34;&gt;\(et al.\)&lt;/span&gt; 2021) ). So let’s look a bit deeper still.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;double-check-rotterdam-vs-berlin&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Double-check: Rotterdam vs Berlin&lt;/h1&gt;
+&lt;p&gt;We can compare the results from the three Berlin studies with a recent Dutch study that also used the Roche antigen test (ref: Igloi et al 2021). The study was conducted in Rotterdam, and used nasopharygeal swabs to obtain the sample for the antigen test.&lt;/p&gt;
+&lt;p&gt;Cool! Lets try and create two comparable groups in both studies so we can compare the sensitivity.&lt;/p&gt;
 &lt;p&gt;The Igloi et al. paper reports results for a particular subset that we can also create in the Berlin dataset.
-They report that for the subset of samples with high viral load (viral load &lt;span class=&#34;math inline&#34;&gt;\(2.17 \cdot 10^5\)&lt;/span&gt; particles / ml = 5.35 on the log10 scale) &lt;strong&gt;AND&lt;/strong&gt; who presented within 7 days of symptom onset, they found a sensitivity of 95.8% (CI95% 90.5-98.2). The percentage is based on N = 640 persons.&lt;/p&gt;
+They report that for the subset of samples with high viral load (viral load &lt;span class=&#34;math inline&#34;&gt;\(2.17 \cdot 10^5\)&lt;/span&gt; particles / ml = 5.35 on the log10 scale, ct_value &amp;lt;= 30) &lt;strong&gt;AND&lt;/strong&gt; who presented within 7 days of symptom onset, they found a sensitivity of 95.8% (CI95% 90.5-98.2). The percentage is based on N = 640 persons.&lt;/p&gt;
 &lt;p&gt;We can check what the sensitivity is for this subgroup in the Berlin dataset:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos %&amp;gt;% filter(viral_load &amp;gt;= 5.35 &amp;amp; days_of_symptoms &amp;lt;= 7) %&amp;gt;%
   summarize(sensitivity = mean(mm_value), 
@@ -210,27 +236,47 @@ They report that for the subset of samples with high viral load (viral load &lt;
 ##   sensitivity     N
 ##         &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
 ## 1       0.898    88&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In the same subgroup of high viral load, sensitivity of the nasal swab test is 6% lower than the nasopharyngeal swab test. But how do we have to weigh this evidence? N = 88 is not so much data.&lt;/p&gt;
-&lt;p&gt;Here, we go Bayesian. What is a reasonable difference to expect, or in bayesian terminology: what is our &lt;strong&gt;prior&lt;/strong&gt; here? Enter domain knowledge.&lt;/p&gt;
-&lt;p&gt;From the literature, both the recent literature on COVID-19 testing, but also the older literature on Influenza swabbing, I estimate that self-collected nasal swabs are roughly 10% less accurate than nasopharyngeal swabs.
-For example, from the meta-analysis of Seaman &lt;em&gt;et al.&lt;/em&gt; (2019):&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Although nasopharyngeal/nasal wash aspirates and nasopharyngeal (NP) swabs are considered the optimal sampling technique for the confirmation of influenza [3,10,11], neither is reliably self-collected&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Pooled sensitivity was 87% (95%CI:80%,92%) and specificity was 99% (95%CI:98%,100%), compared to professional-collected swabs in the diagnosis of influenza.&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;A recent systematic review on the various ways to “obtain a COVID-19 specimen” (Lee et al) found that&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Three specimen types captured lower % positives (Nasal Swabs [82%, 95% CI: 73 to 90%], oropharyngeal swabs [84%, 95% CI: 57 to 100%], and saliva [88%, 95% CI: 81 to 93%]) than nasopharyngeal swabs&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;We can use simulation to get a distribution of plausible values for the sensitivity in the Berlin subset, &lt;strong&gt;assuming that the true sensitivity is 85%&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;In the same subgroup of high viral load, sensitivity of the nasal swab test is 6% lower than the nasopharyngeal swab test, across the two studies. But how do we have to weigh this evidence? N = 88 is not so much data, and the studies are not identical in design.&lt;/p&gt;
+&lt;p&gt;Importantly, since the threshold to be included in this comparison (ct value &amp;lt;= 30, viral_load &amp;gt; 5.35) contains a large part of the region where the probability of a positive result is between 0 and 1, we need to compare the distributions of viral loads for both studies to make an apples to apples comparison.&lt;/p&gt;
+&lt;p&gt;The Igloi study reports their distribution of viral loads for PCR-positive samples (N=186) in five bins:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cat &amp;lt;- c(&amp;quot;ct &amp;lt;= 20&amp;quot;, &amp;quot;ct 20-25&amp;quot;, &amp;quot;ct 25-30&amp;quot;, &amp;quot;ct 30-35&amp;quot;, &amp;quot;ct 35+&amp;quot;)
+counts &amp;lt;- c(31, 82, 46, 27, 1)
+
+ggplot(data.frame(cat, counts), aes(x = cat, y = counts)) +
+  geom_col()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;
+Lets create those same bins in the Berlin dataset as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos$ct_bin &amp;lt;- cut(df_pcr_pos$ct_value, breaks = c(-Inf,20,25,30,35,Inf))
+
+ggplot(df_pcr_pos, aes(x = ct_bin)) +
+  geom_histogram(stat = &amp;quot;count&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;672&#34; /&gt;
+For the subset where we can compare the sensitivities (ct_value &amp;lt;= 30), the Berlin clinical population has a higher viral load than the Rotterdam clinical population! So that does not explain why the Rotterdam study reports a higher sensitivity.&lt;/p&gt;
+&lt;p&gt;I use simulation to create distributions of plausible values for the sensitivity, assuming the observed values in both studies (89.7% for the Berlin studies, and 95.8% for the Rotterdam study) to be the true data generating values.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+# Berlin
 sample_size = 88
-prior_probability = 0.85
+prior_probability = 0.898
 
 est_p &amp;lt;- rbinom(10000, sample_size, p=prior_probability)/sample_size
 
+# Rotterdam
+sample_size2 = 159 # derived from Table 1 (Ct value distribution of PCR+ samples, &amp;lt;= 30)
+prior_probability2 = 0.958
+
+est_p2 &amp;lt;- rbinom(10000, sample_size2, p=prior_probability2)/sample_size2
+
 ggplot(data.frame(est_p), aes(x = est_p)) +
-  geom_histogram() +
-  geom_vline(xintercept = 0.898, linetype = &amp;quot;dashed&amp;quot;, col= &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;
-We can see that the observed outcome in the Berlin dataset is consistent with our domain knowledge, falling into a high probability range of likely outcomes. The outcome of this experiment would cause us to slightly update our beliefs towards a higher probability, say maybe 86% or so.&lt;/p&gt;
-&lt;p&gt;So to conclude: a sizable portion of the reduction in sensitivity of the antigen test versus PCR test is caused by the way the sample is taken, &lt;strong&gt;the swab effect&lt;/strong&gt;, not by using a different measurement technique (PCR vs flow test)!&lt;/p&gt;
+  geom_histogram(binwidth = 0.005) +
+    geom_histogram(data = data.frame(est_p = est_p2), fill = &amp;quot;gray60&amp;quot;, alpha = 0.5, binwidth = 0.005) +
+  geom_vline(xintercept = prior_probability, linetype = &amp;quot;dashed&amp;quot;, col= &amp;quot;red&amp;quot;) +
+geom_vline(xintercept = prior_probability2, linetype = &amp;quot;dashed&amp;quot;, col= &amp;quot;blue&amp;quot;) +
+  ggtitle(&amp;quot;Berlin (black bars) vs Rotterdam (grey bars) sensitivity for higher viral loads&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;
+There is a region of overlap between the two distributions, so the difference between the studies could be (in part) attributed to statistical sampling variation for the same underlying process.&lt;/p&gt;
+&lt;p&gt;I conclude that the Berlin study, who does a head to head comparison of NP versus nasal swabs, finds them to be highly comparable, and reports sensitivities that are close to those reported by the Rotterdam study.&lt;/p&gt;
+&lt;p&gt;Surprisingly, nasal swabs appear to give results that are comparable to those of nasopharyngeal swabs, while having not having the disadvantages of them (unpleasant, can only be performed by professional health worker).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;that-other-metric-the-specificity&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;That other metric: the specificity&lt;/h1&gt;
@@ -254,7 +300,7 @@ conf_matrix &amp;lt;- yardstick::conf_mat(df_leaflet, pcr_result, ag_result)
 autoplot(conf_matrix, 
          type = &amp;quot;heatmap&amp;quot;, 
          title = &amp;quot;Truth = PCR test, Prediction = Antigen test&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;288&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;288&#34; /&gt;
 From the heatmap (confusingly called a confusion matrix among ML practioners), we see that:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;For most samples (N = 431), both tests are COVID-19 negative.&lt;/li&gt;
@@ -295,9 +341,10 @@ Hurray!&lt;/p&gt;
 &lt;p&gt;We also found that even the gold standard PCR is not able to detect all infected persons, it all depends on how much virus is present, and how the sample is obtained.&lt;/p&gt;
 &lt;p&gt;But all in all, the PCR test is clearly more accurate. Why would we want to use an antigen test then?
 To do the PCR test you need a lab with skilled people, equipment such as PCR devices and pipets, and time, as the process takes at least a few hours to complete. The advantage of an antigen test is to have a low-tech, faster alternative that can be self-administered. But that comes at a cost, because the antigen tests are less sensitive.&lt;/p&gt;
-&lt;p&gt;From the analysis, it is clear that the rapid Antigen tests need more virus present to reliably detect infection. It is ALSO clear that the test is highly specific, with less than 1% false positives. Note that a false positive rate of 1% still means that in a healthy population of 1000, 10 are falsely detected as having COVID-19.
-Finally, we find that the nasal swabs are less sensitive than the nasopharyngeal (“deep nose”) swabs, this reduces sensitivity by roughly 10% (Lindner &lt;em&gt;et al.&lt;/em&gt; 2021, Igloi &lt;em&gt;et al.&lt;/em&gt; 2021, Lee &lt;em&gt;et al.&lt;/em&gt; 2021).&lt;/p&gt;
-&lt;p&gt;So both the measurement device, and the self-collection of sample contribute to reduce the sensitivity. But now comes the key insight: the persons that produce the largest amounts of virus get detected, irrespective of whether they have symptoms or not. To me, this seems like a “Unique Selling Point” of the rapid tests: the ability to rapidly detect the most contagious persons in a group, after which these persons can go into quarantine and help reduce spread.&lt;/p&gt;
+&lt;p&gt;From the analysis, it is clear that the rapid Antigen tests need more virus present to reliably detect infection. It is ALSO clear that the test is highly specific, with less than 1% false positives. Note that a false positive rate of 1% still means that in a healthy population of 1000, 10 are falsely detected as having COVID-19.&lt;/p&gt;
+&lt;p&gt;Surprisingly, nasal swabs appear to give results that are comparable to those of nasopharyngeal swabs, while having not having the disadvantages of them (unpleasant, can only be performed by professional health worker).&lt;/p&gt;
+&lt;p&gt;So the antigen tests are less sensitive than PCR tests. But now comes the key insight: the persons that produce the largest amounts of virus get detected, irrespective of whether they have symptoms or not. To me, this seems like a “Unique Selling Point” of the rapid tests: the ability to rapidly detect the most contagious persons in a group, after which these persons can go into quarantine and help reduce spread.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Thanks to dr. Andreas Lindner for providing helpful feedback and pointing out flaws in my original blog post. This should not be seen as an endorsement of the conclusions of this post, and any remaining mistakes are all my own!&lt;/em&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;References&lt;/h1&gt;

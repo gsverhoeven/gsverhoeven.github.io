@@ -37,6 +37,7 @@ df1$pcr_assay_type <- NA
 
 
 
+
 df2 <- read.csv("sars_test/dataset_n179.csv", sep = " ", header = FALSE, na.strings = "X")
 df2_names <- c("id", "ag_prof_nmt", "ag_prof_nmt_signal", "ag_prof_np", "ag_prof_np_signal", "ct_value",  "viral_load", "days_of_symptoms")
 colnames(df2) <- df2_names
@@ -52,8 +53,14 @@ df2$pcr_assay_type <- NA
 
 ## study 3
 
+#Title change: 
+#Journal of Clinical Virology: Diagnostic accuracy and feasibility of patient self-testing with a SARS-CoV-2 antigen-detecting rapid test
+
+#was:
+  
+#SARS-CoV-2 patient self-testing with an antigen-detecting rapid test: a head-to-head comparison with professional testing
 # 
-# 3. https://www.medrxiv.org/content/10.1101/2021.01.06.20249009v1 (146 patients, N*=138, 27.4% infected), still under Review
+# 3. https://www.medrxiv.org/content/10.1101/2021.01.06.20249009v1 (146 patients, N*=138, 27.4% infected, N = 40), still under Review
 # 
 # *SARS-CoV-2 patient self-testing with an antigen-detecting rapid test: a head-to-head comparison with professional testing*
 #   
@@ -88,12 +95,27 @@ df3$study <- 3
 
 # Merged dataset
 
+# select nasal measurements
 df_pcr_pos <- rbind(df1 %>% filter(mm_type == "ag_self_nmt"), 
             df2 %>% filter(mm_type == "ag_prof_nmt"), 
             df3 %>% filter(mm_type == "ag_self_nmt"))
 
 df_pcr_pos$mm_value <- as.integer(as.factor(df_pcr_pos$mm_value ))-1
 
+# select NP measurements
+df_pcr_pos_np <- rbind(df1 %>% filter(mm_type == "ag_prof_np"), 
+                    df2 %>% filter(mm_type == "ag_prof_np"), 
+                    df3 %>% filter(mm_type == "ag_prof_np"))
+
+df_pcr_pos_np$mm_value <- as.integer(as.factor(df_pcr_pos_np$mm_value ))-1
+
 rm(df1, df2, df3, df1_names, df2_names, df3_names)
+
+# Study 4
+
+#Anterior nasal versus nasal mid-turbinate sampling for a SARS-CoV-2 antigen-detecting rapid test: does localisation or professional collection matter?
+#   
+#Olga  Nikolai1*,  Chiara  Rohardt1*, Frank  Tobian2, Andrea  Junge1,  Victor  M. Corman3,4, Terry C. Jones3,4,5,Mary Gaeddert2, Federica Lainati2, #Jilian A. Sacks6, Joachim Seybold7, Frank P. Mockenhaupt1,Claudia M. Denkinger2,8ⴕand Andreas K. Lindner1ⴕ
+
 
 
