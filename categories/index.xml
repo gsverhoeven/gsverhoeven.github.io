@@ -13,18 +13,18 @@
     </image>
     
     <item>
-      <title>Measurement</title>
-      <link>/categories/measurement/</link>
+      <title>Data science</title>
+      <link>/categories/data-science/</link>
       <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
-      <guid>/categories/measurement/</guid>
+      <guid>/categories/data-science/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>R</title>
-      <link>/categories/r/</link>
+      <title>Measurement</title>
+      <link>/categories/measurement/</link>
       <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
-      <guid>/categories/r/</guid>
+      <guid>/categories/measurement/</guid>
       <description></description>
     </item>
     
@@ -57,14 +57,6 @@
       <link>/categories/deep-learning/</link>
       <pubDate>Fri, 15 May 2020 00:00:00 +0000</pubDate>
       <guid>/categories/deep-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Data science</title>
-      <link>/categories/data-science/</link>
-      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
-      <guid>/categories/data-science/</guid>
       <description></description>
     </item>
     
