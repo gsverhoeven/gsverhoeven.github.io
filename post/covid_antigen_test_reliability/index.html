@@ -595,7 +595,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/statistics-r-measurement/">Statistics, R, Measurement</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/statistics/">Statistics</a>, <a href="/categories/r/">R</a>, <a href="/categories/measurement/">Measurement</a></span>
   
 
 </div>
@@ -691,6 +691,7 @@ In these experiments, this deep nose swab was combined with a swab from the thro
 <p>The dataset for the blog post compares <strong>nasal</strong> samples tested with the Roche Antigen test kit, to PCR-tested <strong>nasopharyngeal</strong> plus <strong>oropharyngeal</strong> samples taken by professionals.</p>
 <p><strong>This blog post is possible because the three papers by Lindner and co-workers all contain the raw data as a table in the paper. Cool!</strong>
 Unfortunately, this means the data is not <strong>machine readable</strong>. However, with a combination of manual tweaking / find-replace and some coding, I tidied the data of the three studies into a single <code>tibble</code> data frame. You can grab the code and data from my <a href="https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test">Github</a>.</p>
+<p><strong>UPDATE</strong>: Rein Halbersma showed me how to use web scraping to achieve the same result, with a mere 20 lines of code of either Python or R! Cool! I added his scripts to my <a href="https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test">Github</a> as well, go check them out, I will definitely go this route next time.</p>
 <pre class="r"><code># creates df_pcr_pos
 source(&quot;sars_test/dataprep_roche_test.R&quot;)
 
@@ -981,7 +982,13 @@ Seaman et al 2019 <a href="https://pubmed.ncbi.nlm.nih.gov/31400670/">Link to pa
 
 <div class="article-tags">
   
-  <a class="badge badge-light" href="/tags/covid-19-dag-causal-graph-bayesian-statistics/">COVID-19, DAG, causal graph, bayesian statistics</a>
+  <a class="badge badge-light" href="/tags/covid-19/">COVID-19</a>
+  
+  <a class="badge badge-light" href="/tags/dag/">DAG</a>
+  
+  <a class="badge badge-light" href="/tags/causal-graph/">causal graph</a>
+  
+  <a class="badge badge-light" href="/tags/bayesian-statistics/">Bayesian statistics</a>
   
 </div>
 
@@ -1204,6 +1211,15 @@ Seaman et al 2019 <a href="https://pubmed.ncbi.nlm.nih.gov/31400670/">Link to pa
 
 
   
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/causal-inference-course/">Designing an introductory course on Causal Inference</a></li>
+      
+    </ul>
+  </div>
   
 
 

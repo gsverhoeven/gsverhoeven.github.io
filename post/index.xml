@@ -85,6 +85,7 @@ In these experiments, this deep nose swab was combined with a swab from the thro
 &lt;p&gt;The dataset for the blog post compares &lt;strong&gt;nasal&lt;/strong&gt; samples tested with the Roche Antigen test kit, to PCR-tested &lt;strong&gt;nasopharyngeal&lt;/strong&gt; plus &lt;strong&gt;oropharyngeal&lt;/strong&gt; samples taken by professionals.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;This blog post is possible because the three papers by Lindner and co-workers all contain the raw data as a table in the paper. Cool!&lt;/strong&gt;
 Unfortunately, this means the data is not &lt;strong&gt;machine readable&lt;/strong&gt;. However, with a combination of manual tweaking / find-replace and some coding, I tidied the data of the three studies into a single &lt;code&gt;tibble&lt;/code&gt; data frame. You can grab the code and data from my &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;UPDATE&lt;/strong&gt;: Rein Halbersma showed me how to use web scraping to achieve the same result, with a mere 20 lines of code of either Python or R! Cool! I added his scripts to my &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test&#34;&gt;Github&lt;/a&gt; as well, go check them out, I will definitely go this route next time.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# creates df_pcr_pos
 source(&amp;quot;sars_test/dataprep_roche_test.R&amp;quot;)
 

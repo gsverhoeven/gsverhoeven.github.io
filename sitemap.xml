@@ -3,12 +3,27 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/tags/bayesian-statistics/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/tags/covid-19-dag-causal-graph-bayesian-statistics/</loc>
+    <loc>/tags/causal-graph/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/covid-19/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/dag/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -18,12 +33,22 @@
   </url>
   
   <url>
+    <loc>/categories/measurement/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/post/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/categories/statistics-r-measurement/</loc>
+    <loc>/categories/r/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/statistics/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -98,11 +123,6 @@
   </url>
   
   <url>
-    <loc>/tags/bayesian-statistics/</loc>
-    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/tags/brms/</loc>
     <lastmod>2020-09-04T00:00:00+00:00</lastmod>
   </url>
@@ -119,11 +139,6 @@
   
   <url>
     <loc>/tags/stan/</loc>
-    <lastmod>2020-09-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/statistics/</loc>
     <lastmod>2020-09-04T00:00:00+00:00</lastmod>
   </url>
   
@@ -208,17 +223,7 @@
   </url>
   
   <url>
-    <loc>/tags/causal-graph/</loc>
-    <lastmod>2019-05-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/categories/causal-inference/</loc>
-    <lastmod>2019-05-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/dag/</loc>
     <lastmod>2019-05-11T00:00:00+00:00</lastmod>
   </url>
   

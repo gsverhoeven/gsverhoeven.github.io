@@ -13,10 +13,34 @@
     </image>
     
     <item>
-      <title>COVID-19, DAG, causal graph, bayesian statistics</title>
-      <link>/tags/covid-19-dag-causal-graph-bayesian-statistics/</link>
+      <title>Bayesian statistics</title>
+      <link>/tags/bayesian-statistics/</link>
       <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
-      <guid>/tags/covid-19-dag-causal-graph-bayesian-statistics/</guid>
+      <guid>/tags/bayesian-statistics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>causal graph</title>
+      <link>/tags/causal-graph/</link>
+      <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
+      <guid>/tags/causal-graph/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>COVID-19</title>
+      <link>/tags/covid-19/</link>
+      <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
+      <guid>/tags/covid-19/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>DAG</title>
+      <link>/tags/dag/</link>
+      <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
+      <guid>/tags/dag/</guid>
       <description></description>
     </item>
     
@@ -73,14 +97,6 @@
       <link>/tags/reinforcement-learning/</link>
       <pubDate>Sun, 07 Mar 2021 00:00:00 +0000</pubDate>
       <guid>/tags/reinforcement-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>bayesian statistics</title>
-      <link>/tags/bayesian-statistics/</link>
-      <pubDate>Fri, 04 Sep 2020 00:00:00 +0000</pubDate>
-      <guid>/tags/bayesian-statistics/</guid>
       <description></description>
     </item>
     
@@ -193,22 +209,6 @@
       <link>/tags/process-mining/</link>
       <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
       <guid>/tags/process-mining/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>causal graph</title>
-      <link>/tags/causal-graph/</link>
-      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
-      <guid>/tags/causal-graph/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>DAG</title>
-      <link>/tags/dag/</link>
-      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
-      <guid>/tags/dag/</guid>
       <description></description>
     </item>
     
