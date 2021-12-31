@@ -3,12 +3,52 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/tags/bayesian-statistics/</loc>
-    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+    <loc>/tags/beautiful-soup/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/blood-bowl-fumbbl-dataset/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/data-paper/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/pandas/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/python/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/bayesian-statistics/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -33,27 +73,12 @@
   </url>
   
   <url>
-    <loc>/</loc>
-    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/categories/measurement/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/post/</loc>
-    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/categories/statistics/</loc>
-    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -104,11 +129,6 @@
   
   <url>
     <loc>/post/frozenlake-qlearning-convergence/</loc>
-    <lastmod>2021-03-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/python/</loc>
     <lastmod>2021-03-07T00:00:00+00:00</lastmod>
   </url>
   
