@@ -5,12 +5,141 @@
     <link>/post/</link>
       <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Thu, 30 Dec 2021 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Tue, 04 Jan 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
+    
+    <item>
+      <title>OpenJDK and IcedTea: Java Web Start Forensics on Ubuntu</title>
+      <link>/post/java_webstart_forensics_unbuntu/</link>
+      <pubDate>Tue, 04 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>/post/java_webstart_forensics_unbuntu/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;To play &lt;a href=&#34;https://www.fumbbl.com&#34;&gt;Blood Bowl online on FUMBBL.com&lt;/a&gt;, a Java client is used that must be started using Java Web Start. On my Ubuntu linux systems (18.04LTS and 20.04LTS), open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpfull for others encountering the same issues.&lt;/p&gt;
+&lt;p&gt;From &lt;a href=&#34;https://en.wikipedia.org/wiki/Java_Web_Start&#34;&gt;wikipedia&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Java Web Start was distributed as part of the Java Platform, and included in downloads of the JRE and JDK. It was deprecated by Oracle in Java SE 9 and removed in Java SE 11. The code for Java Web Start was not released by Oracle as part of OpenJDK, and thus OpenJDK originally did not support it. IcedTea-Web provides an independent open source implementation of Java Web Start that is currently developed by the AdoptOpenJDK community, RedHat and Karakun AG, and which is bundled in the official OpenJDK installer.[1]&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The suffering started on December 19th 2021, when &lt;code&gt;openJDK&lt;/code&gt; was automatically upgraded, installing a new &lt;code&gt;java.security&lt;/code&gt; file, and left my system unable to run the FUMBBL client using &lt;code&gt;javaws&lt;/code&gt;. Fixing the &lt;code&gt;java.security&lt;/code&gt; file (see below for details) allowed it to start, but it gave me the dreaded &lt;strong&gt;white bar&lt;/strong&gt;, covering part of the chat window and re-roll icons. And the classic &lt;code&gt;unset -v GNOME_DESKTOP_SESSION_ID&lt;/code&gt; did not work anymore!&lt;/p&gt;
+&lt;div id=&#34;what-is-up-with-gnome_desktop_session_id&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What is up with GNOME_DESKTOP_SESSION_ID?&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;gertjan:~$ env | grep GNOME_DESK
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;unset -v GNOME_DESKTOP_SESSION_ID&lt;/code&gt; removes this. In Ubuntu 20.04LTS, this variable is not even present anymore.&lt;/p&gt;
+&lt;p&gt;Apparently, there is a connection between GNOME and java:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://bugs.openjdk.java.net/browse/JDK-8247753&#34; class=&#34;uri&#34;&gt;https://bugs.openjdk.java.net/browse/JDK-8247753&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Java relies on an environment variable GNOME_DESKTOP_SESSION_ID for getting GTK desktop theme. This environmental variable was deprecated earlier and now this got removed in the latest version&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This provides some hints at why openJDK 11 is not working anymore with the FUMBBL client.
+If the client detects a GTK system, it changes it widgets, creating the bar below, and using a different font.
+Previously, by unsetting the environment variable, we could prevent the client from detecting GTK.
+But since the latest openJDK version, it seems that there is now a different way in which it detects GTK, and we can no longer influence this ourselves.&lt;/p&gt;
+&lt;p&gt;But as life is short, so I just leave this here as a theory for others to investigate, and went for a workaround instead: downgrading the JRE from version 11 to 8.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fixing-the-problem&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fixing the problem&lt;/h1&gt;
+&lt;p&gt;So I decided to look into the matter, forensics style.&lt;/p&gt;
+&lt;p&gt;From the &lt;code&gt;apt&lt;/code&gt; history (&lt;code&gt;/var/log/apt/history.1.gz&lt;/code&gt;), I found that on 19 december 2021, a new version of &lt;code&gt;openjdk-11&lt;/code&gt; was installed automatically:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Start-Date: 2021-12-19  09:31:26
+Commandline: aptdaemon role=&amp;#39;role-commit-packages&amp;#39; sender=&amp;#39;:1.154&amp;#39;
+Upgrade: openjdk-11-jre-headless:amd64 (11.0.11+9-0ubuntu2~18.04, 11.0.13+8-0ubuntu1~18.04), openjdk-11-jre:amd64 (11.0.11+9-0ubuntu2~18.04, 11.0.13+8-0ubuntu1~18.04)
+End-Date: 2021-12-19  09:35:00&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It seems that we went from &lt;code&gt;11.0.11+9-0ubuntu2~18.04&lt;/code&gt; to &lt;code&gt;11.0.13+8-0ubuntu1~18.04&lt;/code&gt;.
+(Which is strange since there were a few releases in between as well according to the CHANGELOG)&lt;/p&gt;
+&lt;p&gt;Trying to go back using &lt;code&gt;sudo apt-get install openjdk-11-jre-headless:amd64=11.0.11+9-0ubuntu2&lt;/code&gt; did not work.
+From browsing &lt;a href=&#34;https://packages.ubuntu.com/&#34; class=&#34;uri&#34;&gt;https://packages.ubuntu.com/&lt;/a&gt; it seems that only the latest version of the &lt;code&gt;openjdk-11-jre&lt;/code&gt; package is available (18.04LTS, codename &lt;strong&gt;bionic&lt;/strong&gt;).&lt;/p&gt;
+&lt;p&gt;Remembering that the FUMBBL client always complains about “requesting JRE 1.6 and getting JRE 11.0” , I decided to try and downgrade openJDK: remove openJDK 11 and only install &lt;code&gt;openJDK-8&lt;/code&gt; to force &lt;code&gt;javaws&lt;/code&gt; to use JRE 1.8.&lt;/p&gt;
+&lt;p&gt;To get a clean reproducible situation, I first removed all openJDK software from my system:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sudo apt remove openjdk-11-jdk-headless
+sudo apt remove jdk-11.0.9  #(installed this manually in a distant past apparently)
+sudo apt remove openjdk-8-jre-headless&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This removes all openjdk packages, including &lt;code&gt;icedtea-netx&lt;/code&gt;, the package which contains the &lt;code&gt;javaws&lt;/code&gt; Java web start to start &lt;code&gt;*.jnlp&lt;/code&gt; files.
+&lt;code&gt;/usr/lib/jvm&lt;/code&gt; is empty now on my system.&lt;/p&gt;
+&lt;p&gt;I then installed the &lt;code&gt;openjdk-8-jre-headless&lt;/code&gt; package:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sudo apt install openjdk-8-jre-headless&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After this, I have indeed a working JRE 1.8 environment:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gertjan:~$ java -version
+openjdk version &amp;quot;1.8.0_312&amp;quot;
+OpenJDK Runtime Environment (build 1.8.0_312-8u312-b07-0ubuntu1~18.04-b07)
+OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, no &lt;code&gt;javaws&lt;/code&gt; (Web start) is present. This is in a separate package called &lt;code&gt;icedtea&lt;/code&gt; (something to do with licensing or .&lt;/p&gt;
+&lt;p&gt;So we do
+&lt;code&gt;sudo apt install icedtea-plugin&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;The following NEW packages will be installed:
+  default-jre default-jre-headless icedtea-8-plugin icedtea-netx
+  icedtea-plugin openjdk-11-jre openjdk-11-jre-headless&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So if we want &lt;code&gt;icedtea&lt;/code&gt;, we also get &lt;code&gt;openjdk-11&lt;/code&gt; as a hard dependency.
+Lets play along and install those packages.&lt;/p&gt;
+&lt;p&gt;This brings &lt;code&gt;javaws&lt;/code&gt; to our system:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;javaws --version
+selected jre: /usr/lib/jvm/default-java
+WARNING: package javax.jnlp not in java.desktop
+icedtea-web 1.8 (1.8)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It displays a text that gives us a hint how &lt;code&gt;javaws&lt;/code&gt; chooses its JRE: by looking at &lt;code&gt;/usr/lib/jvm/default-java&lt;/code&gt;.
+This is at this point a symbolic link pointing at &lt;code&gt;openjdk-11&lt;/code&gt;.
+Indeed, starting the FUMBBL client with &lt;code&gt;javaws&lt;/code&gt; chooses openjdk 11 automatically.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gertjan:~$ javaws ffblive.jnlp
+
+selected jre: /usr/lib/jvm/default-java
+WARNING: package javax.jnlp not in java.desktop
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Codebase matches codebase manifest attribute, and application is signed. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.
+Starting application [com.fumbbl.ffb.client.FantasyFootballClient] ...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This gives us the Blood client with the larger font and white bar covering the lower part of the screen.&lt;/p&gt;
+&lt;p&gt;At first I played with the &lt;code&gt;JAVA_HOME&lt;/code&gt; variable, pointing it to &lt;code&gt;/usr/lib/jvm/java-8-openjdk-amd64&lt;/code&gt;. This does have effect on &lt;code&gt;javaws&lt;/code&gt;, but it gives an error:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;thread &amp;#39;main&amp;#39; panicked at &amp;#39;Error spawning JVM process, java executable: [/usr/lib/jvm/java-8-oracle], arguments: [[&amp;quot;-splash:/usr/share/icedtea-web/javaws_splash.png&amp;quot;, &amp;quot;-Xbootclasspath/a:/usr/share/icedtea-web/javaws.jar:/usr/share/java/js.jar:/usr/share/java/tagsoup.jar:/usr/lib/jvm/java-8-oracle/lib/ext/nashorn.jar:&amp;quot;, &amp;quot;-classpath&amp;quot;, &amp;quot;/usr/lib/jvm/java-8-oracle/lib/rt.jar:/usr/lib/jvm/java-8-oracle/lib/ext/jfxrt.jar:&amp;quot;, &amp;quot;-Dicedtea-web.bin.name=javaws&amp;quot;, &amp;quot;-Dicedtea-web.bin.location=/usr/lib/icedtea-web/bin/javaws&amp;quot;, &amp;quot;net.sourceforge.jnlp.runtime.Boot&amp;quot;]]&amp;#39;, src/os_access.rs:36:19
+note: Run with `RUST_BACKTRACE=1` for a backtrace&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So no messing around with &lt;code&gt;JAVA_HOME&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The trick in the end was to change the symbolic link in &lt;code&gt;/usr/lib/jvm/default-java&lt;/code&gt; to point at &lt;code&gt;java-8-openjdk-amd64&lt;/code&gt; instead of pointing at &lt;code&gt;java-11-openjdk-amd64&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gertjan:~$ ls /usr/lib/jvm -lt
+total 8
+drwxr-xr-x 7 root root 4096 jan  4 19:46 java-11-openjdk-amd64
+drwxr-xr-x 5 root root 4096 jan  4 19:43 java-8-openjdk-amd64
+lrwxrwxrwx 1 root root   20 nov  3 14:54 java-1.8.0-openjdk-amd64 -&amp;gt; java-8-openjdk-amd64
+lrwxrwxrwx 1 root root   21 okt 29 11:11 java-1.11.0-openjdk-amd64 -&amp;gt; java-11-openjdk-amd64
+lrwxrwxrwx 1 root root   25 feb 20  2019 default-java -&amp;gt; java-1.11.0-openjdk-amd64
+
+gertjan:~$ sudo rm /usr/lib/jvm/default-java
+
+gertjan:~$ cd /usr/lib/jvm/
+
+gertjan:/usr/lib/jvm$ sudo ln -ns java-1.8.0-openjdk-amd64 default-java&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Finally, we need fix the &lt;code&gt;java.security&lt;/code&gt; thingy by commenting out the following lines in &lt;code&gt;java.security&lt;/code&gt; (located somewhere in the &lt;code&gt;/usr/lib/jvm/java-8-openjdk-amd64&lt;/code&gt; file tree) with a text editor:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sudo gedit /usr/lib/jvm/default-java/jre/lib/security/java.security &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;These lines must be commented:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#jdk.jar.disabledAlgorithms=MD2, MD5, RSA keySize &amp;lt; 1024, \
+#      DSA keySize &amp;lt; 1024, include jdk.disabled.namedCurves&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, the hurting has not stopped yet on Ubuntu 18.04. &lt;code&gt;openjdk-8&lt;/code&gt; throws a new error, about “Assistive Technology” (not seen on Ubuntu 20.04LTS, where I first fixed these problems):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gertjan:~/Downloads$ javaws ffblive.jnlp
+
+selected jre: /usr/lib/jvm/default-java
+Exception in thread &amp;quot;main&amp;quot; java.awt.AWTError: Assistive Technology not found: org.GNOME.Accessibility.AtkWrapper
+    at java.awt.Toolkit.loadAssistiveTechnologies(Toolkit.java:807)
+    at java.awt.Toolkit.getDefaultToolkit(Toolkit.java:886)
+    at javax.swing.UIManager.getSystemLookAndFeelClassName(UIManager.java:611)
+    at net.sourceforge.jnlp.runtime.JNLPRuntime.initialize(JNLPRuntime.java:221)
+    at net.sourceforge.jnlp.runtime.Boot.init(Boot.java:349)
+    at net.sourceforge.jnlp.runtime.JnlpBoot.run(JnlpBoot.java:58)
+    at net.sourceforge.jnlp.runtime.Boot.run(Boot.java:270)
+    at net.sourceforge.jnlp.runtime.Boot.run(Boot.java:63)
+    at java.security.AccessController.doPrivileged(Native Method)
+    at net.sourceforge.jnlp.runtime.Boot.main(Boot.java:210)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Fortunately, this is a well documented error with an easy solution.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://askubuntu.com/questions/695560/assistive-technology-not-found-awterror&#34; class=&#34;uri&#34;&gt;https://askubuntu.com/questions/695560/assistive-technology-not-found-awterror&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Provided in the form of this oneliner:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sudo sed -i -e &amp;#39;/^assistive_technologies=/s/^/#/&amp;#39; /etc/java-*-openjdk/accessibility.properties`&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And finally … we have a working FUMBBL client again, without the white bar! Hurrah!
+As long as &lt;code&gt;openjdk-8-jre&lt;/code&gt; stays available on Ubuntu universe, I think were good.
+Judging from &lt;a href=&#34;https://packages.ubuntu.com/search?keywords=openjdk-8-jre&#34;&gt;package.ubuntu.com&lt;/a&gt;, this package is broadly available, up to the latest Ubuntu versions, so fingers crossed.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Construction of a public dataset of Blood Bowl matches played on FUMBBL.com</title>
