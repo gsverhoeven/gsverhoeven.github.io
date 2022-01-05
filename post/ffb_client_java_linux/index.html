@@ -28,10 +28,10 @@
   
     
   
-  <meta name="description" content="To play [Blood Bowl online on FUMBBL.com](https://www.fumbbl.com), a Java client is used that must be started using Java Web Start. On my Ubuntu linux system, open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpfull for others encountering the same issues.">
+  <meta name="description" content="To play [Blood Bowl online on FUMBBL.com](https://www.fumbbl.com), a Java client is used that works with Java Web Start. On my Ubuntu linux system, open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpful for others encountering the same issues.">
 
   
-  <link rel="alternate" hreflang="en-us" href="/post/java_webstart_forensics_unbuntu/">
+  <link rel="alternate" hreflang="en-us" href="/post/ffb_client_java_linux/">
 
   
 
@@ -252,7 +252,7 @@
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="/post/java_webstart_forensics_unbuntu/">
+  <link rel="canonical" href="/post/ffb_client_java_linux/">
 
   
   
@@ -268,9 +268,9 @@
   <meta property="twitter:creator" content="@GertjanVerhoev1">
   
   <meta property="og:site_name" content="Gertjan Verhoeven">
-  <meta property="og:url" content="/post/java_webstart_forensics_unbuntu/">
+  <meta property="og:url" content="/post/ffb_client_java_linux/">
   <meta property="og:title" content="OpenJDK and IcedTea: Java Web Start Forensics on Ubuntu | Gertjan Verhoeven">
-  <meta property="og:description" content="To play [Blood Bowl online on FUMBBL.com](https://www.fumbbl.com), a Java client is used that must be started using Java Web Start. On my Ubuntu linux system, open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpfull for others encountering the same issues."><meta property="og:image" content="/img/headers/bloodbowl_dataset.png">
+  <meta property="og:description" content="To play [Blood Bowl online on FUMBBL.com](https://www.fumbbl.com), a Java client is used that works with Java Web Start. On my Ubuntu linux system, open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpful for others encountering the same issues."><meta property="og:image" content="/img/headers/bloodbowl_dataset.png">
   <meta property="twitter:image" content="/img/headers/bloodbowl_dataset.png"><meta property="og:locale" content="en-us">
   
     
@@ -302,7 +302,7 @@
   "@type": "BlogPosting",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "/post/java_webstart_forensics_unbuntu/"
+    "@id": "/post/ffb_client_java_linux/"
   },
   "headline": "OpenJDK and IcedTea: Java Web Start Forensics on Ubuntu",
   
@@ -322,7 +322,7 @@
       "url": "img//"
     }
   },
-  "description": "To play [Blood Bowl online on FUMBBL.com](https://www.fumbbl.com), a Java client is used that must be started using Java Web Start. On my Ubuntu linux system, open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpfull for others encountering the same issues."
+  "description": "To play [Blood Bowl online on FUMBBL.com](https://www.fumbbl.com), a Java client is used that works with Java Web Start. On my Ubuntu linux system, open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpful for others encountering the same issues."
 }
 </script>
 
@@ -583,7 +583,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    6 min read
+    9 min read
   </span>
   
 
@@ -627,23 +627,52 @@
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>To play <a href="https://www.fumbbl.com">Blood Bowl online on FUMBBL.com</a>, a Java client is used that must be started using Java Web Start. On my Ubuntu linux systems (18.04LTS and 20.04LTS), open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpfull for others encountering the same issues.</p>
+<p>To play <a href="https://www.fumbbl.com">Blood Bowl online on FUMBBL.com</a>, a Java client (hereafter “the FFB client”) is used that works with Java Web Start. On my Ubuntu linux systems (18.04LTS and 20.04LTS), open source versions of java and java web start (openJDK and IcedTea) take care of this. This post describes my suffering caused by the client not working anymore after a Ubuntu software update, and might be helpful for others encountering the same issues.</p>
+<p>The suffering started on December 19th 2021, when <code>openJDK</code> was automatically upgraded, installing a new <code>java.security</code> file, and left my system unable to run the FUMBBL client using <code>javaws</code>. Fixing the <code>java.security</code> file (see below for details) allowed it to start, but it gave me the dreaded <strong>white bar</strong>, covering part of the chat window and re-roll icons. And the classic <code>unset -v GNOME_DESKTOP_SESSION_ID</code> did not work anymore!</p>
+<p><strong>Update</strong>: After writing the initial version of this post, I learned a bit more.</p>
+<div id="oracle-openjdk-and-java-8-9-10-17" class="section level1">
+<h1>Oracle, OpenJDK and Java 8, 9, 10, … 17</h1>
+<p>The FFB client is designed to work well with “Oracle Java 8 from java.com”, see e.g. <a href="https://fumbbl.com/index.php?name=PNphpBB2&amp;file=viewtopic&amp;t=31365">here</a> on FUMBBL.com.</p>
+<p>However, from the current state of affairs, written up <a href="https://medium.com/@javachampions/java-is-still-free-3-0-0-ocrt-2021-bca75c88d23b">here by the Java Champions</a>, I gather that both Oracle Java 8 and OpenJDK 8 come from the same codebase maintained at <a href="https://openjdk.java.net/">https://openjdk.java.net/</a> and that differences are mostly in packaging &amp; support. The release notes for the latest Oracle Java 8 version (8u311) can be found <a href="https://www.oracle.com/java/technologies/javase/8u311-relnotes.html">here</a>. We can see that the bug fixes point to <a href="https://bugs.openjdk.java.net">https://bugs.openjdk.java.net</a> where the bugs are fixed in all affected versions, including openjdk 8.</p>
+<p>I also learned about the different versions of Java. There is 8, but also, 9, 10, 11 etc up to 17.
+Of all these versions only 8, 11 and 17 are relevant. Why? Because 8 and 11 are on “Long term support” (LTS), and 17 is the most recent Java version (and also destined to be a LTS version). In the Java champions medium article mentioned above, a nice table is shown with all the different versions and how long they will be supported by the community.</p>
+<p><img src="openjdk_schedule.png" /></p>
+<p>Since our goal is to keep on using a Java app written for Java 8, we focus on 8 and 11 for the rest of this post.
+Can apps written for Java 8 also be run in a Java 11 environment? In a <a href="https://medium.com/uptake-tech/migrating-to-java-11-while-maintaining-a-java-8-client-library-f618a3ca6499">Medium blog post on migrating from Java 8 to Java 11</a> it is mentioned that Java is famous for its backward compatibility. Indeed, my own experience is that the FFB client can also be run with Java 11.
+Which is nice, since Java 11 is currently the default Java version for Ubuntu, and we do not have to install additional software to run the FFB client.</p>
+<p>Finally, there is the web start technology:</p>
 <p>From <a href="https://en.wikipedia.org/wiki/Java_Web_Start">wikipedia</a>:</p>
 <p><em>Java Web Start was distributed as part of the Java Platform, and included in downloads of the JRE and JDK. It was deprecated by Oracle in Java SE 9 and removed in Java SE 11. The code for Java Web Start was not released by Oracle as part of OpenJDK, and thus OpenJDK originally did not support it. IcedTea-Web provides an independent open source implementation of Java Web Start that is currently developed by the AdoptOpenJDK community, RedHat and Karakun AG, and which is bundled in the official OpenJDK installer.[1]</em></p>
-<p>The suffering started on December 19th 2021, when <code>openJDK</code> was automatically upgraded, installing a new <code>java.security</code> file, and left my system unable to run the FUMBBL client using <code>javaws</code>. Fixing the <code>java.security</code> file (see below for details) allowed it to start, but it gave me the dreaded <strong>white bar</strong>, covering part of the chat window and re-roll icons. And the classic <code>unset -v GNOME_DESKTOP_SESSION_ID</code> did not work anymore!</p>
+<p>Icedtea is available for both OpenJDK 8 and OpenJDK 11, so no problem there.</p>
+</div>
+<div id="this-blog-post" class="section level1">
+<h1>This blog post</h1>
+<p>The “forensics” below were directed to getting Java 8 in the form of openjdk-8 on my Ubuntu systems, and getting the FFB client to run in that Java environement. However, in the meantime I also figured out why the FFB client stopped working on Java 11, and how to fix that.</p>
+<p>From the openJDK schedule above we can see that both Java 8 and 11 in the form of OpenJDK 8 and 11 are supported until sept 2026, so we have at least four more years of online Blood Bowl :-)</p>
+</div>
 <div id="what-is-up-with-gnome_desktop_session_id" class="section level1">
 <h1>What is up with GNOME_DESKTOP_SESSION_ID?</h1>
+<p>Ever since I first started playing online Blood Bowl using the FFB client on Ubuntu, I just did the <code>unset -v GNOME_DESKTOP_SESSION_ID</code> trick and started playing.
+However, since the latest <code>openjdk-11</code>, this stopped working, forcing me to look into it.</p>
 <pre><code>gertjan:~$ env | grep GNOME_DESK
 GNOME_DESKTOP_SESSION_ID=this-is-deprecated</code></pre>
-<p><code>unset -v GNOME_DESKTOP_SESSION_ID</code> removes this. In Ubuntu 20.04LTS, this variable is not even present anymore.</p>
-<p>Apparently, there is a connection between GNOME and java:</p>
+<p>In Ubuntu 20.04LTS, this variable is not even present anymore.</p>
+<p>It turns out that Java tries to detect whether it is on a Gnome / GTK system. If Gnome / GTK is detected, it changes its “Look and feel” of the FFB client: widgets, creating the white bar below, and uses a different font.</p>
+<p>Previously, by unsetting the environment variable <code>GNOME_DESKTOP_SESSION_ID</code>, we could prevent the client from detecting GTK.
+But since the latest openJDK 11 version, there is now a different way in which it detects GTK:</p>
 <p><a href="https://bugs.openjdk.java.net/browse/JDK-8247753" class="uri">https://bugs.openjdk.java.net/browse/JDK-8247753</a></p>
 <p><em>Java relies on an environment variable GNOME_DESKTOP_SESSION_ID for getting GTK desktop theme. This environmental variable was deprecated earlier and now this got removed in the latest version</em></p>
-<p>This provides some hints at why openJDK 11 is not working anymore with the FUMBBL client.
-If the client detects a GTK system, it changes it widgets, creating the bar below, and using a different font.
-Previously, by unsetting the environment variable, we could prevent the client from detecting GTK.
-But since the latest openJDK version, it seems that there is now a different way in which it detects GTK, and we can no longer influence this ourselves.</p>
-<p>But as life is short, so I just leave this here as a theory for others to investigate, and went for a workaround instead: downgrading the JRE from version 11 to 8.</p>
+<p>The issue is discussed in detail <a href="https://github.com/adoptium/adoptium-support/issues/94">here</a> on Github.</p>
+<p>The solution the JDK developers went for is to start checking the <code>XDG_CURRENT_DESKTOP</code> variable as well.
+This change appears to be “backported” to Java 11 (but not Java 8).
+So on Ubuntu 18.04, we have to unset both <code>GNOME_DESKTOP_SESSION_ID</code> <strong>and</strong> <code>XDG_CURRENT_DESKTOP</code> before starting <code>javaws</code> with Java 11.
+On ubuntu 20.04, only unsetting <code>XDG_CURRENT_DESKTOP</code> is sufficient.</p>
+<p>So we can do, when we have <code>openjdk-11</code> installed:</p>
+<pre><code>gertjan:~$ unset -v GNOME_DESKTOP_SESSION_ID
+gertjan:~$ unset -v XDG_CURRENT_DESKTOP
+gertjan:~$ javaws ffblive.jnlp</code></pre>
+<p>Before finding this fix for Java 11, I went for a workaround instead: downgrading the JRE from version 11 to 8.
+The rest of the blog post describes this journey.</p>
 </div>
 <div id="fixing-the-problem" class="section level1">
 <h1>Fixing the problem</h1>
@@ -664,8 +693,10 @@ sudo apt remove jdk-11.0.9  #(installed this manually in a distant past apparent
 sudo apt remove openjdk-8-jre-headless</code></pre>
 <p>This removes all openjdk packages, including <code>icedtea-netx</code>, the package which contains the <code>javaws</code> Java web start to start <code>*.jnlp</code> files.
 <code>/usr/lib/jvm</code> is empty now on my system.</p>
-<p>I then installed the <code>openjdk-8-jre-headless</code> package:</p>
-<pre><code>sudo apt install openjdk-8-jre-headless</code></pre>
+<p>I then installed the <code>openjdk-8-jre</code> package (plus the <code>openjdk-8-jre-headless</code> just to be safe):</p>
+<pre><code>sudo apt install openjdk-8-jre
+sudo apt install openjdk-8-jre-headless
+</code></pre>
 <p>After this, I have indeed a working JRE 1.8 environment:</p>
 <pre><code>gertjan:~$ java -version
 openjdk version &quot;1.8.0_312&quot;
@@ -686,7 +717,7 @@ WARNING: package javax.jnlp not in java.desktop
 icedtea-web 1.8 (1.8)</code></pre>
 <p>It displays a text that gives us a hint how <code>javaws</code> chooses its JRE: by looking at <code>/usr/lib/jvm/default-java</code>.
 This is at this point a symbolic link pointing at <code>openjdk-11</code>.
-Indeed, starting the FUMBBL client with <code>javaws</code> chooses openjdk 11 automatically.</p>
+Indeed, starting the FFB client with <code>javaws</code> chooses openjdk 11 automatically.</p>
 <pre><code>gertjan:~$ javaws ffblive.jnlp
 
 selected jre: /usr/lib/jvm/default-java
@@ -697,12 +728,32 @@ Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
 Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
 Codebase matches codebase manifest attribute, and application is signed. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.
 Starting application [com.fumbbl.ffb.client.FantasyFootballClient] ...</code></pre>
-<p>This gives us the Blood client with the larger font and white bar covering the lower part of the screen.</p>
-<p>At first I played with the <code>JAVA_HOME</code> variable, pointing it to <code>/usr/lib/jvm/java-8-openjdk-amd64</code>. This does have effect on <code>javaws</code>, but it gives an error:</p>
-<pre><code>thread &#39;main&#39; panicked at &#39;Error spawning JVM process, java executable: [/usr/lib/jvm/java-8-oracle], arguments: [[&quot;-splash:/usr/share/icedtea-web/javaws_splash.png&quot;, &quot;-Xbootclasspath/a:/usr/share/icedtea-web/javaws.jar:/usr/share/java/js.jar:/usr/share/java/tagsoup.jar:/usr/lib/jvm/java-8-oracle/lib/ext/nashorn.jar:&quot;, &quot;-classpath&quot;, &quot;/usr/lib/jvm/java-8-oracle/lib/rt.jar:/usr/lib/jvm/java-8-oracle/lib/ext/jfxrt.jar:&quot;, &quot;-Dicedtea-web.bin.name=javaws&quot;, &quot;-Dicedtea-web.bin.location=/usr/lib/icedtea-web/bin/javaws&quot;, &quot;net.sourceforge.jnlp.runtime.Boot&quot;]]&#39;, src/os_access.rs:36:19
-note: Run with `RUST_BACKTRACE=1` for a backtrace</code></pre>
-<p>So no messing around with <code>JAVA_HOME</code>.</p>
-<p>The trick in the end was to change the symbolic link in <code>/usr/lib/jvm/default-java</code> to point at <code>java-8-openjdk-amd64</code> instead of pointing at <code>java-11-openjdk-amd64</code>.</p>
+<p>This gives us the FFB client with the larger font and white bar covering the lower part of the screen.</p>
+<p>At first I tried setting the <code>JAVA_HOME</code> variable, pointing it to <code>/usr/lib/jvm/java-8-openjdk-amd64</code>. Previously, this did not work, but possible because I had only installed the <code>headless</code> version of openjdk-8.</p>
+<pre><code>gertjan:~/Downloads$ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+gertjan:~/Downloads$ unset -v GNOME_DESKTOP_SESSION_ID
+gertjan:~/Downloads$ unset -v XDG_CURRENT_DESKTOP
+gertjan:~/Downloads$ javaws ./ffblive.jnlp 
+selected jre: /usr/lib/jvm/java-8-openjdk-amd64/jre/
+Warning - your JRE - 1.8.0_312 - does not match requested JRE - 1.6
+Warning - your JRE - 1.8.0_312 - does not match requested JRE - 1.6
+Warning - your JRE - 1.8.0_312 - does not match requested JRE - 1.6
+Warning - your JRE - 1.8.0_312 - does not match requested JRE - 1.6
+Codebase matches codebase manifest attribute, and application is signed. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.
+Starting application [com.fumbbl.ffb.client.FantasyFootballClient] ...
+</code></pre>
+<p>This now works as well. If <code>JAVA_HOME</code> is not set, <code>javaws</code> looks at <code>/usr/lib/jvm/default-java</code> to choose the JRE.</p>
+<pre><code>gertjan:~/Downloads$ unset JAVA_HOME
+gertjan:~/Downloads$ javaws ./ffblive.jnlp 
+selected jre: /usr/lib/jvm/default-java
+WARNING: package javax.jnlp not in java.desktop
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Warning - your JRE - 11.0.13 - does not match requested JRE - 1.6
+Codebase matches codebase manifest attribute, and application is signed. Continuing. See: http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/no_redeploy.html for details.
+Starting application [com.fumbbl.ffb.client.FantasyFootballClient] ...</code></pre>
+<p>So instead of setting <code>JAVA_HOME</code>, we can also change the symbolic link in <code>/usr/lib/jvm/default-java</code> to point at <code>java-8-openjdk-amd64</code> instead of pointing at <code>java-11-openjdk-amd64</code>.</p>
 <pre><code>gertjan:~$ ls /usr/lib/jvm -lt
 total 8
 drwxr-xr-x 7 root root 4096 jan  4 19:46 java-11-openjdk-amd64
@@ -740,9 +791,7 @@ Exception in thread &quot;main&quot; java.awt.AWTError: Assistive Technology not
 <p><a href="https://askubuntu.com/questions/695560/assistive-technology-not-found-awterror" class="uri">https://askubuntu.com/questions/695560/assistive-technology-not-found-awterror</a></p>
 <p>Provided in the form of this oneliner:</p>
 <pre><code>sudo sed -i -e &#39;/^assistive_technologies=/s/^/#/&#39; /etc/java-*-openjdk/accessibility.properties`</code></pre>
-<p>And finally … we have a working FUMBBL client again, without the white bar! Hurrah!
-As long as <code>openjdk-8-jre</code> stays available on Ubuntu universe, I think were good.
-Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre">package.ubuntu.com</a>, this package is broadly available, up to the latest Ubuntu versions, so fingers crossed.</p>
+<p>And finally … we have a working FFB client again, without the white bar! Hurrah!</p>
 </div>
 
     </div>
@@ -774,7 +823,7 @@ Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre"
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=/post/java_webstart_forensics_unbuntu/&amp;text=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=/post/ffb_client_java_linux/&amp;text=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -787,7 +836,7 @@ Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre"
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=/post/java_webstart_forensics_unbuntu/&amp;t=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=/post/ffb_client_java_linux/&amp;t=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -800,7 +849,7 @@ Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre"
       
       
       <li>
-        <a href="mailto:?subject=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu&amp;body=/post/java_webstart_forensics_unbuntu/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu&amp;body=/post/ffb_client_java_linux/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -813,7 +862,7 @@ Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre"
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=/post/java_webstart_forensics_unbuntu/&amp;title=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=/post/ffb_client_java_linux/&amp;title=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -826,7 +875,7 @@ Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre"
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu%20/post/java_webstart_forensics_unbuntu/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu%20/post/ffb_client_java_linux/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -839,7 +888,7 @@ Judging from <a href="https://packages.ubuntu.com/search?keywords=openjdk-8-jre"
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=/post/java_webstart_forensics_unbuntu/&amp;title=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=/post/ffb_client_java_linux/&amp;title=OpenJDK%20and%20IcedTea:%20Java%20Web%20Start%20Forensics%20on%20Ubuntu" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
