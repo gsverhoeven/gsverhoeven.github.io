@@ -30,7 +30,7 @@
 &lt;p&gt;However, from the current state of affairs, written up &lt;a href=&#34;https://medium.com/@javachampions/java-is-still-free-3-0-0-ocrt-2021-bca75c88d23b&#34;&gt;here by the Java Champions&lt;/a&gt;, I gather that both Oracle Java 8 and OpenJDK 8 come from the same codebase maintained at &lt;a href=&#34;https://openjdk.java.net/&#34;&gt;https://openjdk.java.net/&lt;/a&gt; and that differences are mostly in packaging &amp;amp; support. The release notes for the latest Oracle Java 8 version (8u311) can be found &lt;a href=&#34;https://www.oracle.com/java/technologies/javase/8u311-relnotes.html&#34;&gt;here&lt;/a&gt;. We can see that the bug fixes point to &lt;a href=&#34;https://bugs.openjdk.java.net&#34;&gt;https://bugs.openjdk.java.net&lt;/a&gt; where the bugs are fixed in all affected versions, including openjdk 8.&lt;/p&gt;
 &lt;p&gt;I also learned about the different versions of Java. There is 8, but also, 9, 10, 11 etc up to 17.
 Of all these versions only 8, 11 and 17 are relevant. Why? Because 8 and 11 are on “Long term support” (LTS), and 17 is the most recent Java version (and also destined to be a LTS version). In the Java champions medium article mentioned above, a nice table is shown with all the different versions and how long they will be supported by the community.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;openjdk_schedule.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-01-04_java_webstart_forensics_ubuntu_files/openjdk_schedule.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Since our goal is to keep on using a Java app written for Java 8, we focus on 8 and 11 for the rest of this post.
 Can apps written for Java 8 also be run in a Java 11 environment? In a &lt;a href=&#34;https://medium.com/uptake-tech/migrating-to-java-11-while-maintaining-a-java-8-client-library-f618a3ca6499&#34;&gt;Medium blog post on migrating from Java 8 to Java 11&lt;/a&gt; it is mentioned that Java is famous for its backward compatibility. Indeed, my own experience is that the FFB client can also be run with Java 11.
 Which is nice, since Java 11 is currently the default Java version for Ubuntu, and we do not have to install additional software to run the FFB client.&lt;/p&gt;
@@ -96,9 +96,8 @@ sudo apt install openjdk-8-jre-headless
 openjdk version &amp;quot;1.8.0_312&amp;quot;
 OpenJDK Runtime Environment (build 1.8.0_312-8u312-b07-0ubuntu1~18.04-b07)
 OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;However, no &lt;code&gt;javaws&lt;/code&gt; (Web start) is present. This is in a separate package called &lt;code&gt;icedtea&lt;/code&gt; (something to do with licensing or .&lt;/p&gt;
-&lt;p&gt;So we do
-&lt;code&gt;sudo apt install icedtea-plugin&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;However, no &lt;code&gt;javaws&lt;/code&gt; (Web start) is present. This is in a separate package called &lt;code&gt;icedtea&lt;/code&gt; (something to do with licensing or ?).&lt;/p&gt;
+&lt;p&gt;So we do &lt;code&gt;sudo apt install icedtea-plugin&lt;/code&gt;:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;The following NEW packages will be installed:
   default-jre default-jre-headless icedtea-8-plugin icedtea-netx
   icedtea-plugin openjdk-11-jre openjdk-11-jre-headless&lt;/code&gt;&lt;/pre&gt;
