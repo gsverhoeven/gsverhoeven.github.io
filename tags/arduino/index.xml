@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Arduino | Gertjan Verhoeven</title>
+    <link>/tags/arduino/</link>
+      <atom:link href="/tags/arduino/index.xml" rel="self" type="application/rss+xml" />
+    <description>Arduino</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Tue, 05 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Arduino</title>
+      <link>/tags/arduino/</link>
+    </image>
+    
+    <item>
+      <title>Arduino Weather Station with datalogging</title>
+      <link>/post/arduino-atmospheric-datalogger/</link>
+      <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>/post/arduino-atmospheric-datalogger/</guid>
+      <description>
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;In this post, I show how to create a Arduino-based atmospheric sensor circuit capable of storing large amounts of data on a microSD card.&lt;/p&gt;
+&lt;p&gt;Nowadays, one can buy a commercial Thermo/Hygro datalogger for 50 Euro online (i.e. &lt;a href=&#34;https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger&#34; class=&#34;uri&#34;&gt;https://www.vitalitools.nl/lascar-electronics-el-usb-2-datalogger&lt;/a&gt;). However, I decided that it would be a nice project to learn more about Arduino, in particular how to interface it with a microSD card. So i made one myself. Working with SD cards has the advantage of having a huge storage capacity. To give you an impression: Below we analyse 10K measurements stored in a 60 Kb file, the SD card can hold 4 Gb!&lt;/p&gt;
+&lt;div id=&#34;components&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Components&lt;/h1&gt;
+&lt;p&gt;After some research I ordered:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A microSD card reader/writer with SPI interface (Catalex card)&lt;/li&gt;
+&lt;li&gt;A Bosch BME-280 temperature/pressure/humidity sensor with I2C interface&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As the BME-280 sensor operates at 3.3V and my Arduino Nano at 5V, I also ordered a four channel Logic Level Converter to convert the 5V I2C on the Arduino side of the LLC to 3.3V on the BME-280 side.&lt;/p&gt;
+&lt;p&gt;To make the circuit Mains powered, i took an old Samsung mobile phone Charger (5V 0.7A), cutoff the plug and attached it to the breadboard.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;circuit-programming&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Circuit &amp;amp; Programming&lt;/h1&gt;
+&lt;p&gt;The breadboard layout (created using &lt;a href=&#34;http://fritzing.org&#34;&gt;Fritzing&lt;/a&gt;) is shown below:&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/fritzing_datalogger_bb.png&#34; /&gt;
+
+&lt;/div&gt;
+&lt;p&gt;At first i was using the Arduino 5V pin (with Arduino connected to USB at the front of my Desktop PC, these USB ports might have lower current) to power both the SD card and the Level converter. Separately they would work fine, but together in one circuit the SD card gave erratic results. I guessed that current consumption was too high, and during testing I used the 5V charger as power supply for the SD card. During actual usage I used the 5V charger to power both the SD card AND the Arduino Nano, which worked nicely.&lt;/p&gt;
+&lt;p&gt;Coding was simple, i just combined the example code and libraries for a SPI SD card and for a BME-280 I2C sensor. I put the code on &lt;a href=&#34;https://github.com/gsverhoeven/datalogger_bme280&#34;&gt;GitHub&lt;/a&gt; anyway as a reference.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data-collection-and-preparation&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Data collection and preparation&lt;/h1&gt;
+&lt;p&gt;I ended up testing the device by letting it collect measurements in four different places within the house. In the following order:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The living room&lt;/li&gt;
+&lt;li&gt;The basement&lt;/li&gt;
+&lt;li&gt;First floor bedroom&lt;/li&gt;
+&lt;li&gt;First floor bathroom&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;After collecting the data I put the microSD card in a microSD card reader and copied the &lt;code&gt;DATALOG.TXT&lt;/code&gt; CSV file to my pc for analysis in &lt;code&gt;R&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df &amp;lt;- read.csv2(&amp;quot;DATALOG.TXT&amp;quot;, header = F)
+colnames(df) &amp;lt;- c(&amp;quot;Time&amp;quot;, &amp;quot;Temp&amp;quot;, &amp;quot;Hum&amp;quot;, &amp;quot;Pressure&amp;quot;)
+# give the four traces a unique ID
+df$start_trace &amp;lt;- ifelse(df$Time == 0, 1, 0)
+df$trace_id &amp;lt;- cumsum(df$start_trace)
+
+mdf &amp;lt;- melt(df, id.vars = c(&amp;quot;Time&amp;quot;, &amp;quot;trace_id&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in melt(df, id.vars = c(&amp;quot;Time&amp;quot;, &amp;quot;trace_id&amp;quot;)): The melt generic in
+## data.table has been passed a data.frame and will attempt to redirect to the
+## relevant reshape2 method; please note that reshape2 is deprecated, and this
+## redirection is now deprecated as well. To continue using melt methods from
+## reshape2 while both libraries are attached, e.g. melt.list, you can prepend the
+## namespace like reshape2::melt(df). In the next version, this warning will become
+## an error.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: attributes are not identical across measure variables; they will be
+## dropped&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# label the four traces
+trace_id &amp;lt;- 1:4
+trace_name &amp;lt;- c(&amp;quot;Living room&amp;quot;, &amp;quot;Basement&amp;quot;, 
+                &amp;quot;Bedroom 1st floor&amp;quot;,  &amp;quot;Bathroom 1st floor&amp;quot;)
+
+cod &amp;lt;- data.table(trace_id, trace_name = 
+                    factor(trace_name, levels = trace_name))
+
+mdf &amp;lt;- data.table(merge(mdf, cod, by = &amp;quot;trace_id&amp;quot;))
+mdf &amp;lt;- mdf[, value := as.numeric(value)]&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;analysis&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Analysis&lt;/h1&gt;
+&lt;div id=&#34;pressure&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pressure&lt;/h2&gt;
+&lt;p&gt;We start with the pressure measurements. This is supposed to be a proxy for altitude.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(mdf[mdf$variable == &amp;quot;Pressure&amp;quot; &amp;amp; Time &amp;gt; 1], 
+       aes(x = Time, y = value, 
+           color = variable, group = variable)) +
+  geom_point(col = &amp;quot;grey&amp;quot;) + 
+  facet_grid(~ trace_name) + geom_smooth(size = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The basement, which is the lowest, has the highest pressure. But the difference between living room (ground floor) and the two rooms at the first floor is less pronounced. What is not so clear is what drives the changes in pressure WHILE the sensor is at a particular location, i.e. in the basement, or on the 1st floor. But no time to dwell on that, let&#39;s move on to the temperature!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;temperature&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Temperature&lt;/h2&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(mdf[mdf$variable == &amp;quot;Temp&amp;quot; &amp;amp; Time &amp;gt; 1], 
+       aes(x = Time, y = value, 
+           color = variable, group = variable)) +
+  geom_point() + facet_grid(~ trace_name)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Here, it appears that the sequence of the rooms can explain the slowly changing patterns of temperature. We started out in the Living room at 21C (The thermostat was set at 20C at that time). Then towards the cold basement. It appears that temperature needed some time to equilibrate, possibly because the breadboard was placed on an elevated plastic box, insulating it from below. In the bedroom it was placed on the (cold) floor, and it was already cold from the basement. Then in the bathroom, the final location, it went up, probably due to the floor being heated to keep the bathroom at 18C.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;relative-humidity&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Relative Humidity&lt;/h2&gt;
+&lt;p&gt;Finally, the relative humidity. This appears super strongly correlated with the temperature.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(mdf[mdf$variable == &amp;quot;Hum&amp;quot; &amp;amp; Time &amp;gt; 1], 
+       aes(x = Time, y = value, color = variable, 
+           group = variable)) +
+  geom_point() + facet_grid(~ trace_name)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-03-06-hygro_thermo_datalogger_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Here we see that the living room is at a agreeable 45% RH. The basement has a higher RH percentage, expected because it&#39;s colder.&lt;/p&gt;
+&lt;p&gt;According to Wikipedia:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Humans can be comfortable within a wide range of humidities depending on the temperature—from 30% to 70%[14]—but ideally between 50%[15] and 60%.[16] Very low humidity can create discomfort, respiratory problems, and aggravate allergies in some individuals.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The bedroom is also at a nice humidity level of 55% RH. The bathroom floor was being heated, and this unsurprisingly reduces the local RH to below 40%.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;It all seems to work pretty well. Measurement quality appears reasonable, with temperature and humidity consistent and with little noise, whereas the pressure reading needs some averaging / smoothing to get a stable signal.&lt;/p&gt;
+&lt;p&gt;I had great fun making this device!&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

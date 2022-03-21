@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Better bibtex | Gertjan Verhoeven</title>
+    <link>/tags/better-bibtex/</link>
+      <atom:link href="/tags/better-bibtex/index.xml" rel="self" type="application/rss+xml" />
+    <description>Better bibtex</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sun, 02 May 2021 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Better bibtex</title>
+      <link>/tags/better-bibtex/</link>
+    </image>
+    
+    <item>
+      <title>Writing scientific papers using Rstudio and Zotero</title>
+      <link>/post/zotero-rmarkdown-csl/</link>
+      <pubDate>Sun, 02 May 2021 00:00:00 +0000</pubDate>
+      <guid>/post/zotero-rmarkdown-csl/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;&lt;em&gt;(This blog post is mainly for my future self, and for people that ask me about my workflow for scientific papers. Please contact me if you spot ways to improve this!)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This blog post describes a sequence of 9 steps to set up a reproducible workflow for scientific writing with a focus on getting the journal citation hell right. It boils down to writing the manuscript in Rmarkdown, and using a set of auxiliary tools to manage citations and output to Word to share with collaborators and to prepare the final document for submission to the journal.&lt;/p&gt;
+&lt;div id=&#34;step-1-choose-the-target-journal&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 1: Choose the target journal&lt;/h2&gt;
+&lt;p&gt;First step is to check what the constraints of the journal are where we want to submit.
+Do they have a particular word count? Do they have a particular format for the abstract? etc.
+Go to the target journal, and download the author instructions.
+Because author instructions are typically &lt;strong&gt;REALLY&lt;/strong&gt; boring to read, a quick visual way to find out what is needed is to download a few &lt;strong&gt;recent&lt;/strong&gt; (because change is the only constant), &lt;strong&gt;open access&lt;/strong&gt; (no fuss with paywalls etc), and &lt;strong&gt;highly cited&lt;/strong&gt; (this must mean they did something right, right?) example papers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-2-install-reference-manager-zotero&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 2: Install reference manager Zotero&lt;/h2&gt;
+&lt;p&gt;Zotero is THE open source reference manager.
+Source code on Github, check! Cross-platform, check! 4K stars on Github, check!
+Another cool feature is that your references library is stored online, and your local Zotero install synchronizes with it, so you no longer need to move around library files between work and home, laptop and desktop.&lt;/p&gt;
+&lt;p&gt;Go to &lt;a href=&#34;https://zotero.org&#34;&gt;the Zotero website&lt;/a&gt; to download, install and configure Zotero.
+(This includes creating a Zotero account for online storage of your references)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-3-save-citations-to-zotero-from-your-browser&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 3: Save citations to Zotero from your browser&lt;/h2&gt;
+&lt;p&gt;The easiest way to fill your Zotero library is to use a browser plugin.
+I use Firefox on Linux, so I installed the &lt;a href=&#34;https://www.zotero.org/download/&#34;&gt;Zotero Firefox connector&lt;/a&gt;.
+Once this is installed, I use Google scholar to look up papers I want to cite.
+To add a paper to the Zotero library, make sure to have Zotero open, then click on a paper in Google Scholar to go to that paper’s web site (Typically the Publishers website for the journal).
+Finally, click the icon in the browsers top right top corner (“Save to zotero”).
+Repeat ad nauseam.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-4-create-stable-citation-keys&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 4: Create stable citation keys&lt;/h2&gt;
+&lt;p&gt;While writing our papers, we want short but recognizable identifier keys for our citations.
+For this we use the “Better BibTex for Zotero” Add-on.
+Go to &lt;a href=&#34;https://retorque.re/zotero-better-bibtex/installation/&#34;&gt;the Better Bibtex website&lt;/a&gt; and follow the installation instructions.&lt;/p&gt;
+&lt;p&gt;In the Zotero preferences (Better bibtex tab), I changed the “Citation Key Format” to create keys like &lt;code&gt;verhoeven_etal20&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[auth.etal:lower:replace=.,_][&amp;gt;0][shortyear]|[veryshorttitle][shortyear]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(This snippet comes from &lt;a href=&#34;https://fishandwhistle.net/post/2020/getting-started-zotero-better-bibtex-rmarkdown/&#34;&gt;Dewey Dunnington’s blog&lt;/a&gt; that was a big help in getting my workflow up and running)&lt;/p&gt;
+&lt;p&gt;This should automatically create / update all the citations keys in Zotero.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-5-rstudio-rmarkdown-and-all-that&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 5: Rstudio, Rmarkdown and all that&lt;/h2&gt;
+&lt;p&gt;Rstudio is where we actually write the paper.
+We use the &lt;code&gt;.Rmd&lt;/code&gt; Rmarkdown format.
+This format consists of a YAML header, followed by a body that consists of Markdown formatted text with optional code chunks, figures and tables interspersed.
+Version control is through &lt;a href=&#34;https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control&#34;&gt;Git&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Important thing to check: make sure that your &lt;code&gt;.Rmd&lt;/code&gt; file uses UTF-8 encoding.
+In Rstudio, &lt;code&gt;File --&amp;gt; Save with Encoding --&amp;gt; UTF-8&lt;/code&gt; can set this straight if somehow you ended up with a file in the wrong encoding.&lt;/p&gt;
+&lt;p&gt;Check the &lt;a href=&#34;https://rmarkdown.rstudio.com/authoring_quick_tour.html&#34;&gt;Rstudio website&lt;/a&gt; for more info on Rmarkdown.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; The latest version of Rstudio (1.4) contains a new editing mode for Rmarkdown, “the visual markdown editor”, that contains support for inserting citations from Zotero. I am not sure yet whether I like this, and noted that on my system, it was still buggy, and the editor, when invoked, makes &lt;strong&gt;CHANGES&lt;/strong&gt; to the markdown code. Brrr. Therefore, this blog post does not make use of this new feature.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-6-connecting-rstudio-to-zotero&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 6: Connecting Rstudio to Zotero&lt;/h2&gt;
+&lt;p&gt;Hold on, almost there. We’re in Rstudio, and writing our paper.
+Now comes the moment where we want to cite something!
+Now we need a connection to Zotero. There are two Rstudio Addins that compete for this functionality, &lt;code&gt;citr&lt;/code&gt; and &lt;code&gt;rbbt&lt;/code&gt;.
+Both packages are not on CRAN and therefore need to be installed from Github.
+I tried them both out, and went for &lt;code&gt;rbbt&lt;/code&gt; as &lt;code&gt;citr&lt;/code&gt; does not support CSL-JSON and &lt;code&gt;rbbt&lt;/code&gt; appears slightly leaner.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;remotes::install_github(&amp;quot;paleolimbot/rbbt&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After installing and restarting Rstdio, the &lt;code&gt;rbbt&lt;/code&gt; addin can be found under &lt;code&gt;Addins&lt;/code&gt;.
+Now since citing stuff is a common activity while writing a paper, we want a keyboard shortcut for this.
+I put it under &lt;code&gt;CTRL + K&lt;/code&gt; where K stand for errr, Knowledge ?&lt;/p&gt;
+&lt;p&gt;To bind &lt;code&gt;rbbt&lt;/code&gt; to a particular keyboard shortcut, do the following:
+First, in RStudio, choose &lt;code&gt;Tools --&amp;gt; Modify Keyboard Shortcuts&lt;/code&gt;.
+Type &lt;code&gt;zotero&lt;/code&gt; to filter out the Zotero plugin.
+Click on the ‘Shortcut’ field for the ‘Insert Zotero citation’ addin row, and type the desired shortcut keys.&lt;/p&gt;
+&lt;p&gt;In Rstudio, we can now press CTRL+K, type the name of the first author, select the citation, press enter, and have the citation key added to our &lt;code&gt;.Rmd&lt;/code&gt; document.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-7-creating-the-bibliography&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 7: Creating the bibliography&lt;/h2&gt;
+&lt;p&gt;Now that we have an Rmarkdown document filled with citation keys that references citations in Zotero, we still need one more thing, and that is to create the actual &lt;code&gt;.bib&lt;/code&gt; or &lt;code&gt;.json&lt;/code&gt; file containing the cited references.&lt;/p&gt;
+&lt;p&gt;Here I describe the simplest approach.
+We go to Zotero and export all the references using “Export Collection” , and choosing &lt;code&gt;CSL JSON&lt;/code&gt;, save the file as &lt;code&gt;references.json&lt;/code&gt; in the same folder as your Rmd paper.
+CSL-JSON is an emerging standard that is recommended by Yihui Xie, author of Rmarkdown.&lt;/p&gt;
+&lt;p&gt;In Rstudio, we add to following line to our YAML header:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bibliography: references.json&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;rbbt&lt;/code&gt; has the functionality to automatically create a bib/json file that ONLY contains the references that are cited in the Rmd document. I haven’t tested this yet, but this would be the icing on the cake. Instructions for this are on the &lt;a href=&#34;https://github.com/paleolimbot/rbbt&#34;&gt;rbbt Github page&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-8-getting-the-references-in-the-proper-format&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 8: Getting the references in the proper format&lt;/h2&gt;
+&lt;p&gt;At this point, we can &lt;code&gt;knit&lt;/code&gt; our Rmarkdown document, and it will contain the cited references appended at the end of the HTML/PDF/Word generated output document.&lt;/p&gt;
+&lt;p&gt;However, the references are (most likely) not yet properly formatted for the journal we want to send it to.
+For example, the journal “Health Services Research” wants the references in the main text to be numbered, and the reference list sorted in the order of appearance, and formatted according the APA format (whatever that is).&lt;/p&gt;
+&lt;p&gt;Luckily for us, enter the &lt;a href=&#34;https://citationstyles.org/&#34;&gt;Citation Style Language project&lt;/a&gt;.
+They created a common standard, CSL, and a crowdsourced repository, that contains more than 10.000 free citation styles.
+All we need to do is grab the CSL file for our target journal!&lt;/p&gt;
+&lt;p&gt;Go to the &lt;a href=&#34;https://www.zotero.org/styles&#34;&gt;Zotero Style Repository&lt;/a&gt; , search for the target journal name (in my case Health Services Research) and click on the result. This downloads a CSL file that we add to our Git repo containing the manuscript.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-9-make-rstudio-output-to-word-for-our-collaborators&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 9: Make Rstudio output to Word for our collaborators&lt;/h2&gt;
+&lt;p&gt;Still here? Great. Now we are ready for the final step.
+This one is for our collaborators (who we feel sorry for, because they use Word and miss out on all the Rmarkdown fun), and for those journals, that force us to submit our manuscript as a Word file.&lt;/p&gt;
+&lt;p&gt;In Rstudio, we add the following code to the YAML header:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;output:
+  word_document:
+    reference_docx: style_template.docx&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This tells Rmarkdown to use the Word formatting styles contained in the &lt;code&gt;style_template.docx&lt;/code&gt; file.
+For me, this contains at the moment three things: A4 page size, double line spacing, and numbered lines.&lt;/p&gt;
+&lt;p&gt;Follow the instructions by &lt;a href=&#34;https://rmarkdown.rstudio.com/articles_docx.html&#34;&gt;Rstudio&lt;/a&gt; to make this template.
+In short, you let Rstudio’s pandoc generate a Word document from a &lt;code&gt;.Rmd&lt;/code&gt; file, and tweak the formatting styles of that document. Name the document &lt;code&gt;style_template.docx&lt;/code&gt; and keep it with your &lt;code&gt;.Rmd&lt;/code&gt; manuscript.
+I can confirm that this also works when you edit this document using LibreOffice / OpenOffice.&lt;/p&gt;
+&lt;p&gt;The great thing for me: now I have this blog post, I can forget about all this stuff, and finally get to the scientific writing part!&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

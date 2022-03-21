@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>fake data | Gertjan Verhoeven</title>
+    <link>/tags/fake-data/</link>
+      <atom:link href="/tags/fake-data/index.xml" rel="self" type="application/rss+xml" />
+    <description>fake data</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sat, 26 Oct 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>fake data</title>
+      <link>/tags/fake-data/</link>
+    </image>
+    
+    <item>
+      <title>Simulating Fake Data in R</title>
+      <link>/post/simulating-fake-data/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>/post/simulating-fake-data/</guid>
+      <description>
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This blog post is on simulating fake data. I&#39;m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
+&lt;p&gt;If we want to mimic an existing dataset, it is desirable to&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make sure that the simulated variables have the proper data type and comparable distribution of values and&lt;/li&gt;
+&lt;li&gt;correlations between the variables in the real dataset are taken into account.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In addition, it would be nice if such functionality is available in a standard R package. After reviewing several R packages that can simulate data, I picked the &lt;a href=&#34;https://www.rdatagen.net/page/simstudy/&#34;&gt;simstudy&lt;/a&gt; package as most promising to explore in more detail. &lt;code&gt;simstudy&lt;/code&gt; is created by &lt;strong&gt;Keith Goldfeld&lt;/strong&gt; from New York University.&lt;/p&gt;
+&lt;p&gt;In this blog post, I explain how &lt;code&gt;simstudy&lt;/code&gt; is able to generate correlated variables, having either continuous or binary values. Along the way, we learn about fancy statistical slang such as copula&#39;s and tetrachoric correlations. It turns out there is a close connection with psychometrics, which we&#39;ll briefly discuss.&lt;/p&gt;
+&lt;p&gt;Let&#39;s start with correlated continuous variables.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Loading required packages
+library(simstudy)
+library(data.table)
+library(ggplot2)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;copulas-simulating-continuous-correlated-variables&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Copulas: Simulating continuous correlated variables&lt;/h1&gt;
+&lt;p&gt;Copulas are a fancy word for correlated (&amp;quot;coupled&amp;quot;) variables that each have a uniform distribution between 0 and 1.&lt;/p&gt;
+&lt;p&gt;Using copulas, we can convert correlated multivariate normal data to data from any known continuous probability distribution, while keeping exactly the same correlation matrix. The normal data is something we can easily simulate, and by choosing appropriate probability distributions, we can approximate the variables in real datasets.&lt;/p&gt;
+&lt;p&gt;Ok let&#39;s do it!&lt;/p&gt;
+&lt;div id=&#34;step-1-correlated-multivariate-normal-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 1: correlated multivariate normal data&lt;/h2&gt;
+&lt;p&gt;The workhorse for our simulated data is a function to simulate multivariate normal data. We&#39;ll use the &lt;code&gt;MASS&lt;/code&gt; package function &lt;code&gt;mvrnorm()&lt;/code&gt;. Other slightly faster (factor 3-4) implementations exist, see e.g. &lt;code&gt;mvnfast&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The trick is to first generate multivariate normal data with the required correlation structure, with mean 0 and standard deviation 1. This gives us correlated data, where each variable is marginally (by itself) normal distributed.&lt;/p&gt;
+&lt;p&gt;Here I simulate two variables, but the same procedure holds for N variables. The Pearson correlation is set at &lt;code&gt;0.7&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.7
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e4, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
+&lt;p&gt;Did it work?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1, df$X2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.6985089&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-2-transform-variables-to-uniform-distribution&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 2: transform variables to uniform distribution&lt;/h2&gt;
+&lt;p&gt;Using the normal cumulative distribution function &lt;code&gt;pnorm()&lt;/code&gt;, we can transform our normally distributed variables to have a uniform distribution, while keeping the correlation structure intact!!!!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_U &amp;lt;- pnorm(df$X1)
+df$X2_U &amp;lt;- pnorm(df$X2)
+
+ggplot(df, aes(x = X1_U)) + geom_histogram(boundary = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_U, y = X2_U)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And here&#39;s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_U, df$X2_U)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.677868&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-3-from-uniform-to-any-standard-probability-distribution-we-like&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 3: from uniform to any standard probability distribution we like&lt;/h2&gt;
+&lt;p&gt;Now, if we plug in uniformly distributed data in a &lt;strong&gt;quantile function&lt;/strong&gt; of any arbitrary (known) probability distribution, we can make the variables have any distribution we like.&lt;/p&gt;
+&lt;p&gt;Let&#39;s pick for example a &lt;strong&gt;Gamma&lt;/strong&gt; distribution (Continuous, positive) with shape 4 and rate 1 for X1, and Let&#39;s pick a &lt;strong&gt;Normal&lt;/strong&gt; distribution (Continuous, symmetric) with mean 10 and sd 2 for X2.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_GAM &amp;lt;- qgamma(df$X1_U, shape = 4, rate =1)
+df$X2_NORM &amp;lt;- qnorm(df$X2_U, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X2_NORM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 10, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ok, that worked nicely. But what about their correlation?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_GAM, df$X2_NORM)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.682233&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Whoa!! They still have (almost) the same correlation we started out with before all our transformation magic.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simstudy-in-action&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simstudy in action&lt;/h1&gt;
+&lt;p&gt;Now let&#39;s see how &lt;code&gt;simstudy&lt;/code&gt; helps us generating this type of simulated data. Simstudy works with &amp;quot;definition tables&amp;quot; that allow us to specify, for each variable, which distribution and parameters to use, as well as the desired correlations between the variables.&lt;/p&gt;
+&lt;p&gt;After specifing a definition table, we can call one of its workhorse functions &lt;code&gt;genCorFlex()&lt;/code&gt; to generate the data.&lt;/p&gt;
+&lt;p&gt;N.b. Simstudy uses different parameters for the Gamma distribution, compared to R&#39;s &lt;code&gt;rgamma()&lt;/code&gt; function. Under water, it uses the &lt;code&gt;gammaGetShapeRate()&lt;/code&gt; to transform the &amp;quot;mean&amp;quot; and &amp;quot;variance/ dispersion&amp;quot; to the more conventional &amp;quot;shape&amp;quot; and &amp;quot;rate&amp;quot; parameters.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.7
+
+corr.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+# check that gamma parameters correspond to same shape and rate pars as used above
+#simstudy::gammaGetShapeRate(mean = 4, dispersion = 0.25)
+
+
+def &amp;lt;- defData(varname = &amp;quot;X1_GAM&amp;quot;, 
+               formula = 4, variance = 0.25, dist = &amp;quot;gamma&amp;quot;)
+
+def &amp;lt;- defData(def, varname = &amp;quot;X2_NORM&amp;quot;, 
+               formula = 10, variance = 2, dist = &amp;quot;normal&amp;quot;)
+
+
+
+dt &amp;lt;- genCorFlex(1e4, def, corMatrix = corr.mat)
+
+cor(dt[,-&amp;quot;id&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            X1_GAM   X2_NORM
+## X1_GAM  1.0000000 0.6823006
+## X2_NORM 0.6823006 1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dt, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;generate-correlated-binary-variables&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Generate correlated binary variables&lt;/h1&gt;
+&lt;p&gt;As it turns out, the copula approach does not work for binary variables. Well, it sort of works, but the correlations we get are lower than we actually specify.&lt;/p&gt;
+&lt;p&gt;Come to think of it: two binary variables cannot have all the correlations we like. To see why, check this out.&lt;/p&gt;
+&lt;div id=&#34;feasible-correlations-for-two-binary-variables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Feasible correlations for two binary variables&lt;/h2&gt;
+&lt;p&gt;Let&#39;s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.&lt;/p&gt;
+&lt;p&gt;To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1&#39;s, and let&#39;s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# maximal correlation
+x1 &amp;lt;- c(0, 0, 0, 0, 1)
+x2 &amp;lt;- c(0, 1, 1, 1, 1)
+
+mean(x1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.25&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# minimal correlation
+x1 &amp;lt;- c(1, 0, 0, 0, 0)
+x2 &amp;lt;- c(0, 1, 1, 1, 1)
+
+cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To get these vectors to be maximally correlated, we need to match &lt;code&gt;1&lt;/code&gt;&#39;s in &lt;code&gt;x1&lt;/code&gt; as much as possible with &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;. To get these vectors to be maximally anti-correlated, we need to match &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x1&lt;/code&gt; with as many &lt;code&gt;0&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this example, we conclude that the feasible correlation range is &lt;code&gt;{-1, 0.25}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;simstudy&lt;/code&gt; package contains a function to check for feasible boundaries, that contains this piece of code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p1 &amp;lt;- 0.2
+p2 &amp;lt;- 0.8
+
+# lowest correlation
+l &amp;lt;- (p1 * p2)/((1 - p1) * (1 - p2))
+
+max(-sqrt(l), -sqrt(1/l))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# highest correlation
+u &amp;lt;- (p1 * (1 - p2))/(p2 * (1 - p1))
+
+min(sqrt(u), sqrt(1/u))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.25&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This confirms our example above.&lt;/p&gt;
+&lt;p&gt;Note that if we want to mimic a real dataset with binary correlated variables, the correlations are a given, and are obviously all feasible because we obtain them from actual data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-model-for-two-correlated-binary-variables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;A model for two correlated binary variables&lt;/h2&gt;
+&lt;p&gt;Ok let&#39;s suppose we want a two binary vectors &lt;code&gt;B1&lt;/code&gt; and &lt;code&gt;B2&lt;/code&gt; , with means &lt;code&gt;p1 = 0.2&lt;/code&gt; and &lt;code&gt;p2 = 0.8&lt;/code&gt; and (feasible) Pearson correlation 0.1.&lt;/p&gt;
+&lt;p&gt;How? How?&lt;/p&gt;
+&lt;p&gt;The idea is that to get two binary variables to have an exact particular correlation, we imagine an underlying (&amp;quot;latent&amp;quot;) bivariate (2D) normal distribution. This normal distribution has the means fixed to 0, and the standard deviations fixed to 1.&lt;/p&gt;
+&lt;p&gt;Why? Because a) we know it very well theoretically and b) we know how to simulate efficiently from such a distribution, using &lt;code&gt;mvrnorm()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this bivariate normal distribution, we draw a quadrant (i.e. two thresholds). The thresholds define transformations to binary variables. Below the threshold, the binary value is 0, above it is 1. We have to pick the thresholds such that the resulting binary variables have the desired mean (i.e. percentage of 1&#39;s).&lt;/p&gt;
+&lt;p&gt;This approach reduces the problem to finding the right values of three parameters: multivariate normal correlation, and the two thresholds (above, we already fixed the means and variance to zero and one respectively).&lt;/p&gt;
+&lt;p&gt;For now, we&#39;ll just pick some value for the correlation in the bivariate normal, say 0.5, and focus on where to put the threshholds.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.5
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 10000, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ok, where to put the thresholds? That&#39;s simple, we just need to use the &lt;code&gt;quantile distribution function&lt;/code&gt; to partition the marginal normal variables into 0 and 1 portions.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
+df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
+
+mean(df$B1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.197&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.7988&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s check it out visually:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3) + 
+  geom_vline(xintercept = qnorm(0.2), col = &amp;quot;red&amp;quot;) +
+  geom_hline(yintercept = qnorm(0.8), col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Nice.&lt;/p&gt;
+&lt;p&gt;Ok, so now what is the correlation for these two binary variables?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1877482&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ok, so if X1 and X2 have a correlation of 0.5, this results in a correlation of 0.19 between the binary variables B1 and B2.&lt;/p&gt;
+&lt;p&gt;But we need B1 and B2 to have a correlation of 0.1!&lt;/p&gt;
+&lt;p&gt;At this point, there is only one free parameter left, the correlation of the normally distributed variables &lt;code&gt;X1&lt;/code&gt; and &lt;code&gt;X2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We could of course manually try to find which correlation we must choose between &lt;code&gt;X1&lt;/code&gt; and &lt;code&gt;X2&lt;/code&gt; to get the desired correlation of 0.1 in the binary variables. But that would be very unpractical.&lt;/p&gt;
+&lt;p&gt;Fortunately, Emrich and Piedmonte (1991) published an iterative method to solve this puzzle. And this method has been implemented in &lt;code&gt;simstudy&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;simstudy:::.findRhoBin(p1 = 0.2, 
+                       p2 = 0.8, d = 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s see if it works:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+corr &amp;lt;- 0.2218018
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e6, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))
+
+df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
+df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
+
+cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;relation-to-psychometrics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Relation to psychometrics&lt;/h1&gt;
+&lt;p&gt;So what has psychometrics to do with all this simulation of correlated binary vector stuff?&lt;/p&gt;
+&lt;p&gt;Well, psychometrics is all about theorizing about unobserved, latent, imaginary &amp;quot;constructs&amp;quot;, such as &lt;strong&gt;attitude&lt;/strong&gt;, &lt;strong&gt;general intelligence&lt;/strong&gt; or a &lt;strong&gt;personality trait&lt;/strong&gt;. To measure these constructs, questionnaires are used. The questions are called &lt;strong&gt;items&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Now imagine a situation where we are interested in a particular construct, say &lt;strong&gt;general intelligence&lt;/strong&gt;, and we design two questions to measure (hope to learn more about) the construct. Furthermore, assume that one question is more difficult than the other question. The answers to both questions can either be wrong or right.&lt;/p&gt;
+&lt;p&gt;We can model this by assuming that the (imaginary) variable &amp;quot;intelligence&amp;quot; of each respondent is located on a two-dimensional plane, with the distribution of the respondents determined by a bivariate normal distribution. Dividing this plane into four quadrants then gives us the measurable answers (right or wrong) to both questions. Learning the answers to both questions then gives us an approximate location of a respondent on our &amp;quot;intelligence&amp;quot; plane!&lt;/p&gt;
+&lt;div id=&#34;phi-tetrachoric-correlation-and-the-psych-package&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Phi, tetrachoric correlation and the psych package&lt;/h2&gt;
+&lt;p&gt;Officially, the Pearson correlation between two binary vectors is called the &lt;a href=&#34;https://en.wikipedia.org/wiki/Phi_coefficient&#34;&gt;Phi coefficient&lt;/a&gt;. This name was actually chosen by Karl Pearson himself.&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;psych&lt;/strong&gt; packages contains a set of convenient functions for calculating Phi coefficients from empirical two by two tables (of two binary vectors), and finding the corresponding Pearson coefficient for the 2d (latent) normal. This coefficient is called the &lt;strong&gt;tetrachoric correlation&lt;/strong&gt;. Again a fine archaic slang word for again a basic concept.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(psych)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &amp;#39;psych&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &amp;#39;package:ggplot2&amp;#39;:
+## 
+##     %+%, alpha&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# convert simulated binary vectors B1 and B2 to 2x2 table
+twobytwo &amp;lt;- table(df$B1, df$B2)/nrow(df)
+
+phi(twobytwo, digits = 6)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.099574&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# both give the same result&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can use &lt;strong&gt;phi2tetra&lt;/strong&gt; to find the tetrachoric correlation that corresponds to the combination of a &amp;quot;Phi coefficient&amp;quot;, i.e. the correlation between the two binary vectors, as well as their marginals. This is a wrapper that builds the two by two frequency table and then calls &lt;code&gt;tetrachoric()&lt;/code&gt; . This in turn uses &lt;code&gt;optimize&lt;/code&gt; (Maximum Likelihood method?) to find the tetrachoric correlation.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;phi2tetra(0.1, c(0.2, 0.8))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2217801&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# compare with EP method
+simstudy:::.findRhoBin(0.2, 0.8, 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Comparing with the Emrich and Piedmonte method, we find that they give identical answers. Great, case closed!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simstudy-in-action-ii&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simstudy in action II&lt;/h1&gt;
+&lt;p&gt;Now that we feel confident in our methods and assumptions, let&#39;s see &lt;code&gt;simstudy&lt;/code&gt; in action.&lt;/p&gt;
+&lt;p&gt;Let&#39;s generate two binary variables, that have marginals of 20% and 80% respectively, and a Pearson correlation coefficient of 0.1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+corr &amp;lt;- 0.1
+
+corr.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+res &amp;lt;- simstudy::genCorGen(10000, nvars = 2, 
+                 params1 = c(0.2, 0.8),
+                 corMatrix = corr.mat,
+                 dist = &amp;quot;binary&amp;quot;, 
+                 method = &amp;quot;ep&amp;quot;, wide = TRUE)
+
+# let&amp;#39;s check the result
+cor(res[, -c(&amp;quot;id&amp;quot;)])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            V1         V2
+## V1 1.00000000 0.09682531
+## V2 0.09682531 1.00000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Awesome, it worked!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;Recall, my motivation for simulating fake data with particular variable types and correlation structure is to mimic real datasets.&lt;/p&gt;
+&lt;p&gt;So are we there yet? Well, we made some progress. We now can handle correlated continuous data, as well as correlated binary data.&lt;/p&gt;
+&lt;p&gt;But we need to solve two more problems:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;To simulate a particular dataset, we still need to determine for each variable its data type (binary or continuous), and if it&#39;s continuous, what is the most appropriate probability distribution (Normal, Gamma, Log-normal, etc).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;we haven&#39;t properly solved correlation between dissimilar data types, e.g. a correlation between a continuous and a binary variable.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Judging from the literature (Amatya &amp;amp; Demirtas 2016) and packages such as &lt;code&gt;SimMultiCorrData&lt;/code&gt; by Allison Fialkowski, these are both solved, and I only need to learn about them! So, to be continued.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

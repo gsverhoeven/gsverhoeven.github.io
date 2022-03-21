@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Data science | Gertjan Verhoeven</title>
+    <link>/categories/data-science/</link>
+      <atom:link href="/categories/data-science/index.xml" rel="self" type="application/rss+xml" />
+    <description>Data science</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sun, 06 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Data science</title>
+      <link>/categories/data-science/</link>
+    </image>
+    
+    <item>
+      <title>Using R to analyse the Roche Antigen Rapid Test: How accurate is it?</title>
+      <link>/post/covid_antigen_test_reliability/</link>
+      <pubDate>Sun, 06 Jun 2021 00:00:00 +0000</pubDate>
+      <guid>/post/covid_antigen_test_reliability/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;&lt;em&gt;(Image is from a different antigen test)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Many people are suspicious about the reliability of rapid self-tests, so I decided to check it out.
+For starters, I LOVE measurement. It is where learning from data starts, with technology and statistics involved.
+With this post, I’d like to join the swelling ranks of amateur epidemiologists :) I have spent a few years in a molecular biology lab, that should count for something right?&lt;/p&gt;
+&lt;p&gt;At home, we now have a box of the &lt;strong&gt;SARS-CoV-2 Rapid Antigen Test Nasal&lt;/strong&gt; kit.
+The kit is distributed by Roche, and manufactured in South Korea by a company called SD Biosensor.&lt;/p&gt;
+&lt;p&gt;So how reliable is it? A practical approach is to compare it to the golden standard, the PCR test, that public health test centers use to detect COVID-19. Well, the leaflet of the kit describes three experiments that do exactly that!
+So I tracked down the data mentioned in the kit’s leaflet, and decided to check them out.&lt;/p&gt;
+&lt;p&gt;But before we analyze the data, you want to know how they were generated, right? RIGHT?
+For this we use cause-effect diagrams (a.k.a. DAGs), which we can quickly draw using &lt;a href=&#34;http://dagitty.net&#34;&gt;DAGitty&lt;/a&gt;.&lt;/p&gt;
+&lt;div id=&#34;a-causal-model-of-the-measurement-process&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A causal model of the measurement process&lt;/h1&gt;
+&lt;p&gt;The cool thing about DAGitty is that we can use a point-n-click interface to draw the diagram, and then export code that contains an exact description of the graph to include in R. (You can also view the &lt;a href=&#34;http://dagitty.net/dags.html?id=whqGBx&#34;&gt;graph for this blog post at DAGitty.net&lt;/a&gt;):&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The graph is based on the following description of the various cause-effect pairs:&lt;/p&gt;
+&lt;p&gt;It all starts with whether someone is infected. After infection, virus particles start to build up. These particles can be in the lungs, in the throat, nose etc.
+These particles either do or do not cause symptoms. Whether there are symptoms will likely influence the decision to test, but there will also be people without symptoms that will be tested (i.e. if a family member was tested positive).&lt;/p&gt;
+&lt;p&gt;In the experiments we analyze, two samples were taken, one for the PCR test and one for the antigen test. The way the samples were taken differed as well: “shallow” nose swabs for the rapid antigen test, and a combination of “deep” nose and throat swabs for the PCR test.&lt;/p&gt;
+&lt;p&gt;Now that we now a bit about the measurement process, lets look at how the accuracy of the antigen test is quantified.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;quantifying-the-accuracy-of-an-covid-19-test&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Quantifying the accuracy of an COVID-19 test&lt;/h1&gt;
+&lt;p&gt;The PCR test result serves as the ground truth, the standard to which the antigen test is compared.
+Both tests are binary tests, either it detects the infection or it does not (to a first approximation).&lt;/p&gt;
+&lt;p&gt;For this type of outcome, two concepts are key: the &lt;strong&gt;sensitivity&lt;/strong&gt; (does the antigen test detect COVID when the PCR test has detected it) and &lt;strong&gt;specificity&lt;/strong&gt; of the test (does the antigen test ONLY detect COVID, or also other flu types or even unrelated materials, for which the PCR test produces a negative result).&lt;/p&gt;
+&lt;p&gt;The leaflet contains information on both.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Sensitivity 83.3% (95%CI: 74.7% - 90.0%)&lt;/li&gt;
+&lt;li&gt;Specificity 99.1% (95%CI: 97.7% - 99.7%)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;But what does this really tell us? And where do these numbers come from?&lt;/p&gt;
+&lt;p&gt;Before we go to the data, we first need to know a bit more detail on what we are actually trying to measure, the viral load, and what factors influence this variable.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;viral-load-as-target-for-measurement&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Viral load as target for measurement&lt;/h1&gt;
+&lt;p&gt;So, both tests work by detecting viral particles in a particular sample. The amount of virus particles present in the sample depends on, among others:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Time since infection&lt;/li&gt;
+&lt;li&gt;How and where the sample is taken (throat, nose, lungs, using a swab etc)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I’ll discuss both.&lt;/p&gt;
+&lt;div id=&#34;time-since-infection&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Time since infection&lt;/h2&gt;
+&lt;p&gt;When you have just been infected, your body will contain only a small amount of virus.
+The &lt;strong&gt;viral load&lt;/strong&gt; is a function of time since infection, because it takes time for the virus to multiply itself. Even PCR cannot detect an infection on the first day, and even after 8 days, there are still some 20% of cases that go undetected by PCR (presumably because the amount of viral particle is too low) (Ref: Kucirka et al 2020).&lt;/p&gt;
+&lt;p&gt;If you want to know more about the ability of PCR to detect COVID infections go check out &lt;a href=&#34;https://github.com/HopkinsIDD/covidRTPCR&#34;&gt;the covidRTPCR Github repository&lt;/a&gt;. It is completely awesome, with open data, open code, and Bayesian statistics using &lt;a href=&#34;https://mc-stan.org/&#34;&gt;Stan&lt;/a&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;how-and-where-the-sample-is-taken&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;How and where the sample is taken&lt;/h2&gt;
+&lt;p&gt;There are many ways to obtain a sample from a person.&lt;/p&gt;
+&lt;p&gt;Here the golden standard is a so-called &lt;strong&gt;Nasopharyngeal swab&lt;/strong&gt;. This goes through your nose all the way (~ 5 cm) into the back of the throat, and is highly uncomfortable. Typically, only professional health workers perform &lt;strong&gt;nasopharyngeal&lt;/strong&gt; swabs.
+In these experiments, this deep nose swab was combined with a swab from the throat (&lt;strong&gt;oroharyngeal&lt;/strong&gt;). This is also how test centers in the Netherlands operated during the last year.&lt;/p&gt;
+&lt;p&gt;There are various alternatives: We have spit, saliva, we can cough up “sputum” (slime from the lungs) or we can take swab from the front part of the nose (“nasal”).&lt;/p&gt;
+&lt;p&gt;The Roche antigen test is a &lt;strong&gt;nasal&lt;/strong&gt; test that only goes up to 2 cm in the nose and can be used by patients themselves (“self-collected”).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-dataset-results-from-the-three-berlin-studies&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The dataset: results from the three Berlin studies&lt;/h1&gt;
+&lt;p&gt;Now that we have some background info, we are ready to check the data!&lt;/p&gt;
+&lt;p&gt;As mentioned above, this data came from three experiments on samples from in total 547 persons.&lt;/p&gt;
+&lt;p&gt;After googling a bit, I found out that the experiments were performed by independent researchers in a famous University hospital in Berlin, &lt;a href=&#34;https://de.wikipedia.org/wiki/Charit%C3%A9&#34;&gt;Charité&lt;/a&gt;. After googling a bit more and mailing with one of the researchers involved, Dr. Andreas Lindner, I received a list of papers that describe the research mentioned in the leaflet (References at the end of this post).&lt;/p&gt;
+&lt;p&gt;The dataset for the blog post compares &lt;strong&gt;nasal&lt;/strong&gt; samples tested with the Roche Antigen test kit, to PCR-tested &lt;strong&gt;nasopharyngeal&lt;/strong&gt; plus &lt;strong&gt;oropharyngeal&lt;/strong&gt; samples taken by professionals.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;This blog post is possible because the three papers by Lindner and co-workers all contain the raw data as a table in the paper. Cool!&lt;/strong&gt;
+Unfortunately, this means the data is not &lt;strong&gt;machine readable&lt;/strong&gt;. However, with a combination of manual tweaking / find-replace and some coding, I tidied the data of the three studies into a single &lt;code&gt;tibble&lt;/code&gt; data frame. You can grab the code and data from my &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test&#34;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;UPDATE&lt;/strong&gt;: Rein Halbersma showed me how to use web scraping to achieve the same result, with a mere 20 lines of code of either Python or R! Cool! I added his scripts to my &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test&#34;&gt;Github&lt;/a&gt; as well, go check them out, I will definitely go this route next time.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# creates df_pcr_pos
+source(&amp;quot;sars_test/dataprep_roche_test.R&amp;quot;)
+
+# creates df_leaflet
+source(&amp;quot;sars_test/dataprep_roche_test_leaflet.R&amp;quot;)
+
+# see below
+source(&amp;quot;sars_test/bootstrap_conf_intervals.R&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The dataset &lt;code&gt;df_pcr_pos&lt;/code&gt; contains, for each &lt;strong&gt;PCR positive&lt;/strong&gt; patient:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ct_value&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;viral_load&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;days_of_symptoms&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mm_value&lt;/code&gt; (Result of a &lt;strong&gt;nasal&lt;/strong&gt; antigen test measurement, 1 is positive, 0 is negative)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To understand the PCR data, we need to know a bit more about the PCR method.&lt;/p&gt;
+&lt;div id=&#34;the-pcr-method&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;The PCR method&lt;/h2&gt;
+&lt;p&gt;The PCR method not only measures &lt;strong&gt;if&lt;/strong&gt; someone is infected, it also provides an estimate of the viral load in the sample.
+How does this work? PCR can amplify, in so-called cycles, really low quantities of viral material in a biological sample. The amount of cycles of the PCR device needed to reach a threshold of signal is called the cycle threshold or &lt;strong&gt;Ct value&lt;/strong&gt;. The less material we have in our sample, the more cycles we need to amplify the signal to reach a certain threshold.&lt;/p&gt;
+&lt;p&gt;Because the amplification is an exponential process, if we take the log of the number of virus particles, we get a linear inverse (negative) relationship between &lt;strong&gt;ct_value&lt;/strong&gt; and &lt;strong&gt;viral_load&lt;/strong&gt;. For example, &lt;span class=&#34;math inline&#34;&gt;\(10^6\)&lt;/span&gt; particles is a viral load of 6 on the log10 scale.&lt;/p&gt;
+&lt;p&gt;So let’s plot the &lt;code&gt;ct_value&lt;/code&gt; of the PCR test vs the &lt;code&gt;viral_load&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+ggplot(df_pcr_pos, aes(x = ct_value, y = viral_load, color = factor(pcr_assay_type))) + 
+  geom_point() + ggtitle(&amp;quot;Calibration curves for viral load (log10 scale)&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;
+This plot shows that &lt;code&gt;viral_load&lt;/code&gt; is directly derived from the &lt;code&gt;ct_value&lt;/code&gt; through a calibration factor.
+PCR Ct values of &amp;gt; 35 are considered as the threshold value for detecting a COVID infection using the PCR test, so the values in this plot make sense for COVID positive samples.&lt;/p&gt;
+&lt;p&gt;Take some time to appreciate the huge range difference in the samples on display here.
+From only 10.000 viral particles (&lt;span class=&#34;math inline&#34;&gt;\(log_{10}{(10^4)} = 4\)&lt;/span&gt; ) to almost 1 billion (&lt;span class=&#34;math inline&#34;&gt;\(log_{10}{(10^9)} = 9\)&lt;/span&gt; ) particles.&lt;/p&gt;
+&lt;p&gt;We can also see that apparently, there were two separate PCR assays (test types), each with a separate conversion formula used to obtain the estimated viral load.&lt;/p&gt;
+&lt;p&gt;(&lt;strong&gt;N.b.&lt;/strong&gt; The missings for &lt;code&gt;pcr_assay_type&lt;/code&gt; are because for two of three datasets, it was difficult to extract this information from the PDF file. From the plot, we can conclude that for these datasets, the same two assays were used since the values map onto the same two calibration lines)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;sensitivity-of-the-antigen-test&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Sensitivity of the Antigen test&lt;/h2&gt;
+&lt;p&gt;The dataset contains all samples for which the PCR test was positive.
+Let’s start by checking the raw percentage of antigen test measurements that are positive as well.
+This is called the &lt;strong&gt;sensitivity&lt;/strong&gt; of a test.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res &amp;lt;- df_pcr_pos %&amp;gt;%
+  summarize(sensitivity = mean(mm_value), 
+            N = n())
+
+res&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 1 x 2
+##   sensitivity     N
+##         &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
+## 1       0.792   120&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So for all PCR positive samples, 79.2 % is positive as well.
+This means that, on average, if we would use the antigen test kit, we have a one in five (20%) probability of not detecting COVID-19, compared to when we would have used the method used by test centers operated by the public health agencies.&lt;/p&gt;
+&lt;p&gt;This value is slightly lower, but close to what is mentioned in the Roche kit’s leaflet.&lt;/p&gt;
+&lt;p&gt;Let’s postpone evaluation of this fact for a moment and look a bit closer at the data.
+For example, we can example the relationship between &lt;code&gt;viral_load&lt;/code&gt; and a positive antigen test result (&lt;code&gt;mm_value&lt;/code&gt; = 1):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;table(df_pcr_pos$mm_value, df_pcr_pos_np$mm_value)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    
+##      0  1
+##   0 20  5
+##   1  5 90&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+ggplot(df_pcr_pos, aes(x = viral_load, y = mm_value)) + 
+  geom_jitter(height = 0.1) +
+  geom_smooth() + 
+  geom_vline(xintercept = c(5.7, 7), col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From this plot, we can see that the probability of obtaining a false negative result (&lt;code&gt;mm_value&lt;/code&gt; of 0) on the antigen test decreases as the viral load &lt;strong&gt;of the PCR sample&lt;/strong&gt; increases.&lt;/p&gt;
+&lt;p&gt;From the data we also see that before the antigen test to work about half of the time (blue line at 0.5), the PCR sample needs to contain around &lt;span class=&#34;math inline&#34;&gt;\(5 \cdot 10^5\)&lt;/span&gt; viral particles (log10 scale 5.7), and for it to work reliably, we need around &lt;span class=&#34;math inline&#34;&gt;\(10^7\)&lt;/span&gt; particles (“high” viral load) in the PCR sample (which is a combination of &lt;strong&gt;oropharyngeal and nasopharyngeal swab&lt;/strong&gt;). This last bit is important: the researchers did not measure the viral load in the nasal swabs used for the antigen test, these are likely different.&lt;/p&gt;
+&lt;p&gt;For really high viral loads, above &lt;span class=&#34;math inline&#34;&gt;\(10^7\)&lt;/span&gt; particles in the &lt;strong&gt;NP/OP sample&lt;/strong&gt;, the probability of a false negative result is only a few percent:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos %&amp;gt;% filter(viral_load &amp;gt;= 7) %&amp;gt;%
+  summarize(sensitivity = mean(mm_value), 
+            N = n())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 1 x 2
+##   sensitivity     N
+##         &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
+## 1       0.972    71&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;viral-loads-varies-with-days-of-symptoms&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Viral loads varies with days of symptoms&lt;/h1&gt;
+&lt;p&gt;Above, we already discussed that the viral load varies with the time since infection.&lt;/p&gt;
+&lt;p&gt;If we want to use the antigen test &lt;strong&gt;instead&lt;/strong&gt; of taking a PCR test, we don’t have information on the viral load. What we often do have is the days since symptoms, and we know that in the first few days of symptoms viral load is highest.&lt;/p&gt;
+&lt;p&gt;We can check this by plotting the &lt;code&gt;days_of_symptoms&lt;/code&gt; versus &lt;code&gt;viral_load&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df_pcr_pos, aes(x = days_of_symptoms, y = viral_load)) + 
+  geom_smooth() + expand_limits(x = -4) + geom_vline(xintercept = 1, linetype = &amp;quot;dashed&amp;quot;) +
+  geom_vline(xintercept = c(3, 7), col = &amp;quot;red&amp;quot;) + geom_hline(yintercept = 7, col = &amp;quot;grey&amp;quot;, linetype = &amp;quot;dashed&amp;quot;) +
+  geom_jitter(height = 0, width = 0.2) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;
+From this plot, we learn that the viral load is highest on the onset of symptoms day (typically 5 days after infection) and decreases afterwards.&lt;/p&gt;
+&lt;p&gt;Above, we saw that the sensitivity in the whole sample was not equal to the sensitivity mentioned in the leaflet.
+When evaluating rapid antigen tests, sometimes thresholds for days of symptoms are used, for example &amp;lt;= 3 days or &amp;lt;= 7 days (plotted in red).&lt;/p&gt;
+&lt;p&gt;For the sensitivity in the leaflet, a threshold of &amp;lt;= 7 days was used on the days of symptoms.&lt;/p&gt;
+&lt;p&gt;Let us see how sensitive the antigen test is for these subgroups:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;res &amp;lt;- df_pcr_pos %&amp;gt;%
+  filter(days_of_symptoms &amp;lt;= 3) %&amp;gt;%
+  summarize(label = &amp;quot;&amp;lt; 3 days&amp;quot;,
+            sensitivity = mean(mm_value), 
+            N = n())
+
+res2 &amp;lt;- df_pcr_pos %&amp;gt;%
+  filter(days_of_symptoms &amp;lt;= 7) %&amp;gt;%
+  summarize(label = &amp;quot;&amp;lt; 7 days&amp;quot;,
+            sensitivity = mean(mm_value), 
+            N = n())
+
+bind_rows(res, res2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 2 x 3
+##   label    sensitivity     N
+##   &amp;lt;chr&amp;gt;          &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
+## 1 &amp;lt; 3 days       0.857    49
+## 2 &amp;lt; 7 days       0.85    100&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The sensitivity in both subgroups is increased to 85.7 % and 85 %.
+Now only 1 in 7 cases is missed by the antigen test.
+This sensitivity is now very close to that in the leaflet. The dataset in the leaflet has N = 102, whereas here we have N = 100.
+Given that the difference is very small, I decided to not look into this any further.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;is-there-a-swab-effect&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Is there a swab effect?&lt;/h1&gt;
+&lt;p&gt;Ok, so the rapid antigen test is less sensitive than PCR.
+What about the effect of using self-administered nasal swabs, versus professional health workers taking a nasopharyngeal swab (and often a swab in the back of the throat as well)?&lt;/p&gt;
+&lt;p&gt;Interestingly, the three Berlin studies all contain a head-to-head comparison of &lt;strong&gt;nasal&lt;/strong&gt; versus &lt;strong&gt;nasopharygeal (NP)&lt;/strong&gt; swabs. Lets have a look, shall we?&lt;/p&gt;
+&lt;p&gt;The dataset &lt;code&gt;df_pcr_pos_np&lt;/code&gt; is identical to &lt;code&gt;df_pcr_pos&lt;/code&gt;, but contains the measurement results for the &lt;strong&gt;nasopharygeal&lt;/strong&gt; swabs.&lt;/p&gt;
+&lt;p&gt;To compare both measurement methods, we can plot the relationship between the probability of obtaining a positive result versus viral load. If one method gathers systematically more viral load from the patient, we expect that method to detect infection at lower patient viral loads, and the curves (nasal vs NP) would be shifted relative to each other.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+ggplot(df_pcr_pos_np , aes(x = viral_load, y = mm_value)) + 
+  geom_jitter(data = df_pcr_pos, height = 0.05, col = &amp;quot;blue&amp;quot;) +
+  geom_jitter(height = 0.05, col = &amp;quot;orange&amp;quot;) +
+  geom_smooth(data = df_pcr_pos , col = &amp;quot;blue&amp;quot;) + 
+  geom_smooth(col = &amp;quot;orange&amp;quot;) +
+  ggtitle(&amp;quot;nasal (blue) versus nasopharyngeal (orange) swabs&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;By fitting a smoother through the binary data, we obtain an estimate of the relationship between the probability of obtaining a positive result, and the viral load of the patient as measured by PCR on a combined NP/OP swab.&lt;/p&gt;
+&lt;p&gt;From this plot, I conclude that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The sensitivity of a test is strongly dependent on the distribution of viral loads in the population the measurement was conducted in&lt;/li&gt;
+&lt;li&gt;There is no evidence for any differences in sensitivity between nasal and nasopharyngeal swabs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This last conclusion came as a surprise for me, as nasopharygeal swabs are long considered to be the golden standard for obtaining samples for PCR detection of respiratory viruses, such as influenza and COVID-19 (Seaman &lt;em&gt;et al.&lt;/em&gt; (2019), (Lee &lt;em&gt;et al.&lt;/em&gt; 2021) ). So let’s look a bit deeper still.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;double-check-rotterdam-vs-berlin&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Double-check: Rotterdam vs Berlin&lt;/h1&gt;
+&lt;p&gt;We can compare the results from the three Berlin studies with a recent Dutch study that also used the Roche antigen test (ref: Igloi &lt;em&gt;et al.&lt;/em&gt; 2021). The study was conducted in Rotterdam, and used nasopharygeal swabs to obtain the sample for the antigen test.&lt;/p&gt;
+&lt;p&gt;Cool! Lets try and create two comparable groups in both studies so we can compare the sensitivity.&lt;/p&gt;
+&lt;p&gt;The Igloi et al. paper reports results for a particular subset that we can also create in the Berlin dataset.
+They report that for the subset of samples with high viral load (viral load &lt;span class=&#34;math inline&#34;&gt;\(2.17 \cdot 10^5\)&lt;/span&gt; particles / ml = 5.35 on the log10 scale, ct_value &amp;lt;= 30) &lt;strong&gt;AND&lt;/strong&gt; who presented within 7 days of symptom onset, they found a sensitivity of 95.8% (CI95% 90.5-98.2). The percentage is based on N = 159 persons (or slightly less because of not subsetting on &amp;lt;= 7 days of symptoms, the paper is not very clear here).&lt;/p&gt;
+&lt;p&gt;We can check what the sensitivity is for this subgroup in the Berlin dataset:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos %&amp;gt;% filter(viral_load &amp;gt;= 5.35 &amp;amp; days_of_symptoms &amp;lt;= 7) %&amp;gt;%
+  summarize(sensitivity = mean(mm_value), 
+            N = n())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 1 x 2
+##   sensitivity     N
+##         &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
+## 1       0.898    88&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the same subgroup of high viral load, sensitivity of the nasal swab test is 6% lower than the nasopharyngeal swab test, across the two studies. But how do we have to weigh this evidence? N = 88 is not so much data, and the studies are not identical in design.&lt;/p&gt;
+&lt;p&gt;Importantly, since the threshold to be included in this comparison (ct value &amp;lt;= 30, viral_load &amp;gt; 5.35) contains a large part of the region where the probability of a positive result is between 0 and 1, we need to compare the distributions of viral loads for both studies to make an apples to apples comparison.&lt;/p&gt;
+&lt;p&gt;The Igloi study reports their distribution of viral loads for PCR-positive samples (N=186) in five bins (Table 1 in their paper):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cat &amp;lt;- c(&amp;quot;ct &amp;lt;= 20&amp;quot;, &amp;quot;ct 20-25&amp;quot;, &amp;quot;ct 25-30&amp;quot;, &amp;quot;ct 30-35&amp;quot;, &amp;quot;ct 35+&amp;quot;)
+counts &amp;lt;- c(31, 82, 46, 27, 1)
+
+ggplot(data.frame(cat, counts), aes(x = cat, y = counts)) +
+  geom_col()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;
+Lets create those same bins in the Berlin dataset as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_pcr_pos$ct_bin &amp;lt;- cut(df_pcr_pos$ct_value, breaks = c(-Inf,20,25,30,35,Inf))
+
+ggplot(df_pcr_pos, aes(x = ct_bin)) +
+  geom_histogram(stat = &amp;quot;count&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;672&#34; /&gt;
+For the subset where we can compare the sensitivities (ct_value &amp;lt;= 30), the Berlin clinical population has a higher viral load than the Rotterdam clinical population! So that does not explain why the Rotterdam study reports a higher sensitivity.&lt;/p&gt;
+&lt;p&gt;I use simulation to create distributions of plausible values for the sensitivity, assuming the observed values in both studies (89.7% for the Berlin studies, and 95.8% for the Rotterdam study) to be the true data generating values.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+# Berlin
+sample_size = 88
+prior_probability = 0.898
+
+est_p &amp;lt;- rbinom(10000, sample_size, p=prior_probability)/sample_size
+
+# Rotterdam
+sample_size2 = 159 # derived from Table 1 (Ct value distribution of PCR+ samples, &amp;lt;= 30)
+prior_probability2 = 0.958
+
+est_p2 &amp;lt;- rbinom(10000, sample_size2, p=prior_probability2)/sample_size2
+
+ggplot(data.frame(est_p), aes(x = est_p)) +
+  geom_histogram(binwidth = 0.005) +
+    geom_histogram(data = data.frame(est_p = est_p2), fill = &amp;quot;gray60&amp;quot;, alpha = 0.5, binwidth = 0.005) +
+  geom_vline(xintercept = prior_probability, linetype = &amp;quot;dashed&amp;quot;, col= &amp;quot;red&amp;quot;) +
+geom_vline(xintercept = prior_probability2, linetype = &amp;quot;dashed&amp;quot;, col= &amp;quot;blue&amp;quot;) +
+  ggtitle(&amp;quot;Berlin (black bars) vs Rotterdam (grey bars) sensitivity for higher viral loads&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;
+There is a region of overlap between the two distributions, so the difference between the studies could be (in part) attributed to statistical sampling variation for the same underlying process.&lt;/p&gt;
+&lt;p&gt;I conclude that the Berlin study, who does a head to head comparison of NP versus nasal swabs, finds them to be highly comparable, and reports sensitivities that are close to those reported by the Rotterdam study.&lt;/p&gt;
+&lt;p&gt;Surprisingly, nasal swabs appear to give results that are comparable to those of nasopharyngeal swabs, while having not having the disadvantages of them (unpleasant, can only be performed by professional health worker).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;that-other-metric-the-specificity&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;That other metric: the specificity&lt;/h1&gt;
+&lt;p&gt;So far, the discussion centered around the &lt;strong&gt;sensitivity&lt;/strong&gt; of the test.
+Equally important is the &lt;strong&gt;specificity&lt;/strong&gt; of the test. This quantifies if the test result of the antigen test is specific for COVID-19. It would be bad if the test would also show a result for other viruses, or even unrelated molecules.&lt;/p&gt;
+&lt;p&gt;To examine this, we use the aggregated data supplied on the leaflet from the kit, &lt;code&gt;df_leaflet&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;N.b.&lt;/strong&gt; The aggregated data is a subset of all the data from the three studies, because the data was subsetted for cases with &lt;code&gt;&amp;lt;= 7 days_of_symptoms&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This dataset contains for each sample one of four possibilities:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Both tests are negative,&lt;/li&gt;
+&lt;li&gt;both tests are positive,&lt;/li&gt;
+&lt;li&gt;the PCR test is positive but the antigen test negative,&lt;/li&gt;
+&lt;li&gt;the PCR test is negative but the antigen positive.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We use the &lt;code&gt;yardstick&lt;/code&gt; package of R’s &lt;code&gt;tidymodels&lt;/code&gt; family to create the 2x2 table and analyze the specificity.&lt;/p&gt;
+&lt;p&gt;(&lt;strong&gt;Overthinking&lt;/strong&gt;: Note that the &lt;code&gt;yardstick&lt;/code&gt; package is used to quantify the performance of statistical prediction models by comparing the model predictions to the true values contained in the training data. This provides us with an analogy where the antigen test can be viewed as a model that is trying the predict the outcome of the PCR test.)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;options(yardstick.event_first = FALSE)
+
+conf_matrix &amp;lt;- yardstick::conf_mat(df_leaflet, pcr_result, ag_result)
+
+autoplot(conf_matrix, 
+         type = &amp;quot;heatmap&amp;quot;, 
+         title = &amp;quot;Truth = PCR test, Prediction = Antigen test&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2021_05_14_covid_rapid_test_reliability_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;288&#34; /&gt;
+From the heatmap (confusingly called a confusion matrix among ML practioners), we see that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;For most samples (N = 431), both tests are COVID-19 negative.&lt;/li&gt;
+&lt;li&gt;85 + 17 = 102 samples tested COVID-19 positive using the PCR-test&lt;/li&gt;
+&lt;li&gt;85 out of 102 samples that are PCR positive, are antigen test positive as well&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For the specificity, we have to look at the samples where the PCR test is negative, but the antigen test is positive, and compare these to all the samples that are PCR-test negative. These are the number of tests where the antigen test picked up a non-specific signal. One minus this percentage gives the specificity (1 - 4/435 = 431/435):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;yardstick::spec(df_leaflet, pcr_result, ag_result)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &amp;lt;chr&amp;gt;   &amp;lt;chr&amp;gt;          &amp;lt;dbl&amp;gt;
+## 1 spec    binary         0.991&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Thus, we find that the antigen test is highly specific, with around 1% of false positives.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;uncertainty-in-the-estimated-specificity-and-sensitivity&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Uncertainty in the estimated specificity and sensitivity&lt;/h1&gt;
+&lt;p&gt;So far, we did not discuss the sampling variability in the estimated specificity and sensitivity.&lt;/p&gt;
+&lt;p&gt;The kit leaflet mentions the following confidence intervals:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Sensitivity 83.3% (95%CI: 74.7% - 90.0%)&lt;/li&gt;
+&lt;li&gt;Specificity 99.1% (95%CI: 97.7% - 99.7%)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The R-package &lt;code&gt;yardstick&lt;/code&gt; does not yet include confidence intervals, so I generated these using bootstrapping. I calculate both metrics for 10.000 samples sampled from the raw data. For brevity I omitted the code here, go check out my &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/sars_test&#34;&gt;Github&lt;/a&gt; for the R script.&lt;/p&gt;
+&lt;p&gt;The bootstrapping approach yields the following range of plausible values given the data (95% interval):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(spec_vec, probs = c(0.025, 0.975))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      2.5%     97.5% 
+## 0.9811765 0.9977477&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(sens_vec, probs = c(0.025, 0.975))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      2.5%     97.5% 
+## 0.7570030 0.9029126&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The amount of data (N = 537) prevents us from getting an exact match to the leaflet’s confidence intervals, that are based on theoretic formulas. But we do get pretty close.&lt;/p&gt;
+&lt;p&gt;Especially for the sensitivity, there is quite some uncertainty, we see that plausible values range from 76% up to 90% &lt;em&gt;for this particular cohort of cases with this particular mix of viral loads that showed up during the last four months of 2020 in the University hospital in Berlin&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusions&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusions&lt;/h1&gt;
+&lt;p&gt;To summarise: we found that the numbers of the kit’s leaflet are reliable, reproducible, and published in full detail in the scientific literature.
+Hurray!&lt;/p&gt;
+&lt;p&gt;We also found that even the gold standard PCR is not able to detect all infected persons, it all depends on how much virus is present, and how the sample is obtained.&lt;/p&gt;
+&lt;p&gt;But all in all, the PCR test is clearly more accurate. Why would we want to use an antigen test then?
+To do the PCR test you need a lab with skilled people, equipment such as PCR devices and pipets, and time, as the process takes at least a few hours to complete. The advantage of an antigen test is to have a low-tech, faster alternative that can be self-administered. But that comes at a cost, because the antigen tests are less sensitive.&lt;/p&gt;
+&lt;p&gt;From the analysis, it is clear that the rapid Antigen tests need more virus present to reliably detect infection. It is ALSO clear that the test is highly specific, with less than 1% false positives. Note that a false positive rate of 1% still means that in a healthy population of 1000, 10 are falsely detected as having COVID-19.&lt;/p&gt;
+&lt;p&gt;Surprisingly, nasal swabs appear to give results that are comparable to those of nasopharyngeal swabs, while having not having the disadvantages of them (unpleasant, can only be performed by professional health worker).&lt;/p&gt;
+&lt;p&gt;So the antigen tests are less sensitive than PCR tests. But now comes the key insight: the persons that produce the largest amounts of virus get detected, irrespective of whether they have symptoms or not. To me, this seems like a “Unique Selling Point” of the rapid tests: the ability to rapidly detect the most contagious persons in a group, after which these persons can go into quarantine and help reduce spread.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Thanks to dr. Andreas Lindner for providing helpful feedback and pointing out flaws in my original blog post. This should not be seen as an endorsement of the conclusions of this post, and any remaining mistakes are all my own!&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Head-to-head comparison of SARS-CoV-2 antigen-detecting rapid test with self-collected nasal swab versus professional-collected nasopharyngeal swab&lt;/em&gt;:
+Andreas K. Lindner, Olga Nikolai, Franka Kausch, Mia Wintel, Franziska Hommes, Maximilian Gertler, Lisa J. Krüger, Mary Gaeddert, Frank Tobian, Federica Lainati, Lisa Köppel, Joachim Seybold, Victor M. Corman, Christian Drosten, Jörg Hofmann, Jilian A. Sacks, Frank P. Mockenhaupt, Claudia M. Denkinger, &lt;a href=&#34;https://erj.ersjournals.com/content/57/4/2003961&#34;&gt;European Respiratory Journal 2021 57: 2003961&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Head-to-head comparison of SARS-CoV-2 antigen-detecting rapid test with professional-collected nasal versus nasopharyngeal swab&lt;/em&gt;:
+Andreas K. Lindner, Olga Nikolai, Chiara Rohardt, Susen Burock, Claudia Hülso, Alisa Bölke, Maximilian Gertler, Lisa J. Krüger, Mary Gaeddert, Frank Tobian, Federica Lainati, Joachim Seybold, Terry C. Jones, Jörg Hofmann, Jilian A. Sacks, Frank P. Mockenhaupt, Claudia M. Denkinger &lt;a href=&#34;https://erj.ersjournals.com/content/57/5/2004430&#34;&gt;European Respiratory Journal 2021 57: 2004430&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;SARS-CoV-2 patient self-testing with an antigen-detecting rapid test: a head-to-head comparison with professional testing&lt;/em&gt;:
+Andreas K. Lindner, Olga Nikolai, Chiara Rohardt, Franka Kausch, Mia Wintel, Maximilian Gertler, Susen Burock, Merle Hörig, Julian Bernhard, Frank Tobian, Mary Gaeddert, Federica Lainati, Victor M. Corman, Terry C. Jones, Jilian A. Sacks, Joachim Seybold, Claudia M. Denkinger, Frank P. Mockenhaupt, under review, &lt;a href=&#34;https://www.medrxiv.org/content/10.1101/2021.01.06.20249009v1&#34;&gt;preprint on medrxiv.org&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Variation in False-Negative Rate of Reverse Transcriptase Polymerase Chain Reaction–Based SARS-CoV-2 Tests by Time Since Exposure&lt;/em&gt;: Lauren M. Kucirka, Stephen A. Lauer, Oliver Laeyendecker, Denali Boon, Justin Lessler &lt;a href=&#34;https://www.acpjournals.org/doi/full/10.7326/M20-1495&#34;&gt;Link to paper&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Clinical evaluation of the Roche/SD Biosensor rapid antigen test with symptomatic, non-hospitalized patients in a municipal health service drive-through testing site&lt;/em&gt;:
+Zsὁfia Iglὁi, Jans Velzing, Janko van Beek, David van de Vijver, Georgina Aron, Roel Ensing, KimberleyBenschop, Wanda Han, Timo Boelsums, Marion Koopmans, Corine Geurtsvankessel, Richard Molenkamp &lt;a href=&#34;https://www.medrxiv.org/content/10.1101/2020.11.18.20234104v1&#34;&gt;Link on medrxiv.org&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Performance of Saliva, Oropharyngeal Swabs, and Nasal Swabs for SARS-CoV-2 Molecular Detection: a Systematic Review and Meta-analysis&lt;/em&gt;:
+Rose A. Lee, Joshua C. Herigona, Andrea Benedetti, Nira R. Pollock, Claudia M. Denkinger &lt;a href=&#34;https://journals.asm.org/doi/10.1128/JCM.02881-20&#34;&gt;Link to paper&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Self-collected compared with professional-collected swabbing in the diagnosis of influenza in symptomatic individuals: A meta-analysis and assessment of validity&lt;/em&gt;:
+Seaman et al 2019 &lt;a href=&#34;https://pubmed.ncbi.nlm.nih.gov/31400670/&#34;&gt;Link to paper&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Simulating Fake Data in R</title>
+      <link>/post/simulating-fake-data/</link>
+      <pubDate>Sat, 26 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>/post/simulating-fake-data/</guid>
+      <description>
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This blog post is on simulating fake data. I&#39;m interested in creating synthetic versions of real datasets. For example if the data is too sensitive to be shared, or we only have summary statistics available (for example tables from a published research paper).&lt;/p&gt;
+&lt;p&gt;If we want to mimic an existing dataset, it is desirable to&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make sure that the simulated variables have the proper data type and comparable distribution of values and&lt;/li&gt;
+&lt;li&gt;correlations between the variables in the real dataset are taken into account.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In addition, it would be nice if such functionality is available in a standard R package. After reviewing several R packages that can simulate data, I picked the &lt;a href=&#34;https://www.rdatagen.net/page/simstudy/&#34;&gt;simstudy&lt;/a&gt; package as most promising to explore in more detail. &lt;code&gt;simstudy&lt;/code&gt; is created by &lt;strong&gt;Keith Goldfeld&lt;/strong&gt; from New York University.&lt;/p&gt;
+&lt;p&gt;In this blog post, I explain how &lt;code&gt;simstudy&lt;/code&gt; is able to generate correlated variables, having either continuous or binary values. Along the way, we learn about fancy statistical slang such as copula&#39;s and tetrachoric correlations. It turns out there is a close connection with psychometrics, which we&#39;ll briefly discuss.&lt;/p&gt;
+&lt;p&gt;Let&#39;s start with correlated continuous variables.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Loading required packages
+library(simstudy)
+library(data.table)
+library(ggplot2)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;copulas-simulating-continuous-correlated-variables&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Copulas: Simulating continuous correlated variables&lt;/h1&gt;
+&lt;p&gt;Copulas are a fancy word for correlated (&amp;quot;coupled&amp;quot;) variables that each have a uniform distribution between 0 and 1.&lt;/p&gt;
+&lt;p&gt;Using copulas, we can convert correlated multivariate normal data to data from any known continuous probability distribution, while keeping exactly the same correlation matrix. The normal data is something we can easily simulate, and by choosing appropriate probability distributions, we can approximate the variables in real datasets.&lt;/p&gt;
+&lt;p&gt;Ok let&#39;s do it!&lt;/p&gt;
+&lt;div id=&#34;step-1-correlated-multivariate-normal-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 1: correlated multivariate normal data&lt;/h2&gt;
+&lt;p&gt;The workhorse for our simulated data is a function to simulate multivariate normal data. We&#39;ll use the &lt;code&gt;MASS&lt;/code&gt; package function &lt;code&gt;mvrnorm()&lt;/code&gt;. Other slightly faster (factor 3-4) implementations exist, see e.g. &lt;code&gt;mvnfast&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The trick is to first generate multivariate normal data with the required correlation structure, with mean 0 and standard deviation 1. This gives us correlated data, where each variable is marginally (by itself) normal distributed.&lt;/p&gt;
+&lt;p&gt;Here I simulate two variables, but the same procedure holds for N variables. The Pearson correlation is set at &lt;code&gt;0.7&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.7
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e4, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
+&lt;p&gt;Did it work?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1, df$X2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.6985089&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-2-transform-variables-to-uniform-distribution&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 2: transform variables to uniform distribution&lt;/h2&gt;
+&lt;p&gt;Using the normal cumulative distribution function &lt;code&gt;pnorm()&lt;/code&gt;, we can transform our normally distributed variables to have a uniform distribution, while keeping the correlation structure intact!!!!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_U &amp;lt;- pnorm(df$X1)
+df$X2_U &amp;lt;- pnorm(df$X2)
+
+ggplot(df, aes(x = X1_U)) + geom_histogram(boundary = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_U, y = X2_U)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And here&#39;s our copula! Two variables, each marginally (by itself) uniform, but with pre-specified correlation intact!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_U, df$X2_U)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.677868&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-3-from-uniform-to-any-standard-probability-distribution-we-like&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 3: from uniform to any standard probability distribution we like&lt;/h2&gt;
+&lt;p&gt;Now, if we plug in uniformly distributed data in a &lt;strong&gt;quantile function&lt;/strong&gt; of any arbitrary (known) probability distribution, we can make the variables have any distribution we like.&lt;/p&gt;
+&lt;p&gt;Let&#39;s pick for example a &lt;strong&gt;Gamma&lt;/strong&gt; distribution (Continuous, positive) with shape 4 and rate 1 for X1, and Let&#39;s pick a &lt;strong&gt;Normal&lt;/strong&gt; distribution (Continuous, symmetric) with mean 10 and sd 2 for X2.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$X1_GAM &amp;lt;- qgamma(df$X1_U, shape = 4, rate =1)
+df$X2_NORM &amp;lt;- qnorm(df$X2_U, mean = 10, sd = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X2_NORM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 10, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ok, that worked nicely. But what about their correlation?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$X1_GAM, df$X2_NORM)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.682233&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Whoa!! They still have (almost) the same correlation we started out with before all our transformation magic.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simstudy-in-action&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simstudy in action&lt;/h1&gt;
+&lt;p&gt;Now let&#39;s see how &lt;code&gt;simstudy&lt;/code&gt; helps us generating this type of simulated data. Simstudy works with &amp;quot;definition tables&amp;quot; that allow us to specify, for each variable, which distribution and parameters to use, as well as the desired correlations between the variables.&lt;/p&gt;
+&lt;p&gt;After specifing a definition table, we can call one of its workhorse functions &lt;code&gt;genCorFlex()&lt;/code&gt; to generate the data.&lt;/p&gt;
+&lt;p&gt;N.b. Simstudy uses different parameters for the Gamma distribution, compared to R&#39;s &lt;code&gt;rgamma()&lt;/code&gt; function. Under water, it uses the &lt;code&gt;gammaGetShapeRate()&lt;/code&gt; to transform the &amp;quot;mean&amp;quot; and &amp;quot;variance/ dispersion&amp;quot; to the more conventional &amp;quot;shape&amp;quot; and &amp;quot;rate&amp;quot; parameters.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.7
+
+corr.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+# check that gamma parameters correspond to same shape and rate pars as used above
+#simstudy::gammaGetShapeRate(mean = 4, dispersion = 0.25)
+
+
+def &amp;lt;- defData(varname = &amp;quot;X1_GAM&amp;quot;, 
+               formula = 4, variance = 0.25, dist = &amp;quot;gamma&amp;quot;)
+
+def &amp;lt;- defData(def, varname = &amp;quot;X2_NORM&amp;quot;, 
+               formula = 10, variance = 2, dist = &amp;quot;normal&amp;quot;)
+
+
+
+dt &amp;lt;- genCorFlex(1e4, def, corMatrix = corr.mat)
+
+cor(dt[,-&amp;quot;id&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            X1_GAM   X2_NORM
+## X1_GAM  1.0000000 0.6823006
+## X2_NORM 0.6823006 1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(dt, aes(x = X1_GAM)) + 
+  geom_histogram(boundary = 0) +
+  geom_vline(xintercept = 4, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;generate-correlated-binary-variables&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Generate correlated binary variables&lt;/h1&gt;
+&lt;p&gt;As it turns out, the copula approach does not work for binary variables. Well, it sort of works, but the correlations we get are lower than we actually specify.&lt;/p&gt;
+&lt;p&gt;Come to think of it: two binary variables cannot have all the correlations we like. To see why, check this out.&lt;/p&gt;
+&lt;div id=&#34;feasible-correlations-for-two-binary-variables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Feasible correlations for two binary variables&lt;/h2&gt;
+&lt;p&gt;Let&#39;s suppose we have a binary variable that equals 1 with probability 0.2, and zero otherwise. This variable will never be fully correlated with a binary variable that equals 1 with probability 0.8, and zero otherwise.&lt;/p&gt;
+&lt;p&gt;To see this, I created two binary vectors that have a fraction 0.2 and 0.8 of 1&#39;s, and let&#39;s see if we can arrange the values in both vectors in such a way that minimizes and maximizes their correlation:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# maximal correlation
+x1 &amp;lt;- c(0, 0, 0, 0, 1)
+x2 &amp;lt;- c(0, 1, 1, 1, 1)
+
+mean(x1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.25&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# minimal correlation
+x1 &amp;lt;- c(1, 0, 0, 0, 0)
+x2 &amp;lt;- c(0, 1, 1, 1, 1)
+
+cor(x1, x2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To get these vectors to be maximally correlated, we need to match &lt;code&gt;1&lt;/code&gt;&#39;s in &lt;code&gt;x1&lt;/code&gt; as much as possible with &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;. To get these vectors to be maximally anti-correlated, we need to match &lt;code&gt;1&lt;/code&gt;s in &lt;code&gt;x1&lt;/code&gt; with as many &lt;code&gt;0&lt;/code&gt;s in &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this example, we conclude that the feasible correlation range is &lt;code&gt;{-1, 0.25}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;simstudy&lt;/code&gt; package contains a function to check for feasible boundaries, that contains this piece of code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p1 &amp;lt;- 0.2
+p2 &amp;lt;- 0.8
+
+# lowest correlation
+l &amp;lt;- (p1 * p2)/((1 - p1) * (1 - p2))
+
+max(-sqrt(l), -sqrt(1/l))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# highest correlation
+u &amp;lt;- (p1 * (1 - p2))/(p2 * (1 - p1))
+
+min(sqrt(u), sqrt(1/u))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.25&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This confirms our example above.&lt;/p&gt;
+&lt;p&gt;Note that if we want to mimic a real dataset with binary correlated variables, the correlations are a given, and are obviously all feasible because we obtain them from actual data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-model-for-two-correlated-binary-variables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;A model for two correlated binary variables&lt;/h2&gt;
+&lt;p&gt;Ok let&#39;s suppose we want a two binary vectors &lt;code&gt;B1&lt;/code&gt; and &lt;code&gt;B2&lt;/code&gt; , with means &lt;code&gt;p1 = 0.2&lt;/code&gt; and &lt;code&gt;p2 = 0.8&lt;/code&gt; and (feasible) Pearson correlation 0.1.&lt;/p&gt;
+&lt;p&gt;How? How?&lt;/p&gt;
+&lt;p&gt;The idea is that to get two binary variables to have an exact particular correlation, we imagine an underlying (&amp;quot;latent&amp;quot;) bivariate (2D) normal distribution. This normal distribution has the means fixed to 0, and the standard deviations fixed to 1.&lt;/p&gt;
+&lt;p&gt;Why? Because a) we know it very well theoretically and b) we know how to simulate efficiently from such a distribution, using &lt;code&gt;mvrnorm()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In this bivariate normal distribution, we draw a quadrant (i.e. two thresholds). The thresholds define transformations to binary variables. Below the threshold, the binary value is 0, above it is 1. We have to pick the thresholds such that the resulting binary variables have the desired mean (i.e. percentage of 1&#39;s).&lt;/p&gt;
+&lt;p&gt;This approach reduces the problem to finding the right values of three parameters: multivariate normal correlation, and the two thresholds (above, we already fixed the means and variance to zero and one respectively).&lt;/p&gt;
+&lt;p&gt;For now, we&#39;ll just pick some value for the correlation in the bivariate normal, say 0.5, and focus on where to put the threshholds.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+
+corr &amp;lt;- 0.5
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 10000, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(The diagonal of &lt;code&gt;1&lt;/code&gt; makes sure the variables have SD of 1. The off diagonal value of 0.7 gives us a Pearson correlation of 0.7)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Ok, where to put the thresholds? That&#39;s simple, we just need to use the &lt;code&gt;quantile distribution function&lt;/code&gt; to partition the marginal normal variables into 0 and 1 portions.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
+df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
+
+mean(df$B1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.197&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.7988&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s check it out visually:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(df, aes(x = X1, y = X2)) +
+  geom_point(alpha = 0.3) + 
+  geom_vline(xintercept = qnorm(0.2), col = &amp;quot;red&amp;quot;) +
+  geom_hline(yintercept = qnorm(0.8), col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-10-31-simulating-fake-data-in-R_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;480&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Nice.&lt;/p&gt;
+&lt;p&gt;Ok, so now what is the correlation for these two binary variables?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.1877482&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Ok, so if X1 and X2 have a correlation of 0.5, this results in a correlation of 0.19 between the binary variables B1 and B2.&lt;/p&gt;
+&lt;p&gt;But we need B1 and B2 to have a correlation of 0.1!&lt;/p&gt;
+&lt;p&gt;At this point, there is only one free parameter left, the correlation of the normally distributed variables &lt;code&gt;X1&lt;/code&gt; and &lt;code&gt;X2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We could of course manually try to find which correlation we must choose between &lt;code&gt;X1&lt;/code&gt; and &lt;code&gt;X2&lt;/code&gt; to get the desired correlation of 0.1 in the binary variables. But that would be very unpractical.&lt;/p&gt;
+&lt;p&gt;Fortunately, Emrich and Piedmonte (1991) published an iterative method to solve this puzzle. And this method has been implemented in &lt;code&gt;simstudy&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;simstudy:::.findRhoBin(p1 = 0.2, 
+                       p2 = 0.8, d = 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s see if it works:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+
+corr &amp;lt;- 0.2218018
+
+cov.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+df &amp;lt;- data.frame(MASS::mvrnorm(n = 1e6, 
+                               mu = c(0, 0), 
+                               Sigma = cov.mat))
+
+df$B1 &amp;lt;- ifelse(df$X1 &amp;lt; qnorm(0.2), 1, 0)
+df$B2 &amp;lt;- ifelse(df$X2 &amp;lt; qnorm(0.8), 1, 0)
+
+cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;relation-to-psychometrics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Relation to psychometrics&lt;/h1&gt;
+&lt;p&gt;So what has psychometrics to do with all this simulation of correlated binary vector stuff?&lt;/p&gt;
+&lt;p&gt;Well, psychometrics is all about theorizing about unobserved, latent, imaginary &amp;quot;constructs&amp;quot;, such as &lt;strong&gt;attitude&lt;/strong&gt;, &lt;strong&gt;general intelligence&lt;/strong&gt; or a &lt;strong&gt;personality trait&lt;/strong&gt;. To measure these constructs, questionnaires are used. The questions are called &lt;strong&gt;items&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Now imagine a situation where we are interested in a particular construct, say &lt;strong&gt;general intelligence&lt;/strong&gt;, and we design two questions to measure (hope to learn more about) the construct. Furthermore, assume that one question is more difficult than the other question. The answers to both questions can either be wrong or right.&lt;/p&gt;
+&lt;p&gt;We can model this by assuming that the (imaginary) variable &amp;quot;intelligence&amp;quot; of each respondent is located on a two-dimensional plane, with the distribution of the respondents determined by a bivariate normal distribution. Dividing this plane into four quadrants then gives us the measurable answers (right or wrong) to both questions. Learning the answers to both questions then gives us an approximate location of a respondent on our &amp;quot;intelligence&amp;quot; plane!&lt;/p&gt;
+&lt;div id=&#34;phi-tetrachoric-correlation-and-the-psych-package&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Phi, tetrachoric correlation and the psych package&lt;/h2&gt;
+&lt;p&gt;Officially, the Pearson correlation between two binary vectors is called the &lt;a href=&#34;https://en.wikipedia.org/wiki/Phi_coefficient&#34;&gt;Phi coefficient&lt;/a&gt;. This name was actually chosen by Karl Pearson himself.&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;psych&lt;/strong&gt; packages contains a set of convenient functions for calculating Phi coefficients from empirical two by two tables (of two binary vectors), and finding the corresponding Pearson coefficient for the 2d (latent) normal. This coefficient is called the &lt;strong&gt;tetrachoric correlation&lt;/strong&gt;. Again a fine archaic slang word for again a basic concept.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(psych)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &amp;#39;psych&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &amp;#39;package:ggplot2&amp;#39;:
+## 
+##     %+%, alpha&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# convert simulated binary vectors B1 and B2 to 2x2 table
+twobytwo &amp;lt;- table(df$B1, df$B2)/nrow(df)
+
+phi(twobytwo, digits = 6)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.099574&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(df$B1, df$B2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.09957392&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# both give the same result&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can use &lt;strong&gt;phi2tetra&lt;/strong&gt; to find the tetrachoric correlation that corresponds to the combination of a &amp;quot;Phi coefficient&amp;quot;, i.e. the correlation between the two binary vectors, as well as their marginals. This is a wrapper that builds the two by two frequency table and then calls &lt;code&gt;tetrachoric()&lt;/code&gt; . This in turn uses &lt;code&gt;optimize&lt;/code&gt; (Maximum Likelihood method?) to find the tetrachoric correlation.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;phi2tetra(0.1, c(0.2, 0.8))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2217801&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# compare with EP method
+simstudy:::.findRhoBin(0.2, 0.8, 0.1)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.2218018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Comparing with the Emrich and Piedmonte method, we find that they give identical answers. Great, case closed!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simstudy-in-action-ii&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simstudy in action II&lt;/h1&gt;
+&lt;p&gt;Now that we feel confident in our methods and assumptions, let&#39;s see &lt;code&gt;simstudy&lt;/code&gt; in action.&lt;/p&gt;
+&lt;p&gt;Let&#39;s generate two binary variables, that have marginals of 20% and 80% respectively, and a Pearson correlation coefficient of 0.1.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(123)
+corr &amp;lt;- 0.1
+
+corr.mat &amp;lt;- matrix(c(1, corr, 
+                  corr, 1), nrow = 2)
+
+res &amp;lt;- simstudy::genCorGen(10000, nvars = 2, 
+                 params1 = c(0.2, 0.8),
+                 corMatrix = corr.mat,
+                 dist = &amp;quot;binary&amp;quot;, 
+                 method = &amp;quot;ep&amp;quot;, wide = TRUE)
+
+# let&amp;#39;s check the result
+cor(res[, -c(&amp;quot;id&amp;quot;)])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            V1         V2
+## V1 1.00000000 0.09682531
+## V2 0.09682531 1.00000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Awesome, it worked!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;Recall, my motivation for simulating fake data with particular variable types and correlation structure is to mimic real datasets.&lt;/p&gt;
+&lt;p&gt;So are we there yet? Well, we made some progress. We now can handle correlated continuous data, as well as correlated binary data.&lt;/p&gt;
+&lt;p&gt;But we need to solve two more problems:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;To simulate a particular dataset, we still need to determine for each variable its data type (binary or continuous), and if it&#39;s continuous, what is the most appropriate probability distribution (Normal, Gamma, Log-normal, etc).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;we haven&#39;t properly solved correlation between dissimilar data types, e.g. a correlation between a continuous and a binary variable.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Judging from the literature (Amatya &amp;amp; Demirtas 2016) and packages such as &lt;code&gt;SimMultiCorrData&lt;/code&gt; by Allison Fialkowski, these are both solved, and I only need to learn about them! So, to be continued.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Exploring Process Mining in R</title>
+      <link>/post/exploring-process-mining/</link>
+      <pubDate>Thu, 20 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>/post/exploring-process-mining/</guid>
+      <description>
+&lt;link href=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/rmarkdown-libs/anchor-sections/anchor-sections.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;In this post, we&#39;ll explore the &lt;a href=&#34;https://www.bupar.net&#34;&gt;BupaR&lt;/a&gt; suite of &lt;em&gt;Process Mining&lt;/em&gt; packages created by &lt;em&gt;Gert Janssenswillen&lt;/em&gt; from Hasselt University.&lt;/p&gt;
+&lt;p&gt;We start with exploring the &lt;code&gt;patients&lt;/code&gt; dataset contained in the &lt;code&gt;eventdataR&lt;/code&gt; package. According to the documentation, this is an &amp;quot;Artifical eventlog about patients&amp;quot;.&lt;/p&gt;
+&lt;div id=&#34;getting-started&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Getting started&lt;/h1&gt;
+&lt;p&gt;After installing all required packages, we can load the whole &amp;quot;bupaverse&amp;quot; by loading the &lt;code&gt;bupaR&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+library(bupaR)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;xesreadR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;processmonitR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+## logical.return = TRUE, : there is no package called &amp;#39;petrinetR&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(processmapR)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, our dataset is already in &lt;code&gt;eventlog&lt;/code&gt; format, but typically this not the case. Here&#39;s how to turn a data.frame into an object of class &lt;code&gt;eventlog&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;patients &amp;lt;- eventdataR::patients
+
+df &amp;lt;- eventlog(patients,
+               case_id = &amp;quot;patient&amp;quot;,
+               activity_id = &amp;quot;handling&amp;quot;,
+               activity_instance_id = &amp;quot;handling_id&amp;quot;,
+               lifecycle_id = &amp;quot;registration_type&amp;quot;,
+               timestamp = &amp;quot;time&amp;quot;,
+               resource_id = &amp;quot;employee&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: The `add` argument of `group_by()` is deprecated as of dplyr 1.0.0.
+## Please use the `.add` argument instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&#39;s check it out.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(df)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Number of events:  5442
+## Number of cases:  500
+## Number of traces:  7
+## Number of distinct activities:  7
+## Average trace length:  10.884
+## 
+## Start eventlog:  2017-01-02 11:41:53
+## End eventlog:  2018-05-05 07:16:02&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                   handling      patient          employee  handling_id       
+##  Blood test           : 474   Length:5442        r1:1000   Length:5442       
+##  Check-out            : 984   Class :character   r2:1000   Class :character  
+##  Discuss Results      : 990   Mode  :character   r3: 474   Mode  :character  
+##  MRI SCAN             : 472                      r4: 472                     
+##  Registration         :1000                      r5: 522                     
+##  Triage and Assessment:1000                      r6: 990                     
+##  X-Ray                : 522                      r7: 984                     
+##  registration_type      time                         .order    
+##  complete:2721     Min.   :2017-01-02 11:41:53   Min.   :   1  
+##  start   :2721     1st Qu.:2017-05-06 17:15:18   1st Qu.:1361  
+##                    Median :2017-09-08 04:16:50   Median :2722  
+##                    Mean   :2017-09-02 20:52:34   Mean   :2722  
+##                    3rd Qu.:2017-12-22 15:44:11   3rd Qu.:4082  
+##                    Max.   :2018-05-05 07:16:02   Max.   :5442  
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we learn that there are 500 &amp;quot;cases&amp;quot;, i.e. patients. There are 7 different activities.&lt;/p&gt;
+&lt;p&gt;Let&#39;s check out the data for a single patient:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% filter(patient == 1) %&amp;gt;% 
+  arrange(handling_id) #%&amp;gt;% &lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Log of 12 events consisting of:
+## 1 trace 
+## 1 case 
+## 6 instances of 6 activities 
+## 6 resources 
+## Events occurred from 2017-01-02 11:41:53 until 2017-01-09 19:45:45 
+##  
+## Variables were mapped as follows:
+## Case identifier:     patient 
+## Activity identifier:     handling 
+## Resource identifier:     employee 
+## Activity instance identifier:    handling_id 
+## Timestamp:           time 
+## Lifecycle transition:        registration_type 
+## 
+## # A tibble: 12 x 7
+##    handling patient employee handling_id registration_ty… time               
+##    &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;   &amp;lt;fct&amp;gt;    &amp;lt;chr&amp;gt;       &amp;lt;fct&amp;gt;            &amp;lt;dttm&amp;gt;             
+##  1 Registr… 1       r1       1           start            2017-01-02 11:41:53
+##  2 Registr… 1       r1       1           complete         2017-01-02 12:40:20
+##  3 Blood t… 1       r3       1001        start            2017-01-05 08:59:04
+##  4 Blood t… 1       r3       1001        complete         2017-01-05 14:34:27
+##  5 MRI SCAN 1       r4       1238        start            2017-01-05 21:37:12
+##  6 MRI SCAN 1       r4       1238        complete         2017-01-06 01:54:23
+##  7 Discuss… 1       r6       1735        start            2017-01-07 07:57:49
+##  8 Discuss… 1       r6       1735        complete         2017-01-07 10:18:08
+##  9 Check-o… 1       r7       2230        start            2017-01-09 17:09:43
+## 10 Check-o… 1       r7       2230        complete         2017-01-09 19:45:45
+## 11 Triage … 1       r2       501         start            2017-01-02 12:40:20
+## 12 Triage … 1       r2       501         complete         2017-01-02 22:32:25
+## # … with 1 more variable: .order &amp;lt;int&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt; # select(handling, handling_id, registration_type) # does not work&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We learn that each &amp;quot;handling&amp;quot; has a separate start and complete timestamp.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;traces&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Traces&lt;/h1&gt;
+&lt;p&gt;The summary info of the event log also counts so-called &amp;quot;traces&amp;quot;. A trace is defined a unique sequence of events in the event log. Apparently, there are only seven different traces (possible sequences). Let&#39;s visualize them.&lt;/p&gt;
+&lt;p&gt;To visualize all traces, we set &lt;code&gt;coverage&lt;/code&gt; to 1.0.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% processmapR::trace_explorer(type = &amp;quot;frequent&amp;quot;, coverage = 1.0)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning: `rename_()` is deprecated as of dplyr 0.7.0.
+## Please use `rename()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt; So there are a few traces (0.6%) that do not end with a check-out. Ignoring these rare cases, we find that there are two types of cases:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cases that get an X-ray&lt;/li&gt;
+&lt;li&gt;Cases that get a blood test followed by an MRI scan&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-dotted-chart&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The dotted chart&lt;/h1&gt;
+&lt;p&gt;A really powerful visualization in process mining comes in the form of a &amp;quot;dotted chart&amp;quot;. The dotted chart function produces a &lt;code&gt;ggplot&lt;/code&gt; graph, which is nice, because so we can actually tweak the graph as we can with regular ggplot objects.&lt;/p&gt;
+&lt;p&gt;It has two nice use cases. The first is when we plot actual time on the x-axis, and sort the cases by starting date.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;absolute&amp;quot;, sort = &amp;quot;start&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The slope of this graphs learns us the rate of new cases, and if this changes over time. Here it appears constant, with 500 cases divided over five quarter years.&lt;/p&gt;
+&lt;p&gt;The second is to align all cases relative to the first event, and sort on duration of the whole sequence of events.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df %&amp;gt;% dotted_chart(x = &amp;quot;relative&amp;quot;, sort = &amp;quot;duration&amp;quot;) + ggtitle(&amp;quot;All cases&amp;quot;) +
+  theme_gray()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Joining, by = &amp;quot;patient&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-01-23-exploring-process-mining_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;A nice pattern emerges, where all cases start with registration, then quickly proceed to triage and assessment, after that, a time varying period of 1-10 days follows where either the blood test + MRI scan, or the X-ray is performed, followed by discussing the results. Finally, check out occurs.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;To conclude, the process mining approach to analyze time series event data appears highly promising. The dotted chart is a great addition to my data visualization repertoire, and the process mining folks appear to have at lot more goodies, such as Trace Alignment.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

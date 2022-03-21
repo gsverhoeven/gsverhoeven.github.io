@@ -1,0 +1,40 @@
+1pos. pos.(+++) pos.(+++) 14.82 2 9.57 2 sampling4, X X
+2pos. pos.(+++) pos.(+++) 18.29 3 9.30 2 extraction5
+3pos. pos.(+++) pos.(+++) 16.20 2 9.16 2 extraction5
+4pos. pos.(+++) pos.(+++) 16.34 2 9.12 3 extraction5
+5pos. pos.(+++) pos.(+++) 16.89 2 8.96 1 sampling4, extraction5
+6pos. pos.(+++) pos.(+++) 19.51 3 8.94 2 extraction5, volume6
+7pos. pos.(+++) pos.(+++) 17.43 2 8.80 2
+8pos. pos.(+++) pos.(+++) 20.30 3 8.71 4
+9pos. pos.(++) pos.(+++) 17.74 2 8.70 3
+10pos. pos.(+++) pos.(+++) 20.35 3 8.69 4
+11pos. pos.(+++) pos.(+++) 17.94 2 8.64 3 extraction5, volume6
+12pos. pos.(+++) pos.(+++) 20.72 3 8.58 1
+13pos. pos.(++) neg. 18.50 2 8.48 1 sampling4, extraction5
+14pos. pos.(+++) pos.(+++) 21.34 3 8.40 3
+15pos. pos.(+++) pos.(+++) 18.96 2 8.34 7 extraction5, volume6
+16pos. pos.(+++) pos.(+++) 19.26 2 8.25 2 sampling4, extraction5
+17pos. pos.(+++) pos.(+++) 19.29 2 8.24 3
+18pos. pos.(+++) pos.(+++) 21.94 3 8.22 1 extraction5
+19pos. pos.(+++) pos.(+++) 19.48 2 8.19 4
+20pos. pos.(+++) pos.(+++) 19.49 2 8.18 4 sampling4
+21pos. pos.(+++) pos.(+++) 19.52 2 8.17 4 sampling4, extract.5, vol.6
+22pos. pos.(+++) pos.(+++) 19.74 2 8.11 2 sampling4, extraction5
+23pos. pos.(+++) pos.(+++) 19.95 2 8.05 3
+24pos. pos.(++) pos.(+++) 20.67 2 7.83 3 extraction5
+25pos. pos.(+++) pos.(+++) 23.71 3 7.70 6 sampling4
+26pos. pos.(++) pos.(+++) 23.99 3 7.62 3 extraction5, volume6
+27pos. pos.(+++) pos.(+++) 21.98 2 7.44 7
+28pos. pos.(++) pos.(+++) 24.89 3 7.35 8 sampling4, extraction5
+29neg. pos.(++) pos.(++) 22.67 2 7.24 3 read-out7
+30pos. pos.(++) pos.(++) 24.86 2 6.59 7 sampling4
+31neg. neg. pos.(+) 25.07 2 6.52 5
+32pos. pos.(+++) pos.(++) 28.58 3 6.26 8
+33neg. neg. neg. 27.05 2 5.94 1
+34pos. pos.(++) pos.(+) 29.71 2 5.15 5 extraction5, volume6
+35pos. pos.(++) pos.(+) 30.03 2 5.05 7 extraction5
+36pos. pos.(+) pos.(++) 30.28 2 4.98 7 sampling4, extraction5
+37neg. neg. neg. 35.69 3 4.15 7
+38neg. neg. neg. 33.29 2 3.91 14 sampling4, extract.5, vol.6
+39neg. neg. neg. 34.54 2 3.71 8
+40neg. neg. neg. 34.99 2 3.41 14 extraction5

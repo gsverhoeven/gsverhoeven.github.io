@@ -1,0 +1,3008 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="This blogpost is about **Blood Bowl**, a boardgame I started playing last year. The goal of this blog post is to use Python API and HTML scraping to fetch Blood Bowl match outcome data from FUMBBL.com, and to create a structured dataset ready for analysis and visualization.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/blood-bowl-fumbbl-dataset/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/blood-bowl-fumbbl-dataset/">
+
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="/post/blood-bowl-fumbbl-dataset/">
+  <meta property="og:title" content="Construction of a public dataset of Blood Bowl matches played on FUMBBL.com | Gertjan Verhoeven">
+  <meta property="og:description" content="This blogpost is about **Blood Bowl**, a boardgame I started playing last year. The goal of this blog post is to use Python API and HTML scraping to fetch Blood Bowl match outcome data from FUMBBL.com, and to create a structured dataset ready for analysis and visualization."><meta property="og:image" content="/img/headers/bloodbowl_dataset.png">
+  <meta property="twitter:image" content="/img/headers/bloodbowl_dataset.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2021-12-30T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2021-12-30T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/blood-bowl-fumbbl-dataset/"
+  },
+  "headline": "Construction of a public dataset of Blood Bowl matches played on FUMBBL.com",
+  
+  "datePublished": "2021-12-30T00:00:00Z",
+  "dateModified": "2021-12-30T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Gertjan Verhoeven"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gertjan Verhoeven",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "This blogpost is about **Blood Bowl**, a boardgame I started playing last year. The goal of this blog post is to use Python API and HTML scraping to fetch Blood Bowl match outcome data from FUMBBL.com, and to create a structured dataset ready for analysis and visualization."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Construction of a public dataset of Blood Bowl matches played on FUMBBL.com | Gertjan Verhoeven</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/bloodbowl_dataset.png" class="article-banner" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Construction of a public dataset of Blood Bowl matches played on FUMBBL.com</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Dec 30, 2021
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    27 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/categories/data-paper/">Data paper</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>This blogpost is about <strong>Blood Bowl</strong>, a boardgame of fantasy football that can also be played online at <a href="https://fumbbl.com">FUMBBL.com</a>. The goal of this blog post is to use Python API and HTML scraping to fetch online Blood Bowl match outcome data, and to create a publicly available dataset ready for analysis and visualization. In a <a href="link/to/blog">separate blog post</a> I’ll showcase some analyses on this dataset (also known as <a href="https://www.nufflytics.com">Nufflytics</a> in reference to Nuffle, the god of Blood Bowl). The dataset is primarily constructed to analyze rule changes that were introduced on FUMBBL.com last year, and how these affected the relative strengths of the different teams coaches can pick to field against each other.</p>
+<p>In writing this blog post, I took inspiration from a relatively new development in Open Science, that of the <strong>Data paper</strong> (Chavan &amp; Penev, 2011). A data paper is a (ideally peer reviewed) publication of a dataset as a stand alone research output. A Data paper can be thought of similar to the “Methods” section of a traditional research article, though with greater detail. A data paper describes the contents of the dataset, the data acquisition process, and includes a discussion of the motivation and considerations regarding experimental design (if applicable). Data papers do not provide any analysis nor results / conclusions. The dataset itself should be online available at a data repository such as <strong>Zenodo</strong>, <strong>Figshare</strong> or <strong>Dryad</strong>.</p>
+<p>To give an impression of how this works out in practice, here are two examples: The first data paper, <a href="https://www.nature.com/articles/s41597-019-0247-7"><em>A public data set of spatio-temporal match events in soccer competitions</em></a>, was published in “Scientific data” with the dataset hosted at <a href="https://doi.org/10.6084/m9.figshare.c.4415000.v5">Figshare</a>. The second is collected from Twitter: <a href="https://arxiv.org/abs/2004.03688"><em>A large-scale COVID-19 Twitter chatter dataset for open scientific research – an international collaboration</em></a>, with the open dataset published on <a href="https://doi.org/10.5281/zenodo.5775023">Zenodo</a>.</p>
+<p>*Chavan, V., and Penev, L. (2011). The data paper: a mechanism to incentivize data publishing in biodiversity science. BMC Bioinformatics 12(Suppl. 15):S2. <a href="doi:10.1186/1471-2105-12-S15-S2" class="uri">doi:10.1186/1471-2105-12-S15-S2</a></p>
+<div id="software-needed-to-reproduce-this-blog-post" class="section level1">
+<h1>Software needed to reproduce this blog post</h1>
+<p>This blogpost is written as a Jupyter notebook containing Python code, and is fully reproducible. The idea is to make Blood Bowl data analysis accessible to others. Using open source tooling reduces the barriers for others to build on other people’s work.</p>
+<pre class="python"><code>import random
+import time
+
+import requests # API library
+
+import numpy as np
+import pandas as pd
+
+pd.set_option(&#39;display.max_rows&#39;, 500)
+pd.set_option(&#39;display.max_columns&#39;, 500)</code></pre>
+</div>
+<div id="blood-bowl-online-fumbbl" class="section level1">
+<h1>Blood Bowl online: FUMBBL</h1>
+<p>The <strong>FUMBBL</strong> website (<a href="https://fumbbl.com" class="uri">https://fumbbl.com</a>) contains a large amount of data. From coach pages, with their teams, to team rosters, with players, and match histories. It’s all there.</p>
+<p>To obtain <strong>FUMBBL</strong> data, we need to fetch it match by match, team by team. To do so, the site creator Christer Kaivo-oja, from Sweden, has made an API that allows us to easily fetch data. What follows is a short demonstration how the API works, before we fetch the <strong>FUMBBL</strong> match and team data of the last 12 months.</p>
+</div>
+<div id="behold-the-power-of-requests" class="section level1">
+<h1>Behold, the power of Requests</h1>
+<p>I use the <a href="https://docs.python-requests.org/en/latest/">Python <strong>Requests</strong> library</a> to make the API call over HTTPS and obtain the response from the FUMBLL server. The response is in the JSON format, a <a href="https://www.json.org/json-en.html">light-weight data-interchange format</a> which is both easy to read and write for humans, and easy to parse and generate by computers. So this makes it a natural choice for an API.</p>
+<p>Here is an example of what is available at the coach level. The full documentation of the API can be found at (<a href="https://fumbbl.com/apidoc/" class="uri">https://fumbbl.com/apidoc/</a>).</p>
+<pre class="python"><code>response = requests.get(&quot;https://fumbbl.com/api/coach/teams/gsverhoeven&quot;)
+# display the complete JSON object {}
+response.json()</code></pre>
+<pre><code>{&#39;id&#39;: 255851,
+ &#39;name&#39;: &#39;gsverhoeven&#39;,
+ &#39;teams&#39;: [{&#39;id&#39;: 1003452,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Hillywood Hellraisers&#39;,
+   &#39;rosterId&#39;: 50,
+   &#39;race&#39;: &#39;Human&#39;,
+   &#39;teamValue&#39;: 1090000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;Yes&#39;,
+   &#39;games&#39;: &#39;3&#39;,
+   &#39;divisionId&#39;: 1,
+   &#39;division&#39;: &#39;Ranked&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Retired&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486290},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486291},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486292},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486293},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486294},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486295}]},
+  {&#39;id&#39;: 1035833,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Pharaoh Munchers&#39;,
+   &#39;rosterId&#39;: 51,
+   &#39;race&#39;: &#39;Tomb Kings&#39;,
+   &#39;teamValue&#39;: 960000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;No&#39;,
+   &#39;games&#39;: &#39;0&#39;,
+   &#39;divisionId&#39;: 1,
+   &#39;division&#39;: &#39;Ranked&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Active&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486296},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486297},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486298},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486299},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486300},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486301}]},
+  {&#39;id&#39;: 1035835,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Blackbox Bastards&#39;,
+   &#39;rosterId&#39;: 50,
+   &#39;race&#39;: &#39;Human&#39;,
+   &#39;teamValue&#39;: 840000,
+   &#39;canLfg&#39;: &#39;No&#39;,
+   &#39;isLfg&#39;: &#39;No&#39;,
+   &#39;games&#39;: &#39;1&#39;,
+   &#39;divisionId&#39;: 10,
+   &#39;division&#39;: &#39;Blackbox&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Retired&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486290},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486291},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486292},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486293},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486294},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486295}]},
+  {&#39;id&#39;: 1036599,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Seven cities of Gold&#39;,
+   &#39;rosterId&#39;: 52,
+   &#39;race&#39;: &#39;Lizardmen&#39;,
+   &#39;teamValue&#39;: 1000000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;No&#39;,
+   &#39;games&#39;: &#39;0&#39;,
+   &#39;divisionId&#39;: 1,
+   &#39;division&#39;: &#39;Ranked&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Active&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486302},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486303},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486304},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486305},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486306},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486307}]},
+  {&#39;id&#39;: 1038960,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Hillywood Hellraisers 2.0&#39;,
+   &#39;rosterId&#39;: 50,
+   &#39;race&#39;: &#39;Human&#39;,
+   &#39;teamValue&#39;: 1110000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;Yes&#39;,
+   &#39;games&#39;: &#39;4&#39;,
+   &#39;divisionId&#39;: 1,
+   &#39;division&#39;: &#39;Ranked&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Active&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486290},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486291},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486292},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486293},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486294},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486295}]},
+  {&#39;id&#39;: 1050267,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Gooische Heidebeukers&#39;,
+   &#39;rosterId&#39;: 4974,
+   &#39;race&#39;: &#39;Orc&#39;,
+   &#39;teamValue&#39;: 1330000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;Yes&#39;,
+   &#39;games&#39;: &#39;6&#39;,
+   &#39;divisionId&#39;: 5,
+   &#39;division&#39;: &#39;League&#39;,
+   &#39;leagueId&#39;: 14883,
+   &#39;league&#39;: &#39;Benelux Hate Bowl&#39;,
+   &#39;status&#39;: &#39;Post Match Sequence&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486332},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486333},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486334},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486335},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486336},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486337}]},
+  {&#39;id&#39;: 1052980,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;[2020] Hillywood Hellraisers&#39;,
+   &#39;rosterId&#39;: 4964,
+   &#39;race&#39;: &#39;Human&#39;,
+   &#39;teamValue&#39;: 1000000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;No&#39;,
+   &#39;games&#39;: &#39;0&#39;,
+   &#39;divisionId&#39;: 2,
+   &#39;division&#39;: &#39;Competitive&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Active&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486290},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486291},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486292},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486293},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486294},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486295}]},
+  {&#39;id&#39;: 1053065,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;[2020] Grrrl power&#39;,
+   &#39;rosterId&#39;: 5141,
+   &#39;race&#39;: &#39;Amazon&#39;,
+   &#39;teamValue&#39;: 960000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;No&#39;,
+   &#39;games&#39;: &#39;0&#39;,
+   &#39;divisionId&#39;: 2,
+   &#39;division&#39;: &#39;Competitive&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Active&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 486194},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 486192},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 486195},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 486191},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 486193},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 486190}]},
+  {&#39;id&#39;: 1060696,
+   &#39;coachId&#39;: 255851,
+   &#39;name&#39;: &#39;Hakflem support team&#39;,
+   &#39;rosterId&#39;: 4978,
+   &#39;race&#39;: &#39;Underworld Denizens&#39;,
+   &#39;teamValue&#39;: 730000,
+   &#39;canLfg&#39;: &#39;Yes&#39;,
+   &#39;isLfg&#39;: &#39;No&#39;,
+   &#39;games&#39;: &#39;0&#39;,
+   &#39;divisionId&#39;: 2,
+   &#39;division&#39;: &#39;Competitive&#39;,
+   &#39;leagueId&#39;: 0,
+   &#39;league&#39;: None,
+   &#39;status&#39;: &#39;Active&#39;,
+   &#39;raceLogos&#39;: [{&#39;size&#39;: 32, &#39;logo&#39;: 603383},
+    {&#39;size&#39;: 48, &#39;logo&#39;: 603381},
+    {&#39;size&#39;: 64, &#39;logo&#39;: 603378},
+    {&#39;size&#39;: 96, &#39;logo&#39;: 603382},
+    {&#39;size&#39;: 128, &#39;logo&#39;: 603380},
+    {&#39;size&#39;: 192, &#39;logo&#39;: 603379}]}]}</code></pre>
+</div>
+<div id="parsing-json-data" class="section level1">
+<h1>Parsing JSON data</h1>
+<p>Let’s have a closer look at the JSON data structure here.
+We have a list of key-value pairs.
+Using brackets <code>[]</code> we can choose keys and retrieve their values.
+Some keys contain simple values, such as <code>name</code>,</p>
+<pre class="python"><code>response.json()[&#39;name&#39;]</code></pre>
+<pre><code>&#39;gsverhoeven&#39;</code></pre>
+<p>but some return as value a new list of key-value pairs, such as <code>teams</code>.
+Actually this is a “list of”lists of key-value pairs", since we have a separate list for each team.
+Even the list of a single team contains new structure, for example under the key <code>raceLogos</code>.</p>
+<pre class="python"><code>response.json()[&#39;teams&#39;][2][&#39;raceLogos&#39;]</code></pre>
+<pre><code>[{&#39;size&#39;: 32, &#39;logo&#39;: 486290},
+ {&#39;size&#39;: 48, &#39;logo&#39;: 486291},
+ {&#39;size&#39;: 64, &#39;logo&#39;: 486292},
+ {&#39;size&#39;: 96, &#39;logo&#39;: 486293},
+ {&#39;size&#39;: 128, &#39;logo&#39;: 486294},
+ {&#39;size&#39;: 192, &#39;logo&#39;: 486295}]</code></pre>
+<pre class="python"><code>response.json()[&#39;teams&#39;][2][&#39;name&#39;]</code></pre>
+<pre><code>&#39;Blackbox Bastards&#39;</code></pre>
+</div>
+<div id="what-data-do-we-need-and-in-what-shape" class="section level1">
+<h1>What data do we need? And in what shape?</h1>
+<p>Now we know how the data comes in, we need to think about which variables we want, and how to structure them.
+The most straightforward level to analyze race strength is to look at <strong>match outcomes</strong>.
+At its core, the data consists of matches played by teams, commanded by coaches.
+Furthermore, we expect race strength to change over time, as new strategies are discovered by the players, or new rules get introduced. So the time dimension is important as well.</p>
+<p>So, let’s go with a flat data frame with <strong>rows for each match</strong>, and columns for the various variables associated with each match.
+These would include:</p>
+<ul>
+<li>Coach ids</li>
+<li>Team races</li>
+<li>Team ids</li>
+<li>Date of the match</li>
+<li>Outcome (Touchdowns of both teams)</li>
+</ul>
+<p>With this basic structure, we can add as many match related variables in the future, keeping the basic structure (each row is a match) unchanged.</p>
+<p>So lets get the match data!</p>
+</div>
+<div id="step-1-api-scraping-the-match-data-df_matches" class="section level1">
+<h1>Step 1: API scraping the match data: df_matches</h1>
+<p>So we are mostly interested in the current ruleset, this is <code>BB2020</code>. This ruleset became available for play on <strong>FUMBBL</strong> at september 1st 2021, and two months later, already some 5000 games have been played. We also want to compare with the previous ruleset, where we have much more data available. How far do we go back?
+Let’s go for roughly 12 months of <code>BB2016</code> ruleset matches, and a few months of <code>BB2020</code> matches.</p>
+<p>The easiest way to collect match data over a particular period of time is to just loop over <code>match_id</code>. The most recent match at the time of writing was 4.347.800, and since rougly 100.000 matches are played each year, we can fiddle about and we find match 4.216.258 played on august 1st, 2020. So that means we need to collect some 130K matches.</p>
+<p><strong>VERY IMPORTANT</strong>: We do not want to overload the <strong>FUMBBL</strong> server, so we make only three API requests per second. In this way, the server load is hardly affected and it can continue functioning properly for all the Blood Bowl coaches playing their daily games!</p>
+<p>To collect 130K matches, we will need 130000*0.333/3600 = 12 hours.</p>
+<pre class="python"><code># estimated hours fetching data
+(4347800-4216257)*0.333/3600</code></pre>
+<pre><code>12.16773</code></pre>
+<pre class="python"><code>df_matches = pd.DataFrame(columns=[&#39;match_id&#39;, &#39;match_date&#39;, &#39;match_time&#39;,  
+    &#39;team1_id&#39;, &#39;team1_coach_id&#39;, &#39;team1_roster_id&#39;, &#39;team1_race_name&#39;, &#39;team1_value&#39;,
+    &#39;team2_id&#39;, &#39;team2_coach_id&#39;, &#39;team2_roster_id&#39;, &#39;team2_race_name&#39;, &#39;team2_value&#39;,
+    &#39;team1_score&#39;, &#39;team2_score&#39;])
+
+target = &#39;data/df_matches_&#39; + time.strftime(&quot;%Y%m%d_%H%M%S&quot;) + &#39;.h5&#39;
+print(target)
+
+end_match = 4347800
+begin_match = 4216258
+n_matches = end_match - begin_match
+full_run = 0
+print(n_matches)
+
+if(full_run):
+    for i in range(n_matches):
+        api_string = &quot;https://fumbbl.com/api/match/get/&quot; + str(end_match - i)
+        # wait 0.33 s on average between each API call
+        wait_time = (random.uniform(0.5, 1) + 0.25)/3
+        time.sleep(wait_time)
+        match = requests.get(api_string)
+        match = match.json()
+        if match: # fix for matches that do not exist
+            match_id = match[&#39;id&#39;]
+            match_date = match[&#39;date&#39;]
+            match_time = match[&#39;time&#39;]
+            team1_id = match[&#39;team1&#39;][&#39;id&#39;]
+            team2_id = match[&#39;team2&#39;][&#39;id&#39;]
+            team1_score = match[&#39;team1&#39;][&#39;score&#39;]
+            team2_score = match[&#39;team2&#39;][&#39;score&#39;]  
+            team1_roster_id = match[&#39;team1&#39;][&#39;roster&#39;][&#39;id&#39;]
+            team2_roster_id = match[&#39;team2&#39;][&#39;roster&#39;][&#39;id&#39;]            
+            team1_coach_id = match[&#39;team1&#39;][&#39;coach&#39;][&#39;id&#39;]
+            team2_coach_id = match[&#39;team2&#39;][&#39;coach&#39;][&#39;id&#39;]
+            team1_race_name = match[&#39;team1&#39;][&#39;roster&#39;][&#39;name&#39;] 
+            team2_race_name = match[&#39;team2&#39;][&#39;roster&#39;][&#39;name&#39;] 
+            team1_value = match[&#39;team1&#39;][&#39;teamValue&#39;]
+            team2_value = match[&#39;team2&#39;][&#39;teamValue&#39;]
+            #print(match_id)     
+            df_matches.loc[i] = [match_id, match_date, match_time, 
+                team1_id, team1_coach_id, team1_roster_id, team1_race_name, team1_value,
+                team2_id, team2_coach_id, team2_roster_id, team2_race_name, team2_value,
+                team1_score, team2_score]
+        else:
+            # empty data for this match, create empty row
+            match_id = int(end_match - i)
+            df_matches.loc[i] = [np.NaN, np.NaN, np.NaN, 
+            np.NaN,np.NaN,np.NaN,np.NaN,
+            np.NaN,np.NaN,np.NaN,np.NaN,
+            np.NaN,np.NaN, np.NaN, np.NaN] # try np.repeat([np.NaN], 13, axis=0) next time
+            df_matches.loc[i][&#39;match_id&#39;] = int(match_id)
+        if i % 100 == 0: 
+            # write tmp data as hdf5 file
+            print(i, end=&#39;&#39;)
+            print(&quot;.&quot;, end=&#39;&#39;)
+            df_matches.to_hdf(target, key=&#39;df_matches&#39;, mode=&#39;w&#39;)
+
+    # write data as hdf5 file
+    df_matches.to_hdf(target, key=&#39;df_matches&#39;, mode=&#39;w&#39;)
+else:
+    # read from hdf5 file
+    df_matches = pd.read_hdf(&#39;data/df_matches_20211215_212935.h5&#39;)
+
+df_matches.shape
+</code></pre>
+<pre><code>data/df_matches_20211230_192705.h5
+131542
+
+(131542, 15)</code></pre>
+<p>Since we manually filled the <code>pandas</code> DataFrame, most of the columns are now of <code>object</code> datatype.
+We need to change this to be able to work properly with the data, as well as store it properly.
+Here I convert each column manually, however I later found out about <code>DataFrame.infer_objects()</code>, that can detect the proper dtype automatically.
+This I will try next time.</p>
+<pre class="python"><code># convert object dtype columns to proper pandas dtypes datetime and numeric
+df_matches[&#39;match_date&#39;] = pd.to_datetime(df_matches.match_date) # Datetime object
+df_matches[&#39;match_id&#39;] = pd.to_numeric(df_matches.match_id) 
+df_matches[&#39;team1_id&#39;] = pd.to_numeric(df_matches.team1_id) 
+df_matches[&#39;team1_coach_id&#39;] = pd.to_numeric(df_matches.team1_coach_id) 
+df_matches[&#39;team1_roster_id&#39;] = pd.to_numeric(df_matches.team1_roster_id) 
+df_matches[&#39;team2_id&#39;] = pd.to_numeric(df_matches.team2_id) 
+df_matches[&#39;team2_coach_id&#39;] = pd.to_numeric(df_matches.team2_coach_id) 
+df_matches[&#39;team2_roster_id&#39;] = pd.to_numeric(df_matches.team2_roster_id) 
+df_matches[&#39;team1_score&#39;] = pd.to_numeric(df_matches.team1_score) 
+df_matches[&#39;team2_score&#39;] = pd.to_numeric(df_matches.team2_score) 
+
+# calculate match score difference
+df_matches[&#39;team1_win&#39;] = np.sign(df_matches[&#39;team1_score&#39;] - df_matches[&#39;team2_score&#39;])
+df_matches[&#39;team2_win&#39;] = np.sign(df_matches[&#39;team2_score&#39;] - df_matches[&#39;team1_score&#39;])
+
+# mirror match
+df_matches[&#39;mirror_match&#39;] = 0
+df_matches.loc[df_matches[&#39;team1_race_name&#39;] == df_matches[&#39;team2_race_name&#39;], &#39;mirror_match&#39;] = 1
+</code></pre>
+<pre class="python"><code># 5K mirror matches
+df_matches.query(&#39;mirror_match == 1&#39;).shape</code></pre>
+<pre><code>(5081, 18)</code></pre>
+<pre class="python"><code># Make BB2020 Khorne team name equal to BB2016 to compare them more easily
+df_matches.loc[df_matches[&#39;team1_race_name&#39;] == &quot;Khorne&quot;, &#39;team1_race_name&#39;] = &#39;Daemons of Khorne&#39;
+df_matches.loc[df_matches[&#39;team2_race_name&#39;] == &quot;Khorne&quot;, &#39;team2_race_name&#39;] = &#39;Daemons of Khorne&#39;</code></pre>
+<div id="dataprep-transforming-the-team-values" class="section level2">
+<h2>Dataprep: transforming the team values</h2>
+<p>In Blood Bowl, teams can develop themselves over the course of multiple matches. The winnings of each match can be spend on buying new, stronger players, or replace the players that ended up getting injured or even killed. In addition, players receive so-called <em>star points</em> for important events, such as scoring, or inflicting a casualty on the opponent. Therefore, a balancing mechanism is needed when a newly created “rookie” team is facing a highly developed opposing team with lots of extra skills and strong players.</p>
+<p>Blood Bowl solves this by calculating for both teams their <strong>Current team value</strong>.
+The <strong>Team value difference</strong> for a match determines the amount of gold that the weaker team can use to buy so-called <strong>inducements</strong>.
+These inducements are temporary, and can consists of a famous “star player” who joins the team just for this match. Another popular option is to hire a wizard that can be used to turn one of the opposing players into a frog.</p>
+<p>It is well known that the win rates of the teams depend on how developed a team is. For example, Amazons are thought to be strongest at low team value, as they already start out with lots of <em>block</em> and <em>dodge</em> skills, whereas a Chaos team start out with almost no skills.
+So if we compare win rates, we would like take into account the current team value.
+Now as this can differ between the two teams in a match up, I reasoned that the highest team value is most informative about the average strength level of both teams, because of the inducement mechanism described above.</p>
+<p>In the dataset, we have for each match the current team values of both teams as a text string.
+We transform the text string <code>1100k</code> into an integer number <code>1100</code>, so that we can calculated the difference as <code>tv_diff</code>, and pick for each match the maximum team value and store it as <code>tv_match</code>. Finally, we create a team value bin <code>tv_bin</code> to be able to compare win rates for binned groups of matches where races have comparable team strength / team development.</p>
+<pre class="python"><code># convert team value 1100k to 1100 integer and and above / below median (= low / high TV)
+df_matches[&#39;team1_value&#39;] = df_matches[&#39;team1_value&#39;].str.replace(&#39;k$&#39;, &#39;&#39;)
+df_matches[&#39;team1_value&#39;] = df_matches[&#39;team1_value&#39;].fillna(0).astype(np.int64)
+
+df_matches[&#39;team2_value&#39;] = df_matches[&#39;team2_value&#39;].str.replace(&#39;k$&#39;, &#39;&#39;)
+df_matches[&#39;team2_value&#39;] = df_matches[&#39;team2_value&#39;].fillna(0).astype(np.int64)
+
+df_matches[&#39;tv_diff&#39;] = np.abs(df_matches[&#39;team2_value&#39;] - df_matches[&#39;team1_value&#39;])
+
+df_matches[&#39;tv_match&#39;] = df_matches[[&quot;team1_value&quot;, &quot;team2_value&quot;]].max(axis=1)
+
+df_matches[&#39;tv_bin&#39;] = pd.cut(df_matches[&#39;tv_match&#39;], 
+    bins = [0, 950, 1250,1550, 1850, float(&quot;inf&quot;)], 
+    labels=[&#39;&lt; 950&#39;, &#39;1.1K&#39;, &#39;1.4K&#39;, &#39;1.7K&#39;, &#39;&gt; 1850&#39;]
+)
+</code></pre>
+</div>
+<div id="dropping-empty-matches" class="section level2">
+<h2>Dropping empty matches</h2>
+<p>Some match_id’s do not have match information attached to them, presumably these matches were not played or some real life event interfered. These match_ids are dropped from the dataset to get rid of the NAs in all the columns.</p>
+<pre class="python"><code>df_matches = df_matches.dropna(subset=[&#39;match_date&#39;])</code></pre>
+<pre class="python"><code># 131K matches
+len(df_matches)</code></pre>
+<pre><code>131509</code></pre>
+</div>
+<div id="dataprep-getting-the-dates-right" class="section level2">
+<h2>Dataprep: getting the dates right</h2>
+<p>To see time trends, its useful to aggregate the data by week. For this we add <code>week_number</code> for each date, and from this week number, we convert back to a date to get a <code>week_date</code>. This last part is useful for plotting with <code>plotnine</code>, as this treats dates in a special way. We use the ISO definition of week, this has some unexpected behavior near the beginning / end of each year, that we fix manually.</p>
+<p>The data starts in week 36 (september) of 2020, and stops halfway week 44 in 2021.</p>
+<pre class="python"><code>df_matches[&#39;week_number&#39;] = df_matches[&#39;match_date&#39;].dt.isocalendar().week
+
+# cannot serialize numpy int OR Int64 when writing HDF5 file, so we go for plain int as all NAs are gone now
+df_matches[&#39;week_number&#39;] = df_matches[&#39;week_number&#39;].fillna(0).astype(int)
+
+# add year based on match date (but want it based on match ISO week)
+df_matches[&#39;year&#39;] = pd.DatetimeIndex(df_matches[&#39;match_date&#39;]).year
+
+# manual fix year for ISO week 2020-53 (2020 has 53 ISO weeks, including a few days in jan 2021)
+df_matches.loc[(df_matches[&#39;year&#39;] == 2021) &amp; (df_matches[&#39;week_number&#39;] == 53), &#39;year&#39;] = 2020
+
+df_matches[&#39;week_year&#39;] = df_matches[&#39;year&#39;].astype(str) + &#39;-&#39; + df_matches[&#39;week_number&#39;].astype(str)
+
+df_matches[&#39;week_date&#39;] = pd.to_datetime(df_matches[&#39;week_year&#39;].astype(&quot;string&quot;) + &#39;-1&#39;, format = &quot;%Y-%U-%w&quot;)
+
+# manual fix of week date (grrrr)
+df_matches.loc[(df_matches[&#39;week_date&#39;] == &#39;2021-01-04&#39;) &amp; (df_matches[&#39;week_number&#39;] == 53), &#39;week_date&#39;] = pd.to_datetime(&#39;2020-12-31&#39;)
+</code></pre>
+</div>
+</div>
+<div id="step-2-html-scraping-the-inducements-and-coach-rankings-for-each-match" class="section level1">
+<h1>Step 2: HTML Scraping the inducements and coach rankings for each match</h1>
+<p>Next, we collect for all the matches in <code>df_matches</code> the <strong>inducements</strong> and <strong>coach rankings</strong>.
+This information is not available through the API, but is presented on a HTML page at <a href="https://fumbbl.com/FUMBBL.php?page=match&amp;id=4350014" class="uri">https://fumbbl.com/FUMBBL.php?page=match&amp;id=4350014</a> summarizing information for in this case match 4350014.</p>
+<p>I highly recommend <a href="https://hackersandslackers.com/scraping-urls-with-beautifulsoup/">this tutorial</a> for a great introduction to <code>BeautifulSoup</code>.</p>
+<p>In addition, to clean up the scraped text, I used the <code>re</code> Python module (Regular expressions), part of the <a href="https://docs.python.org/3/library/index.html">Python standard library</a> to extract the actual inducements from the text string that contains them.</p>
+<pre class="python"><code>from bs4 import BeautifulSoup
+import re
+
+df_inducements = pd.DataFrame(columns=[&#39;match_id&#39;, &#39;team1_inducements&#39;, &#39;team2_inducements&#39;, &#39;coach1_ranking&#39;, &#39;coach2_ranking&#39;])
+
+target = &#39;data/df_inducements_&#39; + time.strftime(&quot;%Y%m%d_%H%M%S&quot;) + &#39;.h5&#39;
+print(target)
+
+end_match = 4347800  
+begin_match = 4216257
+
+n_matches = end_match - begin_match
+
+full_run = 0
+
+print(n_matches)
+
+if(full_run):
+    for i in range(n_matches):
+        match_id = end_match - i
+        api_string = &quot;https://fumbbl.com/FUMBBL.php?page=match&amp;id=&quot; + str(match_id)
+        # wait 0.33 s on average between each GET call
+        wait_time = (random.uniform(0.5, 1) + 0.25)/3
+        time.sleep(wait_time)
+        response = requests.get(api_string)
+
+        soup = BeautifulSoup(response.content, &#39;html.parser&#39;)
+
+        if soup.find(&quot;div&quot;, {&quot;class&quot;: &quot;matchrecord&quot;}) is not None:
+            # match record is available
+            inducements = soup.find_all(&quot;div&quot;, class_=&quot;inducements&quot;)
+
+            pattern = re.compile(r&#39;\s+Inducements: (.*)\n&#39;)
+
+            match = re.match(pattern, inducements[0].get_text())
+            if match:
+                team1_inducements = match.group(1)
+            else:
+                team1_inducements = &#39;&#39;
+
+            match = re.match(pattern, inducements[1].get_text())
+            if match:
+                team2_inducements = match.group(1)
+            else:
+                team2_inducements = &#39;&#39;
+
+            coach_rankings = soup.find_all(&quot;div&quot;, class_=&quot;coach&quot;)
+
+            coach1_ranking = coach_rankings[0].get_text()
+            coach2_ranking = coach_rankings[1].get_text()
+
+            df_inducements.loc[i] = [match_id, team1_inducements, team2_inducements, coach1_ranking, coach2_ranking]
+
+        if i % 100 == 0: 
+                    # write tmp data as hdf5 file
+                    print(i, end=&#39;&#39;)
+                    print(&quot;.&quot;, end=&#39;&#39;)
+                    df_inducements.to_hdf(target, key=&#39;df_inducements&#39;, mode=&#39;w&#39;)
+
+    # write data as hdf5 file
+    df_inducements.to_hdf(target, key=&#39;df_inducements&#39;, mode=&#39;w&#39;)
+else:
+    # read from hdf5 file
+    
+    df_inducements = pd.read_hdf(&#39;data/df_inducements_20211215_112148.h5&#39;) 
+
+
+df_inducements.info()</code></pre>
+<pre><code>data/df_inducements_20211230_192709.h5
+131543
+&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Int64Index: 131509 entries, 0 to 131508
+Data columns (total 5 columns):
+ #   Column             Non-Null Count   Dtype 
+---  ------             --------------   ----- 
+ 0   match_id           131509 non-null  object
+ 1   team1_inducements  131509 non-null  object
+ 2   team2_inducements  131509 non-null  object
+ 3   coach1_ranking     131509 non-null  object
+ 4   coach2_ranking     131509 non-null  object
+dtypes: object(5)
+memory usage: 6.0+ MB</code></pre>
+<pre class="python"><code>df_inducements.query(&quot;match_id == 4347799&quot;)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+match_id
+</th>
+<th>
+team1_inducements
+</th>
+<th>
+team2_inducements
+</th>
+<th>
+coach1_ranking
+</th>
+<th>
+coach2_ranking
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+1
+</th>
+<td>
+4347799
+</td>
+<td>
+</td>
+<td>
+1 bloodweiser babe, Mercenary Merc Thrall Line…
+</td>
+<td>
+CR 154.6 (+0.97) Emerging Star Vini
+</td>
+<td>
+motay666 Emerging Star CR 151.12 (-0.97)
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dataprep-coach-rankings" class="section level2">
+<h2>Dataprep: coach rankings</h2>
+<p>We want to extract the part <code>CR 152.53</code> from the scraped coach information field. Just as we matched on <code>Inducements:</code>, we can match on <code>CR</code> and grab the contents directly after that, stopping when we encounter a whitespace.</p>
+<p>We first play around a bit and test until we discover the proper Regular Expression to use :-)</p>
+<pre class="python"><code>#pattern = re.compile(r&#39;\s+Inducements: (.*)\n&#39;)
+pattern = re.compile(r&#39;.*CR (.*)\s\(.*&#39;)
+
+match = re.match(pattern, df_inducements.loc[0, &#39;coach2_ranking&#39;])
+
+if match is not None:
+    print(match.group(1)) # group(0) is the whole string
+else:
+    print(&quot;match is none&quot;)
+
+df_inducements.loc[0, &#39;coach2_ranking&#39;]</code></pre>
+<pre><code>144.51
+
+&#39;LoxodonP Veteran CR 144.51 (-0.76)&#39;</code></pre>
+<p>Got ’m! Now that we have figured it out, we can write the code that extracts the coach rankings:</p>
+<pre class="python"><code># Dataprep fix match_id
+df_inducements[&#39;match_id&#39;] = pd.to_numeric(df_inducements.match_id) 
+
+# Dataprep: add the coach rankings as separate cols
+df_inducements[&#39;coach1_CR&#39;] = df_inducements[&#39;coach1_ranking&#39;].str.extract(r&#39;.*CR (.*)\s\(.*&#39;)
+df_inducements[&#39;coach2_CR&#39;] = df_inducements[&#39;coach2_ranking&#39;].str.extract(r&#39;.*CR (.*)\s\(.*&#39;)
+
+df_inducements[&#39;coach1_CR&#39;] = pd.to_numeric(df_inducements[&#39;coach1_CR&#39;])
+df_inducements[&#39;coach2_CR&#39;] = pd.to_numeric(df_inducements[&#39;coach2_CR&#39;])
+
+df_inducements[&#39;CR_diff&#39;] = np.abs(df_inducements[&#39;coach1_CR&#39;] - df_inducements[&#39;coach2_CR&#39;])
+df_inducements[&#39;CR_diff&#39;] = df_inducements[&#39;CR_diff&#39;].astype(float)
+
+df_inducements[&#39;cr_diff2&#39;] = df_inducements[&#39;coach1_CR&#39;] - df_inducements[&#39;coach2_CR&#39;]
+
+df_inducements[&#39;cr_bin&#39;] = pd.cut(df_inducements[&#39;cr_diff2&#39;], bins = [-1*float(&quot;inf&quot;), -30, -20, -10, -5, 5, 10, 20, 30, float(&quot;inf&quot;)], 
+ labels=[&#39;{-Inf,-30]&#39;, &#39;[-30,-20]&#39;, &#39;[-20,-10]&#39;, &#39;[-10,-5]&#39;, &#39;[-5,5]&#39;, &#39;[5,10]&#39;, &#39;[10,20]&#39;, &#39;[20,30]&#39;, &#39;[30,Inf]&#39;]) </code></pre>
+<pre class="python"><code>df_inducements.dtypes</code></pre>
+<pre><code>match_id                int64
+team1_inducements      object
+team2_inducements      object
+coach1_ranking         object
+coach2_ranking         object
+coach1_CR             float64
+coach2_CR             float64
+CR_diff               float64
+cr_diff2              float64
+cr_bin               category
+dtype: object</code></pre>
+</div>
+<div id="dataprep-match-inducements-for-each-team" class="section level2">
+<h2>Dataprep match inducements for each team</h2>
+<p>The next trick is to use <code>pandas</code> <code>explode()</code> method (similar to <code>separate_rows()</code> in <code>tidyverse</code> R) to give each inducement its own row in the dataset.
+This creates a dataframe (<code>inducements</code>) similar to <code>df_mbt</code> with each match generating at least two rows.</p>
+<pre class="python"><code>team1_inducements = df_inducements[[&#39;match_id&#39;, &#39;team1_inducements&#39;]]
+team2_inducements = df_inducements[[&#39;match_id&#39;, &#39;team2_inducements&#39;]]
+
+# make column names equal
+team1_inducements.columns = team2_inducements.columns = [&#39;match_id&#39;, &#39;inducements&#39;]
+
+# row bind the two dataframes
+inducements = pd.concat([team1_inducements, team2_inducements], ignore_index = True)
+
+# convert comma separated string to list
+inducements[&#39;inducements&#39;] = inducements[&#39;inducements&#39;].str.split(&#39;,&#39;)
+
+# make each element of the list a separate row
+inducements = inducements.explode(&#39;inducements&#39;)
+
+# strip leading and trailing whitespaces
+inducements[&#39;inducements&#39;] = inducements[&#39;inducements&#39;].str.strip()
+
+# create &quot;star player&quot; label
+inducements[&#39;star_player&#39;] = 0
+inducements.loc[inducements[&#39;inducements&#39;].str.contains(&quot;Star player&quot;), &#39;star_player&#39;] = 1
+
+# create &quot;card&quot; label
+inducements[&#39;special_card&#39;] = 0
+inducements.loc[inducements[&#39;inducements&#39;].str.contains(&quot;Card&quot;), &#39;special_card&#39;] = 1
+</code></pre>
+</div>
+<div id="add-inducement-info-to-df_matches" class="section level2">
+<h2>Add inducement info to df_matches</h2>
+<p>Here we add <code>df_inducements</code> to <code>df_matches</code>. This contains each players inducements as a single string, not convenient for analysis.</p>
+<p>The <code>inducements</code> dataframe cannot easily be added to <code>df_matches</code>. We can however, extract information from <code>inducements</code> at the match level and add this to <code>df_matches</code>. Here, I show how to add a 1/0 flag <code>has_sp</code> that codes for if a match included any star player.</p>
+<pre class="python"><code>df_matches = pd.merge(df_matches, df_inducements, on=&#39;match_id&#39;, how=&#39;left&#39;)
+
+df_sp = (inducements
+            .groupby(&quot;match_id&quot;)
+            .agg(has_sp = (&quot;star_player&quot;, &quot;max&quot;))
+            .reset_index()
+)
+
+
+df_matches = pd.merge(df_matches, df_sp, on = &quot;match_id&quot;, how = &quot;left&quot;)
+
+df_matches[&#39;match_id&#39;] = pd.to_numeric(df_matches.match_id) </code></pre>
+</div>
+</div>
+<div id="step-3-create-matches-by-team-dataframe" class="section level1">
+<h1>Step 3: Create matches by team DataFrame</h1>
+<p>When analyzing the data, we also like to have a dataframe <code>df_mbt (df_matches_by_team)</code> that contains, for each match, a separate row for each team participating in that match.
+This structure is nicely visualized <a href="https://www.nufflytics.com/post/the-value-of-tv/">at the Nufflytics blog</a>.
+Such a dataset is suitable for analysis by team, e.g. win rates. We can extend this further by adding, at the match level, data that is specific for each team - coach pair, such as team value, coach rating etc.
+For example, we can imagine adding more team level data, such as casualties caused during the match, or team composition at the start of the match etc.</p>
+<pre class="python"><code># make two copies, one for each team in the match
+team1_data = df_matches[[&#39;match_id&#39;, &#39;match_date&#39;, &#39;week_number&#39;,   &#39;year&#39;, &#39;week_year&#39;, &#39;week_date&#39;, &#39;team1_id&#39;,
+    &#39;team1_coach_id&#39;, &#39;team1_race_name&#39;, &#39;team1_value&#39;, &#39;team1_win&#39;, &#39;tv_diff&#39;, &#39;tv_match&#39;,
+    &#39;tv_bin&#39;, &#39;mirror_match&#39;, &#39;coach1_CR&#39;, &#39;CR_diff&#39;, &#39;has_sp&#39;]].copy()
+
+team2_data = df_matches[[&#39;match_id&#39;, &#39;match_date&#39;, &#39;week_number&#39;,   &#39;year&#39;, &#39;week_year&#39;, &#39;week_date&#39;, &#39;team2_id&#39;, 
+    &#39;team2_coach_id&#39;, &#39;team2_race_name&#39;, &#39;team2_value&#39;, &#39;team2_win&#39;, &#39;tv_diff&#39;, &#39;tv_match&#39;, 
+    &#39;tv_bin&#39;,&#39;mirror_match&#39;, &#39;coach2_CR&#39;, &#39;CR_diff&#39;, &#39;has_sp&#39;]].copy()
+
+team1_data.columns = team2_data.columns = [&#39;match_id&#39;, &#39;match_date&#39;, &#39;week_number&#39;, &#39;year&#39;, &#39;week_year&#39;, &#39;week_date&#39;, &#39;team_id&#39;, 
+    &#39;coach_id&#39;, &#39;race_name&#39;, &#39;team_value&#39;, &#39;wins&#39;, &#39;tv_diff&#39;, &#39;tv_match&#39;, 
+    &#39;tv_bin&#39;, &#39;mirror_match&#39;, &#39;coach_CR&#39;, &#39;CR_diff&#39;, &#39;has_sp&#39;]
+
+# combine both dataframes
+df_mbt = pd.concat([team1_data, team2_data])</code></pre>
+<div id="adding-outcome-weights" class="section level2">
+<h2>Adding outcome weights</h2>
+<p>One way to measure team strength is to calculate a win rate.
+If we want to calculate win rates, we need to decide how to weigh a draw.
+In Blood Bowl data analysis, it seems that a 2:1:0 (W / D / L) weighting scheme is most commonly used.
+So if we want to compare with others, it makes sense to adapt this scheme as well.
+If we divide these weights by two we get something that, if we average it, we can interpret as a win rate.</p>
+<p>This scheme has the advantage that the weighted average win percentage over all matches is always 50%, creating a nice reference point allowing conclusions such as “this and that team has an x percent above average win percentage”.</p>
+<pre class="python"><code>df_mbt.loc[df_mbt[&#39;wins&#39;] == 0, &#39;wins&#39;] = 0.5
+df_mbt.loc[df_mbt[&#39;wins&#39;] == -1, &#39;wins&#39;] = 0
+
+# convert to float
+df_mbt[&#39;wins&#39;] = df_mbt[&#39;wins&#39;].astype(float)</code></pre>
+<p>At this point, Lets have a look at our dataset again:</p>
+<pre class="python"><code>df_mbt.query(&quot;coach_id == 255851&quot;).sort_values(&#39;match_date&#39;)
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+match_id
+</th>
+<th>
+match_date
+</th>
+<th>
+week_number
+</th>
+<th>
+year
+</th>
+<th>
+week_year
+</th>
+<th>
+week_date
+</th>
+<th>
+team_id
+</th>
+<th>
+coach_id
+</th>
+<th>
+race_name
+</th>
+<th>
+team_value
+</th>
+<th>
+wins
+</th>
+<th>
+tv_diff
+</th>
+<th>
+tv_match
+</th>
+<th>
+tv_bin
+</th>
+<th>
+mirror_match
+</th>
+<th>
+coach_CR
+</th>
+<th>
+CR_diff
+</th>
+<th>
+has_sp
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+99692
+</th>
+<td>
+4248074
+</td>
+<td>
+2020-11-13
+</td>
+<td>
+46
+</td>
+<td>
+2020
+</td>
+<td>
+2020-46
+</td>
+<td>
+2020-11-16
+</td>
+<td>
+1003452.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+1000
+</td>
+<td>
+0.0
+</td>
+<td>
+0
+</td>
+<td>
+1000
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+150.00
+</td>
+<td>
+0.80
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+77673
+</th>
+<td>
+4270093
+</td>
+<td>
+2021-01-17
+</td>
+<td>
+2
+</td>
+<td>
+2021
+</td>
+<td>
+2021-2
+</td>
+<td>
+2021-01-11
+</td>
+<td>
+1003452.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+1000
+</td>
+<td>
+0.0
+</td>
+<td>
+40
+</td>
+<td>
+1000
+</td>
+<td>
+1.1K
+</td>
+<td>
+1
+</td>
+<td>
+149.22
+</td>
+<td>
+3.63
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+32991
+</th>
+<td>
+4314794
+</td>
+<td>
+2021-07-01
+</td>
+<td>
+26
+</td>
+<td>
+2021
+</td>
+<td>
+2021-26
+</td>
+<td>
+2021-06-28
+</td>
+<td>
+1003452.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+980
+</td>
+<td>
+0.0
+</td>
+<td>
+10
+</td>
+<td>
+990
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+147.60
+</td>
+<td>
+1.37
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+31599
+</th>
+<td>
+4316193
+</td>
+<td>
+2021-07-10
+</td>
+<td>
+27
+</td>
+<td>
+2021
+</td>
+<td>
+2021-27
+</td>
+<td>
+2021-07-05
+</td>
+<td>
+1035835.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+980
+</td>
+<td>
+0.0
+</td>
+<td>
+20
+</td>
+<td>
+1000
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+146.62
+</td>
+<td>
+9.49
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+25968
+</th>
+<td>
+4321824
+</td>
+<td>
+2021-08-16
+</td>
+<td>
+33
+</td>
+<td>
+2021
+</td>
+<td>
+2021-33
+</td>
+<td>
+2021-08-16
+</td>
+<td>
+1038960.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+970
+</td>
+<td>
+0.5
+</td>
+<td>
+30
+</td>
+<td>
+1000
+</td>
+<td>
+1.1K
+</td>
+<td>
+1
+</td>
+<td>
+145.93
+</td>
+<td>
+9.30
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+23609
+</th>
+<td>
+4324190
+</td>
+<td>
+2021-09-01
+</td>
+<td>
+35
+</td>
+<td>
+2021
+</td>
+<td>
+2021-35
+</td>
+<td>
+2021-08-30
+</td>
+<td>
+1038960.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+1000
+</td>
+<td>
+0.0
+</td>
+<td>
+10
+</td>
+<td>
+1000
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+145.90
+</td>
+<td>
+10.19
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+21018
+</th>
+<td>
+4326781
+</td>
+<td>
+2021-09-13
+</td>
+<td>
+37
+</td>
+<td>
+2021
+</td>
+<td>
+2021-37
+</td>
+<td>
+2021-09-13
+</td>
+<td>
+1038960.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+1010
+</td>
+<td>
+1.0
+</td>
+<td>
+80
+</td>
+<td>
+1010
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+144.24
+</td>
+<td>
+6.02
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+12941
+</th>
+<td>
+4334858
+</td>
+<td>
+2021-10-11
+</td>
+<td>
+41
+</td>
+<td>
+2021
+</td>
+<td>
+2021-41
+</td>
+<td>
+2021-10-11
+</td>
+<td>
+1038960.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Human
+</td>
+<td>
+1110
+</td>
+<td>
+0.0
+</td>
+<td>
+150
+</td>
+<td>
+1260
+</td>
+<td>
+1.4K
+</td>
+<td>
+0
+</td>
+<td>
+145.22
+</td>
+<td>
+16.80
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+10050
+</th>
+<td>
+4337749
+</td>
+<td>
+2021-10-22
+</td>
+<td>
+42
+</td>
+<td>
+2021
+</td>
+<td>
+2021-42
+</td>
+<td>
+2021-10-18
+</td>
+<td>
+1050267.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Orc
+</td>
+<td>
+1080
+</td>
+<td>
+0.0
+</td>
+<td>
+10
+</td>
+<td>
+1090
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+NaN
+</td>
+<td>
+NaN
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+9027
+</th>
+<td>
+4338772
+</td>
+<td>
+2021-10-26
+</td>
+<td>
+43
+</td>
+<td>
+2021
+</td>
+<td>
+2021-43
+</td>
+<td>
+2021-10-25
+</td>
+<td>
+1050267.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Orc
+</td>
+<td>
+1040
+</td>
+<td>
+1.0
+</td>
+<td>
+50
+</td>
+<td>
+1040
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+NaN
+</td>
+<td>
+NaN
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+3783
+</th>
+<td>
+4344017
+</td>
+<td>
+2021-11-15
+</td>
+<td>
+46
+</td>
+<td>
+2021
+</td>
+<td>
+2021-46
+</td>
+<td>
+2021-11-15
+</td>
+<td>
+1050267.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Orc
+</td>
+<td>
+1150
+</td>
+<td>
+0.0
+</td>
+<td>
+170
+</td>
+<td>
+1150
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+NaN
+</td>
+<td>
+NaN
+</td>
+<td>
+0.0
+</td>
+</tr>
+<tr>
+<th>
+1186
+</th>
+<td>
+4346614
+</td>
+<td>
+2021-11-25
+</td>
+<td>
+47
+</td>
+<td>
+2021
+</td>
+<td>
+2021-47
+</td>
+<td>
+2021-11-22
+</td>
+<td>
+1050267.0
+</td>
+<td>
+255851.0
+</td>
+<td>
+Orc
+</td>
+<td>
+1020
+</td>
+<td>
+0.5
+</td>
+<td>
+150
+</td>
+<td>
+1170
+</td>
+<td>
+1.1K
+</td>
+<td>
+0
+</td>
+<td>
+NaN
+</td>
+<td>
+NaN
+</td>
+<td>
+0.0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Great! Almost there. There is still something missing though, we need to know, for all the teams in our matches dataset, in what division or league they are playing, and what version of the rules they use. For these we turn to the API again, to fetch more data, now on the team level.</p>
+</div>
+</div>
+<div id="step-4-fetch-data-on-team-division-and-ruleset" class="section level1">
+<h1>Step 4: Fetch data on team division and ruleset</h1>
+<p>Let grab for all teams in <code>df_mbt</code> the team <strong>division</strong> and <strong>ruleset</strong>.</p>
+<p>A limitation of the FUMBBL API is that it shows only the latest version of the teams and leagues data. This hides the fact that leagues have changed their rules since they were first created. For example, the NAF used BB2016 rules up until summer of 2021, and thereafter switched to the new BB2020 ruleset for their latest online tournament.
+So we have to use our “domain knowledge” here to interpret the data properly.</p>
+<pre class="python"><code># make list of all teams that need to be fetched
+team_ids = list(df_mbt[&#39;team_id&#39;].dropna())
+
+# get unique values by converting to a Python set and back to list
+team_ids = list(set(team_ids))
+
+len(team_ids)</code></pre>
+<pre><code>46831</code></pre>
+<p>So we have to fetch data for 47K different teams.</p>
+<p>We use the same approach as above, looping over all <code>team_id</code> ’s and making a separate API call for each team.</p>
+<p><strong>IMPORTANT: here too, we limit ourselves to a maximum of 3 API calls per second to avoid overloading the FUMBBL server</strong></p>
+<pre class="python"><code>df_teams = pd.DataFrame(columns=[&#39;team_id&#39;, &#39;division_id&#39;, &#39;division_name&#39;,  &#39;league&#39; ,
+    &#39;ruleset&#39;, &#39;roster_id&#39;, &#39;race_name&#39;,  &#39;games_played&#39;])
+
+target = &#39;data/df_teams_&#39; + time.strftime(&quot;%Y%m%d_%H%M%S&quot;) + &#39;.h5&#39;
+print(target)
+
+fullrun = 0
+
+if fullrun:
+    print(&#39;fetching team data for &#39;, len(team_ids), &#39; teams&#39;)
+    for t in range(len(team_ids)):    
+        api_string = &quot;https://fumbbl.com/api/team/get/&quot; + str(int(team_ids[t]))
+        wait_time = (random.uniform(0.5, 1) + 0.25)/3
+        time.sleep(wait_time)
+        team = requests.get(api_string)
+        team = team.json()
+        # grab fields
+        team_id = team[&#39;id&#39;]
+        division_id = team[&#39;divisionId&#39;]
+        division_name = team[&#39;division&#39;]
+        ruleset = team[&#39;ruleset&#39;]
+        league = team[&#39;league&#39;]
+        roster_id = team[&#39;roster&#39;][&#39;id&#39;]
+        race_name = team[&#39;roster&#39;][&#39;name&#39;]
+        games_played = team[&#39;record&#39;][&#39;games&#39;]
+        # add to dataframe
+        df_teams.loc[t] = [team_id, division_id, division_name, league, ruleset, roster_id, race_name, games_played]
+        if t % 100 == 0: 
+            # write tmp data as hdf5 file
+            print(t, end=&#39;&#39;)
+            print(&quot;.&quot;, end=&#39;&#39;)
+            df_teams.to_hdf(target, key=&#39;df_teams&#39;, mode=&#39;w&#39;)
+    
+    df_teams.to_hdf(target, key=&#39;df_teams&#39;, mode=&#39;w&#39;)
+else:
+    # read from hdf5 file
+    df_teams = pd.read_hdf(&#39;data/df_teams_20211215_211746.h5&#39;)
+
+
+df_teams[&#39;roster_name&#39;] = df_teams[&#39;roster_id&#39;].astype(str) + &#39;_&#39; + df_teams[&#39;race_name&#39;]
+
+df_teams.shape
+
+    </code></pre>
+<pre><code>data/df_teams_20211230_192715.h5
+
+(46831, 9)</code></pre>
+<div id="dataprep-add-ruleset_version-and-division_name" class="section level2">
+<h2>Dataprep: Add ruleset_version and division_name</h2>
+<p>FUMBBL allows coaches to create their own rulesets to play their own leagues and tournaments with. For example, there is a so-called “Secret League” where coaches can play with “Ninja halflings”, “Ethereal” spirits etc. Instead of plain normal regular “Halflings” and “Shambling Undead” :-)</p>
+<p>Since we want the team strength for the official rulesets BB2016 and BB2020, we need to distinguish those matches from the matches that are played under different rules.</p>
+<p>Lets have look at the various divisions and leagues, which rulesets are used, and which races are played how often.
+There are a lot of small leagues being played on FUMBBL. We only look at divisions and leagues with a sufficient volume of matches, or otherwise we do not have sufficient statistics for each race.</p>
+<p>So I aggregated the data by division, league and ruleset, and filtered on at least 150 different teams that have played at least once last year.</p>
+<p>Apart from the main “Divisions” that are part of FUMBBL, there were a few user-run leagues present in this table, so I looked up their names on FUMBBL and what ruleset is used (BB2016, BB2020 or some other variant). This information (contained in an xlsx) is added to the dataset below.</p>
+<pre class="python"><code># add ruleset_version and division_name from xlsx
+ruleset_division_names = pd.read_excel(&#39;data/ruleset_division_names.xlsx&#39;,  engine=&#39;openpyxl&#39;)
+
+df_teams = pd.merge(df_teams, ruleset_division_names, on= [&#39;league&#39;, &#39;ruleset&#39;, &#39;division_id&#39;], how=&#39;left&#39;)
+
+df_teams[&#39;division_name&#39;] = df_teams[&#39;new_division_name&#39;]
+
+df_teams = df_teams.drop(&#39;new_division_name&#39;, 1)
+
+df_teams[&#39;division_id&#39;] = pd.to_numeric(df_teams.division_id) 
+df_teams[&#39;roster_id&#39;] = pd.to_numeric(df_teams.roster_id) 
+df_teams[&#39;team_id&#39;] = pd.to_numeric(df_teams.team_id) 
+df_teams[&#39;games_played&#39;] = pd.to_numeric(df_teams.games_played) 
+
+df_teams[&#39;league&#39;] = pd.to_numeric(df_teams.league) 
+df_teams[&#39;ruleset&#39;] = pd.to_numeric(df_teams.ruleset) 
+</code></pre>
+<pre class="python"><code>(df_teams
+    .groupby([&#39;ruleset&#39;, &#39;league&#39;, &#39;division_id&#39;, &#39;division_name&#39;,  &#39;ruleset_version&#39;], dropna=False)
+    .agg( n_teams = (&#39;ruleset&#39;, &#39;count&#39;)
+    )
+    .sort_values(&#39;n_teams&#39;, ascending = False)
+    .query(&#39;n_teams &gt; 150&#39;)[&#39;n_teams&#39;]
+    .reset_index()
+)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+ruleset
+</th>
+<th>
+league
+</th>
+<th>
+division_id
+</th>
+<th>
+division_name
+</th>
+<th>
+ruleset_version
+</th>
+<th>
+n_teams
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+0
+</th>
+<td>
+1
+</td>
+<td>
+0
+</td>
+<td>
+10
+</td>
+<td>
+Blackbox
+</td>
+<td>
+bb2016
+</td>
+<td>
+10439
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+1
+</td>
+<td>
+0
+</td>
+<td>
+1
+</td>
+<td>
+Ranked
+</td>
+<td>
+bb2016
+</td>
+<td>
+7944
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+4
+</td>
+<td>
+0
+</td>
+<td>
+2
+</td>
+<td>
+Competitive
+</td>
+<td>
+bb2020
+</td>
+<td>
+6532
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+6
+</td>
+<td>
+0
+</td>
+<td>
+5
+</td>
+<td>
+Regular_league
+</td>
+<td>
+bb2016
+</td>
+<td>
+5942
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+303
+</td>
+<td>
+10263
+</td>
+<td>
+5
+</td>
+<td>
+Secret League
+</td>
+<td>
+bb2016
+</td>
+<td>
+2554
+</td>
+</tr>
+<tr>
+<th>
+5
+</th>
+<td>
+2228
+</td>
+<td>
+9298
+</td>
+<td>
+5
+</td>
+<td>
+NAF
+</td>
+<td>
+mixed
+</td>
+<td>
+1466
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+2
+</td>
+<td>
+0
+</td>
+<td>
+3
+</td>
+<td>
+Stunty Leeg
+</td>
+<td>
+bb2016
+</td>
+<td>
+607
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+2198
+</td>
+<td>
+14708
+</td>
+<td>
+5
+</td>
+<td>
+SL BB2020
+</td>
+<td>
+bb2020
+</td>
+<td>
+452
+</td>
+</tr>
+<tr>
+<th>
+8
+</th>
+<td>
+888
+</td>
+<td>
+11676
+</td>
+<td>
+5
+</td>
+<td>
+LegaGladio
+</td>
+<td>
+mixed
+</td>
+<td>
+345
+</td>
+</tr>
+<tr>
+<th>
+9
+</th>
+<td>
+4
+</td>
+<td>
+14713
+</td>
+<td>
+5
+</td>
+<td>
+Test Open League BB2020
+</td>
+<td>
+bb2020
+</td>
+<td>
+296
+</td>
+</tr>
+<tr>
+<th>
+10
+</th>
+<td>
+1049
+</td>
+<td>
+12026
+</td>
+<td>
+5
+</td>
+<td>
+NAF 7s
+</td>
+<td>
+bb2016
+</td>
+<td>
+196
+</td>
+</tr>
+<tr>
+<th>
+11
+</th>
+<td>
+432
+</td>
+<td>
+10455
+</td>
+<td>
+5
+</td>
+<td>
+CIBBL
+</td>
+<td>
+bb2016
+</td>
+<td>
+189
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="dataprep-merging-the-match-data-with-the-team-data" class="section level2">
+<h2>Dataprep: Merging the match data with the team data</h2>
+<p>For each match in the <code>df_mbt</code> <strong>DataFrame</strong> we can now add the team-level information from <code>df_teams</code>.</p>
+<p>As both datasets contain ‘race_name’, we drop one of them.</p>
+<pre class="python"><code>df_mbt = pd.merge(df_mbt, df_teams.drop(&#39;race_name&#39;, 1), on=&#39;team_id&#39;, how=&#39;left&#39;)</code></pre>
+<pre class="python"><code>df_matches = pd.merge(df_matches, df_teams.drop([&#39;race_name&#39;, &#39;roster_id&#39;, &#39;roster_name&#39;, &#39;games_played&#39;], 1), left_on=&#39;team1_id&#39;, right_on = &#39;team_id&#39;, how=&#39;left&#39;)
+
+df_matches[&#39;team1_id&#39;] = pd.to_numeric(df_matches.team1_id) 
+df_matches = df_matches.drop(&#39;team_id&#39;, 1)</code></pre>
+</div>
+</div>
+<div id="step-5-adding-team-tiers" class="section level1">
+<h1>Step 5: adding team tiers</h1>
+<p>According to <a href="https://www.thenaf.net/2017/05/tiers/">this article from the NAF from 2017</a>, already since 2010 efforts were made to balance things out a bit between the different team strengths. For example, the weaker teams get more gold to spend on players, or get more so-called “Star player points” to spend on skilling players up. According to <a href="https://www.thenaf.net/tournaments/information/tiers-and-tiering/">the NAF</a>, traditionally team tiering consists of three groups, with Tier 1 being the strongest teams, and tier 3 the weakest teams. The GW BB2020 rule book also contains three tier groups, that are similar to the NAF tiers: except for Humans and Old World Alliance. And in november 2021, Games Workshop published an update of the three tier groups, now with High Elves moving from tier 2 to tier 1, and Old World Alliance moving back to tier 2.</p>
+<p>This is most naturally added to the <code>df_mbt</code> dataframe, as it can differ for each team in a match.</p>
+<pre class="python"><code>race_tiers = pd.read_excel(&#39;data/race_tiers_mapping.xlsx&#39;,  engine=&#39;openpyxl&#39;)
+race_tiers = race_tiers[ [&#39;race_name&#39;, &#39;bb2020_tier&#39;, &#39;naf_tier&#39;, &#39;bb2020_nov21_tier&#39;]]
+race_tiers = race_tiers.dropna()</code></pre>
+<pre class="python"><code># add bb2020 tiers
+df_mbt = pd.merge(df_mbt, race_tiers, on=&#39;race_name&#39;, how=&#39;left&#39;)
+
+</code></pre>
+</div>
+<div id="save-all-prepped-datasets-as-hdf5-files" class="section level1">
+<h1>Save all prepped datasets as HDF5 files</h1>
+<pre class="python"><code>target = &#39;data/df_inducements_final.h5&#39;
+df_inducements.to_hdf(target, key=&#39;df_inducements&#39;, mode=&#39;w&#39;, format = &#39;t&#39;, complevel = 9)
+
+target = &#39;data/inducements_final.h5&#39;
+inducements.to_hdf(target, key=&#39;inducements&#39;, mode=&#39;w&#39;, format = &#39;t&#39;,  complevel = 9)</code></pre>
+<pre class="python"><code>target = &#39;data/df_matches_final.h5&#39;
+
+df_matches.to_hdf(target, key=&#39;df_matches&#39;, mode=&#39;w&#39;, format = &#39;t&#39;,  complevel = 9)</code></pre>
+<pre class="python"><code>target = &#39;data/df_mbt_final.h5&#39;
+
+df_mbt.to_hdf(target, key=&#39;df_mbt&#39;, mode=&#39;w&#39;, format = &#39;t&#39;,  complevel = 9)
+</code></pre>
+</div>
+<div id="choosing-a-license-for-the-public-dataset" class="section level1">
+<h1>Choosing a license for the public dataset</h1>
+<p>An important part of making data publicly available is being explicit about what is allowed if people want to use the dataset.
+However, before we do so, we have to check if <strong>we</strong> are actually allowed to publish the data. This is explained nicely <a href="https://datacarpentry.org/blog/2016/06/data-licensing">in a blogpost by Elizabeth Wickes</a>.</p>
+<p>Since our data will come from the <strong>FUMBBL.com</strong> website, we check the <a href="https://fumbbl.com/p/privacy"><strong>Privacy policy</strong></a> where all users, including myself have agreed on when signing up. It contains this part which is specific to the unauthenticated API, which we use to fetch the data, as well as additional public match data, such as which inducements are used in a match, and the Coach rankings of the playing coaches that were current when the match was played.</p>
+<pre><code>Content you provide through the website
+All the information you provide through the website is processed by FUMBBL. This includes things such as forum posts, private message posts, blog entries, team and player names and biographies and news comments. Data provided this way is visible by other people on the website and in most cases public even to individuals without accounts (not including private messages), and as such are considered of public interest. If direct personal information is posted in public view, you can contact moderators to resolve this. Match records are also considered content in this context, and is also considered of public interest. This data is collected as the primary purpose of the website and it is of course entirely up to you how much of this is provided to FUMBBL. 
+
+Third party sharing
+Some of the public data is available through a public (*i.e. unauthenticated*) API, which shares some of the information provided by FUMBBL users in a way suitable for third-party websites and services to process.
+
+The data available through the unauthenticated API is considered non-personal as it only reflects information that is public by its nature on the website. The authenticated API will only show information connected to the authenticated account.</code></pre>
+<p>I conclude that since the match data is already considered public content, there is no harm in collecting this public data in a structured dataset and placing this data in a public repository. The final step is then to decide what others are allowed to do with this data. In practice, this means choosing a license under which to release the dataset. I decided to choose a <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 license</a>: this places the data in the public domain, and people can use the dataset as they wish. Citing or mentioning the source of the data would still be appreciated of course.</p>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/python/">Python</a>
+  
+  <a class="badge badge-light" href="/tags/pandas/">Pandas</a>
+  
+  <a class="badge badge-light" href="/tags/beautiful-soup/">Beautiful Soup</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/blood-bowl-fumbbl-dataset/&amp;text=Construction%20of%20a%20public%20dataset%20of%20Blood%20Bowl%20matches%20played%20on%20FUMBBL.com" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/blood-bowl-fumbbl-dataset/&amp;t=Construction%20of%20a%20public%20dataset%20of%20Blood%20Bowl%20matches%20played%20on%20FUMBBL.com" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Construction%20of%20a%20public%20dataset%20of%20Blood%20Bowl%20matches%20played%20on%20FUMBBL.com&amp;body=/post/blood-bowl-fumbbl-dataset/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/blood-bowl-fumbbl-dataset/&amp;title=Construction%20of%20a%20public%20dataset%20of%20Blood%20Bowl%20matches%20played%20on%20FUMBBL.com" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Construction%20of%20a%20public%20dataset%20of%20Blood%20Bowl%20matches%20played%20on%20FUMBBL.com%20/post/blood-bowl-fumbbl-dataset/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/blood-bowl-fumbbl-dataset/&amp;title=Construction%20of%20a%20public%20dataset%20of%20Blood%20Bowl%20matches%20played%20on%20FUMBBL.com" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hudb6f5a71508eb5317c72df2dc43608d9_19467_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
+      <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods. Follow me on <a href="https://twitter.com/GertjanVerhoev1">Twitter</a> to receive updates on new blog posts.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+        <i class="ai ai-google-scholar"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-stack-overflow"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/frozenlake-qlearning-convergence/">OpenAI Gym&#39;s FrozenLake: Converging on the true Q-values</a></li>
+      
+      <li><a href="/post/jacks-car-rental-gym/">Jacks Car Rental as a Gym Environment</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.3/mermaid.min.js" integrity="" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/python.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.a0d331bcd05dbe8b31e244f796710f08.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © 2019, 2020 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

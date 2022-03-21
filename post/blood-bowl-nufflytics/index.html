@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="This blogpost is about **Blood Bowl**, a boardgame I started playing last year. The idea of this blog post is to showcase some possible analyses that can be done on the FUMBBL match data I&#39;ve compiled.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/blood-bowl-nufflytics/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/blood-bowl-nufflytics/">
+
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="/post/blood-bowl-nufflytics/">
+  <meta property="og:title" content="Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python | Gertjan Verhoeven">
+  <meta property="og:description" content="This blogpost is about **Blood Bowl**, a boardgame I started playing last year. The idea of this blog post is to showcase some possible analyses that can be done on the FUMBBL match data I&#39;ve compiled."><meta property="og:image" content="/img/headers/bloodbowl_dataset.png">
+  <meta property="twitter:image" content="/img/headers/bloodbowl_dataset.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2022-03-20T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2022-03-20T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/blood-bowl-nufflytics/"
+  },
+  "headline": "Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python",
+  
+  "datePublished": "2022-03-20T00:00:00Z",
+  "dateModified": "2022-03-20T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Gertjan Verhoeven"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gertjan Verhoeven",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "This blogpost is about **Blood Bowl**, a boardgame I started playing last year. The idea of this blog post is to showcase some possible analyses that can be done on the FUMBBL match data I've compiled."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python | Gertjan Verhoeven</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/bloodbowl_dataset.png" class="article-banner" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Mar 20, 2022
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    13 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/categories/datascience/">Datascience</a>, <a href="/categories/blood-bowl/">Blood Bowl</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+<p>This blogpost is about <strong>Blood Bowl</strong>, a strategic boardgame invented in the late 80’s, that I finally started playing last year. Blood bowl is a game of Fantasy Football, where fantasy team races (think “Orcs”, or “Elves”) are pitted against each other. Interestingly, the various teams (there are over 20 different ones) require different play styles, and not all team races are equally strong. On tournaments, this gives rise to various compensation schemes to make all teams “viable” for competition. There exists a lively tournament scene, with thousands of matches played each year.</p>
+<p>The idea of this blog post is to showcase some possible analyses that can be done on the <a href="https://gsverhoeven.github.io/post/blood-bowl-fumbbl-dataset/">FUMBBL match data I’ve compiled</a>. The idea is to make Blood Bowl data analysis (also know as <a href="https://nufflytics.com">Nufflytics</a>, a term coined by Blood Bowler “Schlice” in reference to Nuffle, the god of Blood Bowl) easier and more accessible to others. I took inspiration from various sources, detailed at the end of this post. So lets dive in the world of Blood Bowl stats nerdery.</p>
+<div id="getting-started-with-the-data" class="section level1">
+<h1>Getting started with the data</h1>
+<p>Since the previous blog post on FUMBBL data, I decided to make a separate Github repository <a href="https://github.com/gsverhoeven/fumbbl_datasets">fumbbl_datasets</a> that contains the Python code to fetch and construct the FUMBBL datasets. You can either download the latest datasets manually, or clone the entire repo to your local drive, depending on your expertise and preferences.</p>
+<p>The datasets are available both in CSV and HDF5. CSV would be the format of choice for Excel analysis, whereas the HDF5 format is suitable for scripted languages such as Python or R. Here we use Python, with the libraries <code>Pandas</code> and <code>plotnine</code> for data analysis and visualization. The code below assumes the datasets are locally stored at the location contained in the <code>path_to_datasets</code> variable:</p>
+<pre class="python"><code>import pandas as pd
+import numpy as np
+import plotnine as p9
+
+# adjust this accordingly
+path_to_datasets = &#39;../../../../fumbbl_datasets/&#39;
+
+# FUMBBL matches
+target = &#39;datasets/v0.2/df_matches.h5&#39;
+df_matches = pd.read_hdf(path_to_datasets + target) 
+
+# FUMBBL matches by team
+target = &#39;datasets/v0.2/df_mbt.h5&#39;
+df_mbt = pd.read_hdf(path_to_datasets + target) 
+
+# FUMBBL inducements
+target = &#39;datasets/v0.2/inducements.h5&#39;
+inducements = pd.read_hdf(path_to_datasets + target) </code></pre>
+</div>
+<div id="what-data-do-we-have-weekly-game-volumes-by-division" class="section level1">
+<h1>What data do we have? Weekly game volumes by division</h1>
+<p>Let’s see what we’ve got! The pandas DataFrame <code>df_matches</code> contains records for all matches played on FUMBBL between august 2020 and march 2022.</p>
+<p>Since we have a proper <code>datetime</code> type variable for each week (<code>week_date</code>), we can use <code>pandas</code> and <code>plotnine</code> to plot the weekly game volume as a time series.</p>
+<p>The introduction of the new <strong>Competitive division</strong> with BB2020 rules is marked by a vertical red line. I labeled the larger leagues as well a recent tournament I took part in myself.</p>
+<pre class="python"><code>res = (df_matches
+    .loc[(df_matches[&#39;week_date&#39;] &gt;= &#39;2020-08-01&#39; ) &amp; (df_matches[&#39;week_date&#39;] &lt; &#39;2022-11-25&#39;)]
+    .groupby([&#39;week_date&#39;, &#39;week_number&#39;, &#39;division_name&#39;])
+    .agg(        
+        n_games = (&#39;match_id&#39;, &quot;count&quot;) 
+    )
+    .reset_index()) # this adds the &quot;group by&quot; variables back as columns of res
+
+(p9.ggplot(data = res, mapping = p9.aes(x = &#39;week_date&#39;, y = &#39;n_games&#39;, color = &#39;division_name&#39;))
++ p9.geom_point() 
++ p9.geom_line()
++ p9.expand_limits(y=[0,2000])
++ p9.geom_vline(xintercept = &#39;2021-09-01&#39;, color = &quot;red&quot;)
++ p9.theme(figure_size = (10, 5))
++ p9.ggtitle(&quot;Weekly game volume on FUMBBL august 2020 - march 2022&quot;))</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_4_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (8735758025157)&gt;</code></pre>
+<p>To check the dataset, I compared this plot with the plot of weekly game volumes that FUMBBL itself provides at <a href="https://fumbbl.com/p/stats" class="uri">https://fumbbl.com/p/stats</a>.
+Both plots looked identical at the time of writing, so it seems that we have a complete dataset for the given period.</p>
+<p>The effect of starting the new BB2020 Competitive division is clearly visible, with the weekly game volume almost doubling in september 2021.
+The first online NAF tournament using BB2020 rules is also visible, running for 6 weeks in October / November 2021.</p>
+</div>
+<div id="star-player-usage-across-divisions-and-leagues-over-time" class="section level1">
+<h1>Star player usage across divisions and leagues, over time</h1>
+<p>We can also look at the percentage of matches that involve star players.
+I used the various plot aesthetics like symbol shape and size to encode the game volume and ruleset (BB2016 or BB2020 based).</p>
+<pre class="python"><code>divisions = [&#39;Blackbox&#39;, &#39;Competitive&#39;, &#39;Online NAF Tournaments&#39;,  &#39;Ranked&#39;, &#39;Regular_league&#39;]
+
+res = (df_matches
+.query(&quot;division_name in @divisions&quot;)
+.groupby([&#39;division_name&#39;, &#39;league&#39;, &#39;ruleset&#39;, &#39;ruleset_version&#39;, &#39;week_date&#39;])
+.agg(
+    n_games = (&#39;match_id&#39;, &#39;count&#39;),
+    perc_sp = (&#39;has_sp&#39;, &#39;mean&#39;)
+)
+.reset_index()
+.sort_values(&quot;n_games&quot;, ascending=False)
+)
+
+(p9.ggplot(data = res.query(&quot;n_games &gt; 30&quot;), mapping = p9.aes(x = &#39;week_date&#39;, y = &#39;perc_sp&#39;, 
+group = &#39;factor(division_name)&#39;, color = &#39;factor(division_name)&#39;))
+    + p9.geom_point(p9.aes(shape = &#39;factor(ruleset_version)&#39;, size = &#39;n_games&#39;)) 
+    + p9.expand_limits(y=[0,1])
+    + p9.scale_size_area()
+    + p9.geom_vline(xintercept = &#39;2021-09-01&#39;, color = &quot;red&quot;)
+    + p9.ggtitle(&quot;Star player usage over time, by division/league&quot;)
+    + p9.theme(figure_size = (10, 6)))</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_7_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (8735757363250)&gt;</code></pre>
+<p>In above graph, the various online NAF Tournaments are clearly distinguished. <strong>Amorical Cup 2020</strong> in summer 2020, <strong>Eur’Open Online</strong> in Nov/dec 2020, <strong>SteelBowl</strong> in Feb 2021, and <strong>LitBowl</strong> in May 2021 were all using BB2016 rules.</p>
+<p>Through Googling and using the Wayback Machine, I was able to find the rulepacks of these tournaments. LitBowl featured “big budgets” (up to 1440K) and a requirement of only 10 regular players before inducement, this likely explains the large amount of Star Players in that tournament.</p>
+<p>In contrast, in the GBFU tournament, the first online NAF tournament using the BB2020 rules, only some 15% of matches involved at least one star player.</p>
+</div>
+<div id="are-coach-ratings-predictive-of-match-outcomes" class="section level1">
+<h1>Are coach ratings predictive of match outcomes?</h1>
+<p>For the main divisions on FUMBBL, ELO style coach ratings are available that are updated after each game.
+The coach rankings are explained on <a href="https://fumbbl.com/help:Ranking">this help page</a>.</p>
+<p>According to the ELO ranking system, a coach rating difference of 40 should result in 85% wins for the higher ranked coach.
+Coaches of equal rating should have a win rate of 0.5 (with draws weighted at half point).</p>
+<p>The range of coach rankings observed for a particular game tells us something about the relationship between skill and luck.
+If a game is pure luck, we will never observe large differences in coach rating, since the outcome will be determined by a coin flip, independent of coach skill.</p>
+<p>On FUMBBL, coach ratings vary roughly between 125 and 175. What do we expect if a coach with a rating of 175 plays a coach of rating 145? Well, the rating difference is 30. According to the formula (assuming equal team strength and equal races), the expected win probability is 1/(1 + 10^0.75) = 85%, and the probability of loss is 15%.</p>
+<p>Since our CR we obtained from the FUMBBL match result page is an overall coach rating (i.e. it ignores division), we can simply pool all matches from divisions where coach rating is tracked.</p>
+<p>The match data contains a <strong>Coach Ranking Difference</strong> bin (category) that we can each to calculate the Win/draw/loss percentages for each category.</p>
+<p>Let’s see what the actual percentages are:</p>
+<pre class="python"><code>main_divisions = [&#39;Blackbox&#39;, &#39;Ranked&#39;, &#39;Competitive&#39;]
+
+res = (df_matches[df_matches[&#39;division_name&#39;].isin(main_divisions)]
+    .groupby([&#39;cr_bin&#39;, &#39;team1_win&#39;])
+    .agg(        
+        n_games = (&#39;cr_bin&#39;, &quot;count&quot;),
+    )
+    .reset_index()) # this adds the group by variable (now index) as a column
+
+# add total games played within each bin
+res[&#39;n_games_bin&#39;] = res.groupby(&#39;cr_bin&#39;).n_games.transform(&#39;sum&#39;)
+
+res[&#39;perc&#39;] = res[&#39;n_games&#39;]/res[&#39;n_games_bin&#39;]
+
+(p9.ggplot(res, p9.aes(x = &#39;factor(cr_bin)&#39;, y = &#39;perc&#39;, fill = &#39;factor(team1_win)&#39;)) 
+    + p9.geom_bar(position = &quot;fill&quot;, stat = &quot;identity&quot;) 
+    + p9.theme(axis_text_x= p9.element_text(rotation=90, hjust=1))
+    + p9.ggtitle(&#39;probability of win/draw/loss as a function of Coach Rating difference&#39;)
+)</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_10_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (8735757373462)&gt;</code></pre>
+<pre class="python"><code>res = (df_matches[df_matches[&#39;division_name&#39;].isin(main_divisions)]
+    .groupby([&#39;cr_bin&#39;, &#39;division_name&#39;])
+    .agg(        
+        n_games = (&#39;cr_bin&#39;, &quot;count&quot;),
+    )
+    .reset_index()) # this adds the group by variable (now index) as a column
+
+(p9.ggplot(res, p9.aes(x = &#39;factor(cr_bin)&#39;, y = &#39;n_games&#39;, fill = &#39;division_name&#39;)) 
+    + p9.geom_col(position = p9.position_dodge()) 
+    + p9.theme(axis_text_x= p9.element_text(rotation=90, hjust=1))
+    + p9.ggtitle(&#39;number of games per CR difference bin&#39;)
+)</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_11_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (8735757397231)&gt;</code></pre>
+<p>From above graphs, we can conclude that the coach ratings work as expected, with large coach rating differences indeed showing high win rates for the higher ranked coach. From this we can infer that a highly skilled coach will win 9 times out of ten agains a below average coach. We call Blood Bowl a Strategy game for a reason!</p>
+</div>
+<div id="what-about-the-passing-game-in-bb2020" class="section level1">
+<h1>What about the passing game in BB2020?</h1>
+<p>With Blood Bowl 2020 also came a large change to passing the ball. Passing is no longer linked to the <strong>Agility</strong> statistics, but now has its own <strong>Passing</strong> (PA) stat. Overall, passing became riskier, and high agility teams do not automatically have good passing stats. For example, only a High Elf thrower has a PA of 2+, whereas the rest of the players have a PA of 4+ or higher. On the Dark Elf team, the player with the best PA stat is the runner, with a PA of 3+, without a built in re-roll. So we can expect quite some changes in the number of completions per match. For more detail I refer to a nice post by king_ghidra at <a href="https://bloodbowlstrategies.com/en/tactics-blood-bowl-second-season/">Blood Bowl Strategies</a>.</p>
+<p>Let’s have a look!</p>
+<pre class="python"><code>divisions = [&#39;Ranked&#39;, &#39;Blackbox&#39;, &#39;Competitive&#39;]
+
+tv_bins = [&#39;1.1M&#39;, &#39;1.4M&#39;, &#39;1.7M&#39;]
+
+res = (df_mbt[df_mbt[&#39;division_name&#39;].isin(divisions)]
+    .loc[df_mbt[&#39;tv_bin&#39;].isin(tv_bins)]
+    .query(&quot;mirror_match == 0 &amp; has_sp == 0 &amp; tv_bin in @tv_bins &amp; division_name in @divisions&quot;)
+    .groupby([&#39;division_name&#39;, &#39;ruleset_version&#39;, &#39;week_date&#39;, &#39;tv_bin&#39;])
+    .agg(        
+        avg_comp = (&#39;home_comp&#39;, &quot;mean&quot;),
+        avg_pass = (&#39;home_pass&#39;, &quot;mean&quot;),
+        avg_foul = (&#39;home_foul&#39;, &quot;mean&quot;),
+        avg_block = (&#39;home_block&#39;, &quot;mean&quot;),    
+        avg_cas = (&#39;home_cas&#39;, &quot;mean&quot;),  
+        avg_rcv_cas = (&#39;away_cas&#39;, &quot;mean&quot;),
+        n_games = (&#39;race_name&#39;, &quot;count&quot;)
+    )
+    .sort_values( &#39;n_games&#39;, ascending = False)
+    .reset_index()) # this adds the group by variables (now index) as a column
+
+res = res.dropna()
+
+(p9.ggplot(data = res.query(&#39;n_games &gt; 10&#39;), 
+            mapping = p9.aes(x = &#39;week_date&#39;, y = &#39;avg_comp&#39;, 
+                            size = &#39;n_games&#39;, shape = &#39;factor(division_name)&#39;, color = &#39;factor(tv_bin)&#39;))
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.theme(figure_size = (10, 5))
+    + p9.ggtitle(&quot;average completions per game Ranked vs Regular league&quot;))</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_14_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (-9223363301097377606)&gt;</code></pre>
+<pre class="python"><code>divisions = [&#39;Ranked&#39;, &#39;Blackbox&#39;, &#39;Competitive&#39;]
+
+tv_bins = [&#39;1.1M&#39;, &#39;1.4M&#39;, &#39;1.7M&#39;]
+
+res = (df_mbt[df_mbt[&#39;division_name&#39;].isin(divisions)]
+    .loc[df_mbt[&#39;tv_bin&#39;].isin(tv_bins)]
+    .query(&quot;mirror_match == 0 &amp; has_sp == 0 &amp; tv_bin in @tv_bins &amp; division_name in @divisions&quot;)
+    .groupby([&#39;ruleset_version&#39;, &#39;race_name&#39;, &#39;tv_bin&#39;])
+    .agg(        
+        avg_comp = (&#39;home_comp&#39;, &quot;mean&quot;),
+        avg_pass = (&#39;home_pass&#39;, &quot;mean&quot;),
+        avg_foul = (&#39;home_foul&#39;, &quot;mean&quot;),
+        n_games = (&#39;race_name&#39;, &quot;count&quot;)
+    )
+    .sort_values( &#39;n_games&#39;, ascending = False)
+    .reset_index()) # this adds the group by variables (now index) as a column
+
+res = res.dropna()
+
+(p9.ggplot(data = res.query(&#39;n_games &gt; 10 &amp; tv_bin == &quot;1.1M&quot;&#39;), 
+            mapping = p9.aes(y = &#39;reorder(race_name, avg_comp)&#39;, x = &#39;avg_comp&#39;, 
+                            size = &#39;n_games&#39;, group = &#39;factor(ruleset_version)&#39;, 
+                            color = &#39;factor(ruleset_version)&#39;))
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.ggtitle(&quot;average completions per game BB2016 vs BB2020 at 1.1M TV&quot;))</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_15_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (-9223363301097412194)&gt;</code></pre>
+<p>Across the board we see a decrease in average completions per match. Note that this is for low team values, at around 1.1M, between 950K and 1250K.</p>
+<p>Observations that stand out:</p>
+<ul>
+<li>High agility teams such as Elven Union, Wood Elf and Skaven show large drops,</li>
+<li>Dark elves show the largest relative drop (more than halving in completions),</li>
+<li>High Elves are hardly affected, as well as Humans,</li>
+<li>Halflings show a large increase.</li>
+</ul>
+</div>
+<div id="and-what-about-the-fouling-game" class="section level1">
+<h1>And what about the fouling game?</h1>
+<p>Also for fouling Blood Bowl 2020 brought some changes to the rules. The <strong>Sneaky Git</strong> skill became better, allowing a player to continue moving after the foul has been committed. The <strong>Black Orcs</strong> were added as a new team, that show fouling potential: they have access to cheap bribes, the <strong>Grab</strong> skill to set up a foul, and cheap goblin bruisers to quickly move around the pitch. And there was of course the <strong>swarming</strong> for the Underworld and Snotling teams, that provides a continuous supply of disposable players to foul with. For more detail I refer to a nice post by king_ghidra at <a href="https://bloodbowlstrategies.com/en/tactics-blood-bowl-second-season/">Blood Bowl Strategies</a>.
+Let us see how the stats were affected!</p>
+<pre class="python"><code>divisions = [&#39;Ranked&#39;, &#39;Blackbox&#39;, &#39;Competitive&#39;]
+
+tv_bins = [&#39;1.1M&#39;, &#39;1.2M&#39;, &#39;1.3M&#39;, &#39;1.4M&#39;]
+
+res = (df_mbt[df_mbt[&#39;division_name&#39;].isin(divisions)]
+    .loc[df_mbt[&#39;tv_bin2&#39;].isin(tv_bins)]
+    .query(&quot;mirror_match == 0 &amp; has_sp == 0 &amp; tv_bin2 in @tv_bins &amp; division_name in @divisions&quot;)
+    .groupby([&#39;ruleset_version&#39;, &#39;race_name&#39;, &#39;tv_bin2&#39;])
+    .agg(        
+        avg_comp = (&#39;home_comp&#39;, &quot;mean&quot;),
+        avg_pass = (&#39;home_pass&#39;, &quot;mean&quot;),
+        avg_foul = (&#39;home_foul&#39;, &quot;mean&quot;),
+        n_games = (&#39;race_name&#39;, &quot;count&quot;)
+    )
+    .sort_values( &#39;n_games&#39;, ascending = False)
+    .reset_index()) # this adds the group by variables (now index) as a column
+
+res = res.dropna()
+
+(p9.ggplot(data = res.query(&#39;n_games &gt; 10&#39;), 
+            mapping = p9.aes(y = &#39;reorder(race_name, avg_foul)&#39;, x = &#39;avg_foul&#39;, 
+                            size = &#39;n_games&#39;, shape = &#39;factor(ruleset_version)&#39;, 
+                            color = &#39;factor(tv_bin2)&#39;))
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.ggtitle(&quot;average number of fouls per game BB2016 vs BB2020&quot;))</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_18_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (8735757429789)&gt;</code></pre>
+<p>From this plot, we can see that BB2020 indeed shows increased fouling, with the arrival with a new fouling team, the Black Orcs, as well as increased fouling for Underworld, Goblins, Halflings and Snotlings. The rest of the teams isn’t much affected. We can also see that as teams develop, fouling typically increases.</p>
+</div>
+<div id="fumbbl-bb2020-win-rate-and-malta-eurobowl-2022-tiers" class="section level1">
+<h1>FUMBBL BB2020 Win rate and Malta Eurobowl 2022 tiers</h1>
+<p>Last but not least, a win rate analysis. In a tournament setting, elaborate tiering systems are in place to compensate for differences in race strength, skills are selected from skill packs, and player casualties are forgotten with each match played with a “resurrected” fresh team. Furthermore, opponents are randomly assigned and must be played. Contrast this with the FUMBBL Competitive division: Here teams start with 1M gold and without any extra skills. Teams must be developed, like in a league, and opponents can be strategically chosen based on which race they play, their coach rating etc.</p>
+<p>With all this in mind, I tried the impossible: to compare relative team strength as expected by the tournament tiers, with the observed win rates in the Competitive Division. With the Eurobowl 2022 in Malta coming up, I decided to approximate the conditions of that rulepack. Teams are created using 1.15M gold, as well as roughly 36 SPP worth of skills. This translates to 6 primary skills worth 20K, giving us a total team value of 1270K, say around 1.3M.</p>
+<p>To correct for differences in coaching ability, I restricted the match selection for matches where coach ratings are not too different (&lt; 10), and above 150. I excluded matches involving Star players, and mirror matches (I.e. Orcs vs Orcs).
+To distinguish the relatively small % differences in win rate, we need to have a bandwidth around 1.3M to get sufficient statistics for each team.
+I included confidence intervals to visualize the statistical uncertainty for the win rates.</p>
+<pre class="python"><code># Function for computing confidence intervals
+from statsmodels.stats.proportion import proportion_confint   
+
+divisions = [&#39;Competitive&#39;]
+
+tv_bins = [&#39;1.2M&#39;, &#39;1.3M&#39;, &#39;1.4M&#39;]
+
+res = (df_mbt[df_mbt[&#39;division_name&#39;].isin(divisions)]
+    .loc[df_mbt[&#39;tv_bin2&#39;].isin(tv_bins)]
+    .query(&#39;mirror_match == 0 &amp; has_sp == 0 &amp; CR_diff &lt; 10 &amp; coach_CR &gt; 150&#39;)
+    .groupby([&#39;race_name&#39;, &#39;ruleset_version&#39;, &#39;Malta_2022&#39;])
+    .agg(        
+        perc_win = (&#39;wins&#39;, &quot;mean&quot;),
+        n_wins = (&#39;wins&#39;, &quot;sum&quot;),
+        n_games = (&#39;race_name&#39;, &quot;count&quot;)
+    )
+    .query(&#39;n_games &gt; 0&#39;)
+    .reset_index()) # this adds the group by variable (now index) as a column
+
+res[&#39;lower_CI&#39;], res[&#39;upper_CI&#39;] =  proportion_confint(
+                                      count = round(res[&#39;n_wins&#39;]).astype(int),
+                                      nobs = res[&#39;n_games&#39;],
+                                      alpha = 0.05
+                                  )
+
+(p9.ggplot(data = res.query(&#39;n_games &gt; 30&#39;), 
+            mapping = p9.aes(x = &#39;reorder(race_name, -Malta_2022)&#39;, y = &#39;perc_win&#39;, 
+            size = &#39;n_games&#39;, color = &#39;factor(Malta_2022)&#39;))
+    + p9.geom_linerange(p9.aes(ymin = &#39;lower_CI&#39;, ymax = &#39;upper_CI&#39;), size = 1)
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.coord_flip()
+    + p9.geom_hline(yintercept = 0.5)
+    + p9.ggtitle(&quot;FUMBBL BB2020 win rates around 1.3M&quot;))
+</code></pre>
+<div class="figure">
+<img src="/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_21_0.png" alt="" />
+<p class="caption">png</p>
+</div>
+<pre><code>&lt;ggplot: (8735757339684)&gt;</code></pre>
+<p>First off, I think the most important lesson here is that it is really difficult to compare win rates across such different settings.</p>
+<p>But what info can we squeeze from this plot nevertheless:</p>
+<p>It seems that Amazon and Underworld have higher FUMBBL win rates than expected based on their Malta 2022 tier.
+* For Amazon, this might be due to being able to avoid particular opponents on FUMBBL, such as Dwarves and Chaos Dwarves, with a lot of Tackle.
+* For Underworld, this is likely related to their improvements in BB2020, leading the charts at NAF tournaments, that resulted in recent rule changes that weakened them with the November 2021 Games Workshop ruling.</p>
+<p>What else do we got:
+* Nurgle has a relatively low win rate compared to other teams with the same tier.
+* High Elf has a low tier, but shows an above average win rate, and appears to perform well at NAF tournaments. Curious to see how this race will do this year.</p>
+</div>
+<div id="concluding-remarks-and-acknowledgements" class="section level1">
+<h1>Concluding Remarks and acknowledgements</h1>
+<p>The analyses above are meant to demonstrate some possibilities with the rich FUMMBL data available.</p>
+<p>One last application: The data can also be used to search for matches based on highly particular search criteria: for example, if you are interested in Snotling matches that induce Morg N Thorg and play against a skilled Elf coach. The <code>match_id</code> can then be used to watch the replay on FUMBBL.</p>
+<p>Finally, some acknowledgements. While writing this blog, I drew inspiration from several sources:</p>
+<ul>
+<li>most notable the <a href="https://www.fumbbl.com">FUMBBL website itself</a> that has a wealth of statistics available,</li>
+<li>the <a href="https://fumbbldata.azurewebsites.net/stats.html">website of FUMBBL coach Koadah</a> with aggregated FUMBBL stats,</li>
+<li>the <a href="https://public.tableau.com/app/profile/mike.sann0638.davies/viz/TheNAFReport/Games">NAF monthly reports</a> by Mike Davies,</li>
+<li>a <a href="https://bloodbowlstrategies.com/en/relative-strength-of-teams/">blog post on team strength</a>by Tareau Amiral ,</li>
+<li>the <a href="https://nufflytics.com">Nufflytics blog</a> by Blood Bowl 2 coach Schlice,</li>
+<li>the various technical posts of <a href="https://fumbbl.com/~SzieberthAdam">FUMBBL coach Adam Szieberth</a> who followed a similar approach using Python API and web scraping FUMBBL data.</li>
+</ul>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/python/">Python</a>
+  
+  <a class="badge badge-light" href="/tags/pandas/">Pandas</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/blood-bowl-nufflytics/&amp;text=Nufflytics:%20Analyzing%20Blood%20Bowl%20matches%20from%20FUMBBL%20using%20Python" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/blood-bowl-nufflytics/&amp;t=Nufflytics:%20Analyzing%20Blood%20Bowl%20matches%20from%20FUMBBL%20using%20Python" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Nufflytics:%20Analyzing%20Blood%20Bowl%20matches%20from%20FUMBBL%20using%20Python&amp;body=/post/blood-bowl-nufflytics/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/blood-bowl-nufflytics/&amp;title=Nufflytics:%20Analyzing%20Blood%20Bowl%20matches%20from%20FUMBBL%20using%20Python" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Nufflytics:%20Analyzing%20Blood%20Bowl%20matches%20from%20FUMBBL%20using%20Python%20/post/blood-bowl-nufflytics/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/blood-bowl-nufflytics/&amp;title=Nufflytics:%20Analyzing%20Blood%20Bowl%20matches%20from%20FUMBBL%20using%20Python" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hudb6f5a71508eb5317c72df2dc43608d9_19467_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
+      <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods. Follow me on <a href="https://twitter.com/GertjanVerhoev1">Twitter</a> to receive updates on new blog posts.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+        <i class="ai ai-google-scholar"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-stack-overflow"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/blood-bowl-fumbbl-dataset/">Construction of a public dataset of Blood Bowl matches played on FUMBBL.com</a></li>
+      
+      <li><a href="/post/frozenlake-qlearning-convergence/">OpenAI Gym&#39;s FrozenLake: Converging on the true Q-values</a></li>
+      
+      <li><a href="/post/jacks-car-rental-gym/">Jacks Car Rental as a Gym Environment</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.3/mermaid.min.js" integrity="" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/python.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.a0d331bcd05dbe8b31e244f796710f08.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © 2019, 2020 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
