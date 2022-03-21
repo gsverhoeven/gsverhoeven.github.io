@@ -5,12 +5,355 @@
     <link>/categories/blood-bowl/</link>
       <atom:link href="/categories/blood-bowl/index.xml" rel="self" type="application/rss+xml" />
     <description>Blood Bowl</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Tue, 04 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sun, 20 Mar 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Blood Bowl</title>
       <link>/categories/blood-bowl/</link>
     </image>
+    
+    <item>
+      <title>Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python</title>
+      <link>/post/blood-bowl-nufflytics/</link>
+      <pubDate>Sun, 20 Mar 2022 00:00:00 +0000</pubDate>
+      <guid>/post/blood-bowl-nufflytics/</guid>
+      <description>
+
+
+&lt;div id=&#34;nufflytics-analyzing-blood-bowl-matches-from-fumbbl-using-python&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python&lt;/h1&gt;
+&lt;p&gt;This blogpost is about &lt;strong&gt;Blood Bowl&lt;/strong&gt;, a strategic boardgame invented in the late 80’s, that I finally started playing last year. Blood bowl is a game of Fantasy Football, where fantasy team races (think “Orcs”, or “Elves”) are pitted against each other. Interestingly, the various teams (there are over 20 different ones) require different play styles, and not all team races are equally strong. On tournaments, this gives rise to various compensation schemes to make all teams “viable” for competition. There exists a lively tournament scene, with thousands of matches played each year.&lt;/p&gt;
+&lt;p&gt;The idea of this blog post is to showcase some possible analyses that can be done on the [FUMBBL match data I’ve compiled]((&lt;a href=&#34;https://gsverhoeven.github.io/post/blood-bowl-fumbbl-dataset/&#34; class=&#34;uri&#34;&gt;https://gsverhoeven.github.io/post/blood-bowl-fumbbl-dataset/&lt;/a&gt;). The idea is to make Blood Bowl data analysis (also know as &lt;a href=&#34;https://nufflytics.com&#34;&gt;Nufflytics&lt;/a&gt;, in reference to Nuffle, the god of Blood Bowl) easier and more accessible to others. I took inspiration from various sources, detailed at the end of this post. So lets dive in the world of Blood Bowl stats nerdery.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;getting-started-with-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Getting started with the data&lt;/h1&gt;
+&lt;p&gt;Since the previous blog post on FUMBBL data, I decided to make a separate Github repository &lt;a href=&#34;https://github.com/gsverhoeven/fumbbl_datasets&#34;&gt;fumbbl_datasets&lt;/a&gt; that contains the Python code to fetch and construct the FUMBBL datasets. You can either download the latest datasets manually, or clone the entire repo to your local drive, depending on your expertise and preferences.&lt;/p&gt;
+&lt;p&gt;The datasets are available both in CSV and HDF5. CSV would be the format of choice for Excel analysis, whereas the HDF5 format is suitable for scripted languages such as Python or R. Here we use Python, with the libraries &lt;code&gt;Pandas&lt;/code&gt; and &lt;code&gt;plotnine&lt;/code&gt; for data analysis and visualization. The code below assumes the datasets are locally stored at the location contained in the &lt;code&gt;path_to_datasets&lt;/code&gt; variable:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import pandas as pd
+import numpy as np
+import plotnine as p9
+
+# adjust this accordingly
+path_to_datasets = &amp;#39;../../../../fumbbl_datasets/&amp;#39;
+
+# FUMBBL matches
+target = &amp;#39;datasets/v0.2/df_matches.h5&amp;#39;
+df_matches = pd.read_hdf(path_to_datasets + target) 
+
+# FUMBBL matches by team
+target = &amp;#39;datasets/v0.2/df_mbt.h5&amp;#39;
+df_mbt = pd.read_hdf(path_to_datasets + target) 
+
+# FUMBBL inducements
+target = &amp;#39;datasets/v0.2/inducements.h5&amp;#39;
+inducements = pd.read_hdf(path_to_datasets + target) &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;what-data-do-we-have-weekly-game-volumes-by-division&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What data do we have? Weekly game volumes by division&lt;/h1&gt;
+&lt;p&gt;Let’s see what we’ve got! The pandas DataFrame &lt;code&gt;df_matches&lt;/code&gt; contains records for all matches played on FUMBBL between sept 2020 and nov 2021.&lt;/p&gt;
+&lt;p&gt;Since we have a proper &lt;code&gt;datetime&lt;/code&gt; type variable for each week (&lt;code&gt;week_date&lt;/code&gt;), we can use &lt;code&gt;pandas&lt;/code&gt; and &lt;code&gt;plotnine&lt;/code&gt; to plot the weekly game volume as a time series.&lt;/p&gt;
+&lt;p&gt;The introduction of the new &lt;strong&gt;Competitive division&lt;/strong&gt; with BB2020 rules is marked by a vertical red line.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;res = (df_matches
+    .loc[(df_matches[&amp;#39;week_date&amp;#39;] &amp;gt;= &amp;#39;2020-08-01&amp;#39; ) &amp;amp; (df_matches[&amp;#39;week_date&amp;#39;] &amp;lt; &amp;#39;2022-11-25&amp;#39;)]
+    .groupby([&amp;#39;week_date&amp;#39;, &amp;#39;week_number&amp;#39;, &amp;#39;division_name&amp;#39;])
+    .agg(        
+        n_games = (&amp;#39;match_id&amp;#39;, &amp;quot;count&amp;quot;) 
+    )
+    .reset_index()) # this adds the &amp;quot;group by&amp;quot; variables back as columns of res
+
+(p9.ggplot(data = res, mapping = p9.aes(x = &amp;#39;week_date&amp;#39;, y = &amp;#39;n_games&amp;#39;, color = &amp;#39;division_name&amp;#39;))
++ p9.geom_point() 
++ p9.geom_line()
++ p9.expand_limits(y=[0,2000])
++ p9.geom_vline(xintercept = &amp;#39;2021-09-01&amp;#39;, color = &amp;quot;red&amp;quot;)
++ p9.theme(figure_size = (10, 5))
++ p9.ggtitle(&amp;quot;Weekly game volume on FUMBBL august 2020 - march 2022&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_4_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8735758025157)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To check the dataset, I compared this plot with the plot of weekly game volumes that FUMBBL itself provides at &lt;a href=&#34;https://fumbbl.com/p/stats&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/p/stats&lt;/a&gt;.
+Both plots looked identical at the time of writing, so it seems that we have a complete dataset for the given period.&lt;/p&gt;
+&lt;p&gt;The effect of starting the new BB2020 Competitive division is clearly visible, with the weekly game volume almost doubling in september 2021.
+The first online NAF tournament using BB2020 rules is also visible, running for 6 weeks in October / November 2021.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;star-player-usage-across-divisions-and-leagues-over-time&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Star player usage across divisions and leagues, over time&lt;/h1&gt;
+&lt;p&gt;We can also look at the percentage of matches that involve star players.
+I used the various plot aesthetics like symbol shape and size to encode the game volume and ruleset (BB2016 or BB2020 based).&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;divisions = [&amp;#39;Blackbox&amp;#39;, &amp;#39;Competitive&amp;#39;, &amp;#39;Online NAF Tournaments&amp;#39;,  &amp;#39;Ranked&amp;#39;, &amp;#39;Regular_league&amp;#39;]
+
+res = (df_matches
+.query(&amp;quot;division_name in @divisions&amp;quot;)
+.groupby([&amp;#39;division_name&amp;#39;, &amp;#39;league&amp;#39;, &amp;#39;ruleset&amp;#39;, &amp;#39;ruleset_version&amp;#39;, &amp;#39;week_date&amp;#39;])
+.agg(
+    n_games = (&amp;#39;match_id&amp;#39;, &amp;#39;count&amp;#39;),
+    perc_sp = (&amp;#39;has_sp&amp;#39;, &amp;#39;mean&amp;#39;)
+)
+.reset_index()
+.sort_values(&amp;quot;n_games&amp;quot;, ascending=False)
+)
+
+(p9.ggplot(data = res.query(&amp;quot;n_games &amp;gt; 30&amp;quot;), mapping = p9.aes(x = &amp;#39;week_date&amp;#39;, y = &amp;#39;perc_sp&amp;#39;, 
+group = &amp;#39;factor(division_name)&amp;#39;, color = &amp;#39;factor(division_name)&amp;#39;))
+    + p9.geom_point(p9.aes(shape = &amp;#39;factor(ruleset_version)&amp;#39;, size = &amp;#39;n_games&amp;#39;)) 
+    + p9.expand_limits(y=[0,1])
+    + p9.scale_size_area()
+    + p9.geom_vline(xintercept = &amp;#39;2021-09-01&amp;#39;, color = &amp;quot;red&amp;quot;)
+    + p9.ggtitle(&amp;quot;Star player usage over time, by division/league&amp;quot;)
+    + p9.theme(figure_size = (10, 6)))&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_7_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8735757363250)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In above graph, the various online NAF Tournaments are clearly distinguished. &lt;strong&gt;Amorical Cup 2020&lt;/strong&gt; in summer 2020, &lt;strong&gt;Eur’Open Online&lt;/strong&gt; in Nov/dec 2020, &lt;strong&gt;SteelBowl&lt;/strong&gt; in Feb 2021, and &lt;strong&gt;LitBowl&lt;/strong&gt; in May 2021 were all using BB2016 rules.&lt;/p&gt;
+&lt;p&gt;Through Googling and using the Wayback Machine, I was able to find the rulepacks of these tournaments. LitBowl featured “big budgets” (up to 1440K) and a requirement of only 10 regular players before inducement, this likely explains the large amount of Star Players in that tournament.&lt;/p&gt;
+&lt;p&gt;In contrast, in the GBFU tournament, the first online NAF tournament using the BB2020 rules, only some 15% of matches involved at least one star player.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;are-coach-ratings-predictive-of-match-outcomes&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Are coach ratings predictive of match outcomes?&lt;/h1&gt;
+&lt;p&gt;For the main divisions on FUMBBL, ELO style coach ratings are available that are updated after each game.
+The coach rankings are explained on &lt;a href=&#34;https://fumbbl.com/help:Ranking&#34;&gt;this help page&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;According to the ELO ranking system, a coach rating difference of 40 should result in 85% wins for the higher ranked coach.
+Coaches of equal rating should have a win rate of 0.5 (with draws weighted at half point).&lt;/p&gt;
+&lt;p&gt;The range of coach rankings observed for a particular game tells us something about the relationship between skill and luck.
+If a game is pure luck, we will never observe large differences in coach rating, since the outcome will be determined by a coin flip, independent of coach skill.&lt;/p&gt;
+&lt;p&gt;On FUMBBL, coach ratings vary roughly between 125 and 175. What do we expect if a coach with a rating of 175 plays a coach of rating 145? Well, the rating difference is 30. According to the formula (assuming equal team strength and equal races), the expected win probability is 1/(1 + 10^0.75) = 85%, and the probability of loss is 15%.&lt;/p&gt;
+&lt;p&gt;Since our CR we obtained from the FUMBBL match result page is an overall coach rating (i.e. it ignores division), we can simply pool all matches from divisions where coach rating is tracked.&lt;/p&gt;
+&lt;p&gt;The match data contains a &lt;strong&gt;Coach Ranking Difference&lt;/strong&gt; bin (category) that we can each to calculate the Win/draw/loss percentages for each category.&lt;/p&gt;
+&lt;p&gt;Let’s see what the actual percentages are:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;main_divisions = [&amp;#39;Blackbox&amp;#39;, &amp;#39;Ranked&amp;#39;, &amp;#39;Competitive&amp;#39;]
+
+res = (df_matches[df_matches[&amp;#39;division_name&amp;#39;].isin(main_divisions)]
+    .groupby([&amp;#39;cr_bin&amp;#39;, &amp;#39;team1_win&amp;#39;])
+    .agg(        
+        n_games = (&amp;#39;cr_bin&amp;#39;, &amp;quot;count&amp;quot;),
+    )
+    .reset_index()) # this adds the group by variable (now index) as a column
+
+# add total games played within each bin
+res[&amp;#39;n_games_bin&amp;#39;] = res.groupby(&amp;#39;cr_bin&amp;#39;).n_games.transform(&amp;#39;sum&amp;#39;)
+
+res[&amp;#39;perc&amp;#39;] = res[&amp;#39;n_games&amp;#39;]/res[&amp;#39;n_games_bin&amp;#39;]
+
+(p9.ggplot(res, p9.aes(x = &amp;#39;factor(cr_bin)&amp;#39;, y = &amp;#39;perc&amp;#39;, fill = &amp;#39;factor(team1_win)&amp;#39;)) 
+    + p9.geom_bar(position = &amp;quot;fill&amp;quot;, stat = &amp;quot;identity&amp;quot;) 
+    + p9.theme(axis_text_x= p9.element_text(rotation=90, hjust=1))
+    + p9.ggtitle(&amp;#39;probability of win/draw/loss as a function of Coach Rating difference&amp;#39;)
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_10_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8735757373462)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;res = (df_matches[df_matches[&amp;#39;division_name&amp;#39;].isin(main_divisions)]
+    .groupby([&amp;#39;cr_bin&amp;#39;, &amp;#39;division_name&amp;#39;])
+    .agg(        
+        n_games = (&amp;#39;cr_bin&amp;#39;, &amp;quot;count&amp;quot;),
+    )
+    .reset_index()) # this adds the group by variable (now index) as a column
+
+(p9.ggplot(res, p9.aes(x = &amp;#39;factor(cr_bin)&amp;#39;, y = &amp;#39;n_games&amp;#39;, fill = &amp;#39;division_name&amp;#39;)) 
+    + p9.geom_col(position = p9.position_dodge()) 
+    + p9.theme(axis_text_x= p9.element_text(rotation=90, hjust=1))
+    + p9.ggtitle(&amp;#39;number of games per CR difference bin&amp;#39;)
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_11_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8735757397231)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From above graphs, we can conclude that the coach ratings work as expected, with large coach rating differences indeed showing high win rates for the higher ranked coach. From this we can infer that a highly skilled coach will win 9 times out of ten agains a below average coach. We call Blood Bowl a Strategy game for a reason!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;what-about-the-passing-game-in-bb2020&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What about the passing game in BB2020?&lt;/h1&gt;
+&lt;p&gt;With Blood Bowl 2020 also came a large change to passing the ball. Passing is no longer linked to the &lt;strong&gt;Agility&lt;/strong&gt; statistics, but now has its own &lt;strong&gt;Passing&lt;/strong&gt; (PA) stat. Overall, passing became riskier, and high agility teams do not automatically have good passing stats. For example, only a High Elf thrower has a PA of 2+, whereas the rest of the players have a PA of 4+ or higher. On the Dark Elf team, the player with the best PA stat is the runner, with a PA of 3+, without a built in re-roll. So we can expect quite some changes in the number of completions per match. For more detail I refer to a nice post by king_ghidra at &lt;a href=&#34;https://bloodbowlstrategies.com/en/tactics-blood-bowl-second-season/&#34;&gt;Blood Bowl Strategies&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Let’s have a look!&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;divisions = [&amp;#39;Ranked&amp;#39;, &amp;#39;Blackbox&amp;#39;, &amp;#39;Competitive&amp;#39;]
+
+tv_bins = [&amp;#39;1.1M&amp;#39;, &amp;#39;1.4M&amp;#39;, &amp;#39;1.7M&amp;#39;]
+
+res = (df_mbt[df_mbt[&amp;#39;division_name&amp;#39;].isin(divisions)]
+    .loc[df_mbt[&amp;#39;tv_bin&amp;#39;].isin(tv_bins)]
+    .query(&amp;quot;mirror_match == 0 &amp;amp; has_sp == 0 &amp;amp; tv_bin in @tv_bins &amp;amp; division_name in @divisions&amp;quot;)
+    .groupby([&amp;#39;division_name&amp;#39;, &amp;#39;ruleset_version&amp;#39;, &amp;#39;week_date&amp;#39;, &amp;#39;tv_bin&amp;#39;])
+    .agg(        
+        avg_comp = (&amp;#39;home_comp&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_pass = (&amp;#39;home_pass&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_foul = (&amp;#39;home_foul&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_block = (&amp;#39;home_block&amp;#39;, &amp;quot;mean&amp;quot;),    
+        avg_cas = (&amp;#39;home_cas&amp;#39;, &amp;quot;mean&amp;quot;),  
+        avg_rcv_cas = (&amp;#39;away_cas&amp;#39;, &amp;quot;mean&amp;quot;),
+        n_games = (&amp;#39;race_name&amp;#39;, &amp;quot;count&amp;quot;)
+    )
+    .sort_values( &amp;#39;n_games&amp;#39;, ascending = False)
+    .reset_index()) # this adds the group by variables (now index) as a column
+
+res = res.dropna()
+
+(p9.ggplot(data = res.query(&amp;#39;n_games &amp;gt; 10&amp;#39;), 
+            mapping = p9.aes(x = &amp;#39;week_date&amp;#39;, y = &amp;#39;avg_comp&amp;#39;, 
+                            size = &amp;#39;n_games&amp;#39;, shape = &amp;#39;factor(division_name)&amp;#39;, color = &amp;#39;factor(tv_bin)&amp;#39;))
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.theme(figure_size = (10, 5))
+    + p9.ggtitle(&amp;quot;average completions per game Ranked vs Regular league&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_14_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363301097377606)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;divisions = [&amp;#39;Ranked&amp;#39;, &amp;#39;Blackbox&amp;#39;, &amp;#39;Competitive&amp;#39;]
+
+tv_bins = [&amp;#39;1.1M&amp;#39;, &amp;#39;1.4M&amp;#39;, &amp;#39;1.7M&amp;#39;]
+
+res = (df_mbt[df_mbt[&amp;#39;division_name&amp;#39;].isin(divisions)]
+    .loc[df_mbt[&amp;#39;tv_bin&amp;#39;].isin(tv_bins)]
+    .query(&amp;quot;mirror_match == 0 &amp;amp; has_sp == 0 &amp;amp; tv_bin in @tv_bins &amp;amp; division_name in @divisions&amp;quot;)
+    .groupby([&amp;#39;ruleset_version&amp;#39;, &amp;#39;race_name&amp;#39;, &amp;#39;tv_bin&amp;#39;])
+    .agg(        
+        avg_comp = (&amp;#39;home_comp&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_pass = (&amp;#39;home_pass&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_foul = (&amp;#39;home_foul&amp;#39;, &amp;quot;mean&amp;quot;),
+        n_games = (&amp;#39;race_name&amp;#39;, &amp;quot;count&amp;quot;)
+    )
+    .sort_values( &amp;#39;n_games&amp;#39;, ascending = False)
+    .reset_index()) # this adds the group by variables (now index) as a column
+
+res = res.dropna()
+
+(p9.ggplot(data = res.query(&amp;#39;n_games &amp;gt; 10 &amp;amp; tv_bin == &amp;quot;1.1M&amp;quot;&amp;#39;), 
+            mapping = p9.aes(y = &amp;#39;reorder(race_name, avg_comp)&amp;#39;, x = &amp;#39;avg_comp&amp;#39;, 
+                            size = &amp;#39;n_games&amp;#39;, group = &amp;#39;factor(ruleset_version)&amp;#39;, 
+                            color = &amp;#39;factor(ruleset_version)&amp;#39;))
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.ggtitle(&amp;quot;average completions per game BB2016 vs BB2020 at 1.1M TV&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_15_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363301097412194)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Across the board we see a decrease in average completions per match. Note that this is for low team values, at around 1.1M, between 950K and 1250K.&lt;/p&gt;
+&lt;p&gt;Observations that stand out:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;High agility teams such as Elven Union, Wood Elf and Skaven show large drops,&lt;/li&gt;
+&lt;li&gt;Dark elves show the largest relative drop (more than halving in completions),&lt;/li&gt;
+&lt;li&gt;High Elves are hardly affected, as well as Humans,&lt;/li&gt;
+&lt;li&gt;Halflings show a large increase.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;and-what-about-the-fouling-game&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;And what about the fouling game?&lt;/h1&gt;
+&lt;p&gt;Also for fouling Blood Bowl 2020 brought some changes to the rules. The &lt;strong&gt;Sneaky Git&lt;/strong&gt; skill became better, allowing a player to continue moving after the foul has been committed. The &lt;strong&gt;Black Orcs&lt;/strong&gt; were added as a new team, that show fouling potential: they have access to cheap bribes, the &lt;strong&gt;Grab&lt;/strong&gt; skill to set up a foul, and cheap goblin bruisers to quickly move around the pitch. And there was of course the &lt;strong&gt;swarming&lt;/strong&gt; for the Underworld and Snotling teams, that provides a continuous supply of disposable players to foul with. For more detail I refer to a nice post by king_ghidra at &lt;a href=&#34;https://bloodbowlstrategies.com/en/tactics-blood-bowl-second-season/&#34;&gt;Blood Bowl Strategies&lt;/a&gt;.
+Let us see how the stats were affected!&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;divisions = [&amp;#39;Ranked&amp;#39;, &amp;#39;Blackbox&amp;#39;, &amp;#39;Competitive&amp;#39;]
+
+tv_bins = [&amp;#39;1.1M&amp;#39;, &amp;#39;1.2M&amp;#39;, &amp;#39;1.3M&amp;#39;, &amp;#39;1.4M&amp;#39;]
+
+res = (df_mbt[df_mbt[&amp;#39;division_name&amp;#39;].isin(divisions)]
+    .loc[df_mbt[&amp;#39;tv_bin2&amp;#39;].isin(tv_bins)]
+    .query(&amp;quot;mirror_match == 0 &amp;amp; has_sp == 0 &amp;amp; tv_bin2 in @tv_bins &amp;amp; division_name in @divisions&amp;quot;)
+    .groupby([&amp;#39;ruleset_version&amp;#39;, &amp;#39;race_name&amp;#39;, &amp;#39;tv_bin2&amp;#39;])
+    .agg(        
+        avg_comp = (&amp;#39;home_comp&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_pass = (&amp;#39;home_pass&amp;#39;, &amp;quot;mean&amp;quot;),
+        avg_foul = (&amp;#39;home_foul&amp;#39;, &amp;quot;mean&amp;quot;),
+        n_games = (&amp;#39;race_name&amp;#39;, &amp;quot;count&amp;quot;)
+    )
+    .sort_values( &amp;#39;n_games&amp;#39;, ascending = False)
+    .reset_index()) # this adds the group by variables (now index) as a column
+
+res = res.dropna()
+
+(p9.ggplot(data = res.query(&amp;#39;n_games &amp;gt; 10&amp;#39;), 
+            mapping = p9.aes(y = &amp;#39;reorder(race_name, avg_foul)&amp;#39;, x = &amp;#39;avg_foul&amp;#39;, 
+                            size = &amp;#39;n_games&amp;#39;, shape = &amp;#39;factor(ruleset_version)&amp;#39;, 
+                            color = &amp;#39;factor(tv_bin2)&amp;#39;))
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.ggtitle(&amp;quot;average number of fouls per game BB2016 vs BB2020&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_18_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8735757429789)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From this plot, we can see that BB2020 indeed shows increased fouling, with the arrival with a new fouling team, the Black Orcs, as well as increased fouling for Underworld, Goblins, Halflings and Snotlings. The rest of the teams isn’t much affected. We can also see that as teams develop, fouling typically increases.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fumbbl-bb2020-win-rate-and-malta-eurobowl-2022-tiers&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;FUMBBL BB2020 Win rate and Malta Eurobowl 2022 tiers&lt;/h1&gt;
+&lt;p&gt;Last but not least, a win rate analysis. In a tournament setting, elaborate tiering systems are in place to compensate for differences in race strength, skills are selected from skill packs, and player casualties are forgotten with each match played with a “resurrected” fresh team. Furthermore, opponents are randomly assigned and must be played. Contrast this with the FUMBBL Competitive division: Here teams start with 1M gold and without any extra skills. Teams must be developed, like in a league, and opponents can be strategically chosen based on which race they play, their coach rating etc.&lt;/p&gt;
+&lt;p&gt;With all this in mind, I tried the impossible: to compare relative team strength as expected by the tournament tiers, with the observed win rates in the Competitive Division. With the Eurobowl 2022 in Malta coming up, I decided to approximate the conditions of that rulepack. Teams are created using 1.15M gold, as well as roughly 36 SPP worth of skills. This translates to 6 primary skills worth 20K, giving us a total team value of 1270K, say around 1.3M.&lt;/p&gt;
+&lt;p&gt;To correct for differences in coaching ability, I restricted the match selection for matches where coach ratings are not too different (&amp;lt; 10), and above 150. I excluded matches involving Star players, and mirror matches (I.e. Orcs vs Orcs).
+To distinguish the relatively small % differences in win rate, we need to have a bandwidth around 1.3M to get sufficient statistics for each team.
+I included confidence intervals to visualize the statistical uncertainty for the win rates.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;# Function for computing confidence intervals
+from statsmodels.stats.proportion import proportion_confint   
+
+divisions = [&amp;#39;Competitive&amp;#39;]
+
+tv_bins = [&amp;#39;1.2M&amp;#39;, &amp;#39;1.3M&amp;#39;, &amp;#39;1.4M&amp;#39;]
+
+res = (df_mbt[df_mbt[&amp;#39;division_name&amp;#39;].isin(divisions)]
+    .loc[df_mbt[&amp;#39;tv_bin2&amp;#39;].isin(tv_bins)]
+    .query(&amp;#39;mirror_match == 0 &amp;amp; has_sp == 0 &amp;amp; CR_diff &amp;lt; 10 &amp;amp; coach_CR &amp;gt; 150&amp;#39;)
+    .groupby([&amp;#39;race_name&amp;#39;, &amp;#39;ruleset_version&amp;#39;, &amp;#39;Malta_2022&amp;#39;])
+    .agg(        
+        perc_win = (&amp;#39;wins&amp;#39;, &amp;quot;mean&amp;quot;),
+        n_wins = (&amp;#39;wins&amp;#39;, &amp;quot;sum&amp;quot;),
+        n_games = (&amp;#39;race_name&amp;#39;, &amp;quot;count&amp;quot;)
+    )
+    .query(&amp;#39;n_games &amp;gt; 0&amp;#39;)
+    .reset_index()) # this adds the group by variable (now index) as a column
+
+res[&amp;#39;lower_CI&amp;#39;], res[&amp;#39;upper_CI&amp;#39;] =  proportion_confint(
+                                      count = round(res[&amp;#39;n_wins&amp;#39;]).astype(int),
+                                      nobs = res[&amp;#39;n_games&amp;#39;],
+                                      alpha = 0.05
+                                  )
+
+(p9.ggplot(data = res.query(&amp;#39;n_games &amp;gt; 30&amp;#39;), 
+            mapping = p9.aes(x = &amp;#39;reorder(race_name, -Malta_2022)&amp;#39;, y = &amp;#39;perc_win&amp;#39;, 
+            size = &amp;#39;n_games&amp;#39;, color = &amp;#39;factor(Malta_2022)&amp;#39;))
+    + p9.geom_linerange(p9.aes(ymin = &amp;#39;lower_CI&amp;#39;, ymax = &amp;#39;upper_CI&amp;#39;), size = 1)
+    + p9.geom_point()
+    + p9.scale_size_area() 
+    + p9.coord_flip()
+    + p9.geom_hline(yintercept = 0.5)
+    + p9.ggtitle(&amp;quot;FUMBBL BB2020 win rates around 1.3M&amp;quot;))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_21_0.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8735757339684)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First off, I think the most important lesson here is that it is really difficult to compare win rates across such different settings.&lt;/p&gt;
+&lt;p&gt;But what info can we squeeze from this plot nevertheless:&lt;/p&gt;
+&lt;p&gt;It seems that Amazon and Underworld have higher FUMBBL win rates than expected based on their Malta 2022 tier.
+* For Amazon, this might be due to being able to avoid particular opponents on FUMBBL, such as Dwarves and Chaos Dwarves, with a lot of Tackle.
+* For Underworld, this is likely related to their improvements in BB2020, leading the charts at NAF tournaments, that resulted in recent rule changes that weakened them with the November 2021 Games Workshop ruling.&lt;/p&gt;
+&lt;p&gt;What else do we got:
+* Nurgle has a relatively low win rate compared to other teams with the same tier.
+* High Elf has a low tier, but shows an above average win rate, and appears to perform well at NAF tournaments. Curious to see how this race will do this year.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;concluding-remarks-and-acknowledgements&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Concluding Remarks and acknowledgements&lt;/h1&gt;
+&lt;p&gt;The analyses above are meant to demonstrate some possibilities with the rich FUMMBL data available.&lt;/p&gt;
+&lt;p&gt;One last application: The data can also be used to search for matches based on highly particular search criteria: for example, if you are interested in Snotling matches that induce Morg N Thorg and play against a skilled Elf coach. The &lt;code&gt;match_id&lt;/code&gt; can then be used to watch the replay on FUMBBL.&lt;/p&gt;
+&lt;p&gt;Finally, some acknowledgements. While writing this blog, I drew inspiration from several sources:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;most notable the &lt;a href=&#34;https://www.fumbbl.com&#34;&gt;FUMBBL website itself&lt;/a&gt; that has a wealth of statistics available,&lt;/li&gt;
+&lt;li&gt;the &lt;a href=&#34;https://fumbbldata.azurewebsites.net/stats.html&#34;&gt;website of FUMBBL coach Koadah&lt;/a&gt; with aggregated FUMBBL stats,&lt;/li&gt;
+&lt;li&gt;the &lt;a href=&#34;https://public.tableau.com/app/profile/mike.sann0638.davies/viz/TheNAFReport/Games&#34;&gt;NAF monthly reports&lt;/a&gt; by Mike Davies,&lt;/li&gt;
+&lt;li&gt;a &lt;a href=&#34;https://bloodbowlstrategies.com/en/relative-strength-of-teams/&#34;&gt;blog post on team strength&lt;/a&gt;by Tareau Amiral ,&lt;/li&gt;
+&lt;li&gt;the &lt;a href=&#34;https://nufflytics.com&#34;&gt;Nufflytics blog&lt;/a&gt; by Blood Bowl 2 coach Schlice,&lt;/li&gt;
+&lt;li&gt;the various technical posts of &lt;a href=&#34;https://fumbbl.com/~SzieberthAdam&#34;&gt;FUMBBL coach Adam Szieberth&lt;/a&gt; who followed a similar approach using Python API and web scraping FUMBBL data.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>OpenJDK and IcedTea: Java Web Start Forensics on Ubuntu</title>
