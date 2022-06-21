@@ -5,7 +5,7 @@
     <link>/categories/blood-bowl/</link>
       <atom:link href="/categories/blood-bowl/index.xml" rel="self" type="application/rss+xml" />
     <description>Blood Bowl</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019, 2020</copyright><lastBuildDate>Sun, 20 Mar 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Sun, 20 Mar 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Blood Bowl</title>
@@ -65,10 +65,7 @@ inducements = pd.read_hdf(path_to_datasets + target) &lt;/code&gt;&lt;/pre&gt;
 + p9.geom_vline(xintercept = &amp;#39;2021-09-01&amp;#39;, color = &amp;quot;red&amp;quot;)
 + p9.theme(figure_size = (10, 5))
 + p9.ggtitle(&amp;quot;Weekly game volume on FUMBBL august 2020 - march 2022&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_4_0.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_4_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363302253724542)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;To check the dataset, I compared this plot with the plot of weekly game volumes that FUMBBL itself provides at &lt;a href=&#34;https://fumbbl.com/p/stats&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/p/stats&lt;/a&gt;.
 Both plots looked identical at the time of writing, so it seems that we have a complete dataset for the given period.&lt;/p&gt;
@@ -102,10 +99,7 @@ group = &amp;#39;factor(division_name)&amp;#39;, color = &amp;#39;factor(divisio
     + p9.theme(figure_size = (10, 6))
     + p9.ylab(&amp;quot;% matches with at least one Star Player&amp;quot;))
     &lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_7_0.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_7_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363302246313763)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In above graph, the various online NAF Tournaments are clearly distinguished. &lt;strong&gt;Amorical Cup 2020&lt;/strong&gt; in summer 2020, &lt;strong&gt;Eur’Open Online&lt;/strong&gt; in Nov/dec 2020, &lt;strong&gt;SteelBowl&lt;/strong&gt; in Feb 2021, and &lt;strong&gt;LitBowl&lt;/strong&gt; in May 2021 were all using BB2016 rules.&lt;/p&gt;
 &lt;p&gt;Through Googling and using the Wayback Machine, I was able to find the rulepacks of these tournaments. LitBowl featured “big budgets” (up to 1440K) and a requirement of only 10 regular players before inducement, this likely explains the large amount of Star Players in that tournament.&lt;/p&gt;
@@ -142,10 +136,7 @@ res[&amp;#39;perc&amp;#39;] = res[&amp;#39;n_games&amp;#39;]/res[&amp;#39;n_game
     + p9.theme(axis_text_x= p9.element_text(rotation=90, hjust=1))
     + p9.ggtitle(&amp;#39;probability of win/draw/loss as a function of Coach Rating difference&amp;#39;)
 )&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_10_0.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_10_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363302350291624)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;(Note that I made the bins for large CR differences (greater than 10) wider to get more games per bin.)&lt;/p&gt;
 &lt;p&gt;From above graphs, we can conclude that the coach ratings work as expected, with large coach rating differences indeed showing high win rates for the higher ranked coach. From this we can infer that a highly skilled coach will win 9 times out of ten agains a below average coach. We call Blood Bowl a Strategy game for a reason!&lt;/p&gt;
@@ -185,10 +176,7 @@ res = res.dropna()
     + p9.theme(figure_size = (10, 5))
     + p9.ggtitle(&amp;quot;average completions per game BB2020 vs BB2016&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;/home/gertjan/venvs/requests_env/lib/python3.6/site-packages/plotnine/scales/scale_shape.py:85: PlotnineWarning: Using shapes for an ordinal variable is not advised.&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_13_1.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_13_1.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363302350371093)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;python&#34;&gt;&lt;code&gt;divisions = [&amp;#39;Ranked&amp;#39;, &amp;#39;Blackbox&amp;#39;, &amp;#39;Competitive&amp;#39;]
 
@@ -216,10 +204,7 @@ res = res.dropna()
     + p9.geom_point()
     + p9.scale_size_area() 
     + p9.ggtitle(&amp;quot;average completions per game BB2016 vs BB2020 at 1.1M TV&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_14_0.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_14_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363302350232432)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Across the board we see a decrease in average completions per match. Note that this is for low team values, at around 1.1M, between 950K and 1250K.&lt;/p&gt;
 &lt;p&gt;Observations that stand out:&lt;/p&gt;
@@ -261,10 +246,7 @@ res = res.dropna()
     + p9.scale_size_area() 
     + p9.ggtitle(&amp;quot;average number of fouls per game BB2016 vs BB2020&amp;quot;)
     + p9.ylab(&amp;quot;&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_17_1.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_17_1.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (8734504437775)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;From this plot, we can see that BB2020 indeed shows increased fouling across the board. As expected, the Black Orcs are high up in the fouling charts, and we see large increases in fouling for Underworld, Goblins, Halflings and Snotlings. We can also see that as teams develop, fouling typically increases, possible related to developing a specialized fouling player with the sneaky git skill. For humans access to cheap agile halfling hopefulls with access to sneaky git increased fouling opportunity. In Orc teams goblins can forfill this role.&lt;/p&gt;
 &lt;/div&gt;
@@ -310,10 +292,7 @@ res[&amp;#39;lower_CI&amp;#39;], res[&amp;#39;upper_CI&amp;#39;] =  proportion_c
     + p9.geom_hline(yintercept = 0.5)
     + p9.ggtitle(&amp;quot;FUMBBL BB2020 win rates around 1.3M&amp;quot;))
 &lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_20_0.png&#34; alt=&#34;&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;png&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-03-20_nufflytics_blog_post_files/nufflytics_blog_post_20_0.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;ggplot: (-9223363302334269892)&amp;gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;First off, I think the most important lesson here is that it is really difficult to compare win rates across such different settings.&lt;/p&gt;
 &lt;p&gt;But what info can we squeeze from this plot nevertheless:&lt;/p&gt;

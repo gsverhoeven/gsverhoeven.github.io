@@ -3,22 +3,77 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/tags/caret/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/feature-selection/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/machine-learning/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/random-forest-rfe_vs_tuning/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/r/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/random-forest/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/ranger/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/recursive-feature-elimination/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/statistics/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2022-06-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/blood-bowl/</loc>
     <lastmod>2022-03-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/categories/</loc>
-    <lastmod>2022-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/datascience/</loc>
-    <lastmod>2022-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/</loc>
+    <loc>/categories/data-science/</loc>
     <lastmod>2022-03-20T00:00:00+00:00</lastmod>
   </url>
   
@@ -33,17 +88,7 @@
   </url>
   
   <url>
-    <loc>/post/</loc>
-    <lastmod>2022-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/tags/python/</loc>
-    <lastmod>2022-03-20T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
     <lastmod>2022-03-20T00:00:00+00:00</lastmod>
   </url>
   
@@ -103,17 +148,7 @@
   </url>
   
   <url>
-    <loc>/categories/data-science/</loc>
-    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/categories/measurement/</loc>
-    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/statistics/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -149,11 +184,6 @@
   
   <url>
     <loc>/tags/ai/</loc>
-    <lastmod>2021-03-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/machine-learning/</loc>
     <lastmod>2021-03-07T00:00:00+00:00</lastmod>
   </url>
   
@@ -243,11 +273,6 @@
   </url>
   
   <url>
-    <loc>/tags/r/</loc>
-    <lastmod>2019-10-26T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/post/simulating-fake-data/</loc>
     <lastmod>2019-10-26T00:00:00+00:00</lastmod>
   </url>
@@ -280,11 +305,6 @@
   <url>
     <loc>/post/causal-inference-course/</loc>
     <lastmod>2019-05-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/caret/</loc>
-    <lastmod>2019-03-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -329,16 +349,6 @@
   
   <url>
     <loc>/tags/interaction-detection/</loc>
-    <lastmod>2017-09-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/random-forest/</loc>
-    <lastmod>2017-09-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/ranger/</loc>
     <lastmod>2017-09-01T00:00:00+00:00</lastmod>
   </url>
   

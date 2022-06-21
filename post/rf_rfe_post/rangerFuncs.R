@@ -1,4 +1,4 @@
-# Backwards Feature Selection Helper Functions (aka recursive feature elimination)
+# Backwards Feature Selection Helper Functions (aka RFE: recursive feature elimination)
 
 # this version only calculates feature importance for the model that includes all the features (the first)
 rangerFuncs <-  list(summary = defaultSummary,
@@ -11,20 +11,22 @@ rangerFuncs <-  list(summary = defaultSummary,
                        ranger::ranger(.outcome ~ ., 
                                       data = dat, 
                                       importance = if(first) "permutation" else "none", # we use permutation importance 
-                                      probability = is.factor(y), # TRUE if the outcome is a factor
+                                      probability = FALSE, # for classification do majority vote instead of probability forest
                                       write.forest = TRUE, # Save ranger.forest object, required for prediction
                                       ...)
                      },
                      pred = function(object, x)  {
-                       #if(!is.data.frame(x)) x <- as.data.frame(x)
-                       #out <- predict(object, x)$predictions
-                       out <- as.data.frame(predict(object, data = x, type = "response")$predictions)
+                       if(!is.data.frame(x)) x <- as.data.frame(x)
+                       # remove as.data.frame(), needed for regression rfe
+                       out <- predict(object, data = x, type = "response")$predictions
                        
                        if(object$treetype == "Probability estimation") {
+                         # added as.data.frame(), needed for (multi?) classification
+                         out <- as.data.frame(out)
                          #out <- cbind(pred = colnames(out)[apply(out, 1, which.max)], out) # https://github.com/topepo/caret/issues/1137
                          out$pred <- factor(colnames(out)[apply(out,1,which.max)], levels=sort(colnames(out)))
                          rownames(out) <- rownames(x)
-                       } 
+                       }
                        return(out)
 
                      },

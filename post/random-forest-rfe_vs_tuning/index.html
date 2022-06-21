@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="This blog post demonstrates that the presence of irrelevant variables can reduce the performance of the Random Forest algorithm (as implemented in R by `ranger()`). The solution is either to tune one of the algorithm&#39;s parameters, OR to remove irrelevant features using a procedure called Recursive Feature Elimination (RFE).">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/random-forest-rfe_vs_tuning/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/random-forest-rfe_vs_tuning/">
+
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="/post/random-forest-rfe_vs_tuning/">
+  <meta property="og:title" content="Optimal performance with Random Forests: does feature selection beat tuning? | Gertjan Verhoeven">
+  <meta property="og:description" content="This blog post demonstrates that the presence of irrelevant variables can reduce the performance of the Random Forest algorithm (as implemented in R by `ranger()`). The solution is either to tune one of the algorithm&#39;s parameters, OR to remove irrelevant features using a procedure called Recursive Feature Elimination (RFE)."><meta property="og:image" content="/img/headers/steven-kamenar-MMJx78V7xS8-unsplash.png">
+  <meta property="twitter:image" content="/img/headers/steven-kamenar-MMJx78V7xS8-unsplash.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2022-06-20T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2022-06-20T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/random-forest-rfe_vs_tuning/"
+  },
+  "headline": "Optimal performance with Random Forests: does feature selection beat tuning?",
+  
+  "datePublished": "2022-06-20T00:00:00Z",
+  "dateModified": "2022-06-20T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Gertjan Verhoeven"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gertjan Verhoeven",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "This blog post demonstrates that the presence of irrelevant variables can reduce the performance of the Random Forest algorithm (as implemented in R by `ranger()`). The solution is either to tune one of the algorithm's parameters, OR to remove irrelevant features using a procedure called Recursive Feature Elimination (RFE)."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Optimal performance with Random Forests: does feature selection beat tuning? | Gertjan Verhoeven</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/steven-kamenar-MMJx78V7xS8-unsplash.png" class="article-banner" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Optimal performance with Random Forests: does feature selection beat tuning?</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Jun 20, 2022
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    21 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/categories/statistics/">Statistics</a>, <a href="/categories/machine-learning/">Machine Learning</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+<p><em>(Photo by <a href="https://unsplash.com/@skamenar?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Steven Kamenar</a> on <a href="https://unsplash.com/s/photos/forest?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>)</em></p>
+<p>The Random Forest algorithm is often said to perform well “out-of-the-box”, with no tuning or feature selection needed, even with so-called high-dimensional data, where we have a high number of features (predictors) relative to the number of observations.</p>
+<p>Here, we show that Random Forest can still be harmed by irrelevant features, and offer two ways of dealing with it. We can do so either by removing the irrelevant features (using a procedure called <strong>recursive feature elimination (RFE)</strong>), or by <strong>tuning the algorithm</strong>, increasing the number of features available during each split (the <code>mtry</code> parameter in R) during training (model building).</p>
+<p>Furthermore, using a simulation study where I gradually increase the amount of <strong>noise</strong> (irrelevant features) relative to the <strong>signal</strong> (relevant features), we find that at some point the RF tuning approach no longer is able to achieve optimal performance. Under such (possibly extreme) circumstances, RF feature selection keeps performing well, filtering out the signal variables from the noise variables.</p>
+<p>But first, why should we care about this 2001 algorithm in 2022? Shouldn’t we be all be using deep learning by now (or doing bayesian statistics)?</p>
+<div id="why-random-forest-is-my-favorite-ml-algorithm" class="section level2">
+<h2>Why Random Forest is my favorite ML algorithm</h2>
+<p>The Random Forest algorithm <span class="citation">(<a href="#ref-breiman01" role="doc-biblioref">Breiman 2001</a>)</span> is my favorite ML algorithm for cross-sectional, tabular data. Thanks to <a href="https://mnwright.github.io/">Marvin Wright</a> a fast and reliable implementation exists for R called <code>ranger</code><span class="citation">(<a href="#ref-wright_ziegler17" role="doc-biblioref">Wright and Ziegler 2017</a>)</span>. For tabular data, RF seems to offer the highest value per unit of compute compared to other popular ML methods, such as Deep learning or Gradient Boosting algorithms such as <strong>XGBoost</strong>. In this setting, predictive performance is often on par with Deep Learning or Gradient boosting <span class="citation">(<a href="#ref-svetnik_etal05" role="doc-biblioref">Svetnik et al. 2005</a>; <a href="#ref-xu_etal21" role="doc-biblioref">Xu et al. 2021</a>)</span>. For classification prediction models, it has been shown to outperform logistic regression <span class="citation">(<a href="#ref-couronne_etal18" role="doc-biblioref">Couronné, Probst, and Boulesteix 2018</a>)</span>.</p>
+<p>The Random Forest algorithm can provide a quick benchmark for the predictive performance of a set of predictors, that is hard to beat with models that explicitly formulate a interpretable model of a dependent variable, for example a linear regression model with interactions and non-linear transformations of the predictors. For a great talk on the Random Forest method, check out <a href="https://www.youtube.com/watch?v=iVmsJJYjgNs">Prof. Marvin Wright’s UseR talk from 2019 on YouTube</a>.</p>
+</div>
+<div id="but-it-is-not-perfect-the-effect-of-irrelevant-variables" class="section level2">
+<h2>But it is not perfect: the effect of irrelevant variables</h2>
+<p>In that talk, Marvin Wright discusses the common claim that “Random Forest works well on high-dimensional data”. High-dimensional data is common in genetics, when we have say complete genomes for only a handful of subjects. The suggestion is that RF can be used on small datasets with lots of (irrelevant / noise) features without having to do variable selection first.</p>
+<p>To check this claim, Wright shows that RF performance is unaffected by adding 100 noise variables to the <code>iris</code> dataset, a simple example classification problem with three different species. Because RF uses decision trees, it performs “automatic” feature (predictor / variable) selection as part of the model building process. This property of the algorithm is used to explain this result. A tree model will simply ignore the noise predictors and choose the relevant predictors instead.</p>
+<p>See the accompanying R notebook <a href="https://github.com/gsverhoeven/hugo_source/blob/master/content/post/rf_rfe_post/prep_and_fit.Rmd">prep_and_fit.Rmd</a> that contains all the simulations I performed for this blog post. It also includes the simulation on the <code>iris</code> dataset:</p>
+<pre class="r"><code>fit_list &lt;- readRDS(&quot;rf_rfe_post/fitlist.rds&quot;)
+fit_list$algo &lt;- paste0(fit_list$method, &quot;_mtry_&quot;, fit_list$mtry)</code></pre>
+<pre class="r"><code>fit_list %&gt;% filter(ds_group == &quot;df_iris&quot; &amp; algo == &quot;ranger_mtry_default&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 17
+##   model_id method mtry    ds_id ds_name      ds_group target  forest_type n_obs
+##      &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;       &lt;int&gt;
+## 1        1 ranger default     4 df_iris      df_iris  Species class         150
+## 2        1 ranger default     5 df_iris_N100 df_iris  Species class         150
+## # … with 8 more variables: n_features &lt;dbl&gt;, fit_id &lt;int&gt;, performance &lt;dbl&gt;,
+## #   algo &lt;chr&gt;, performance_lower &lt;dbl&gt;, performance_upper &lt;dbl&gt;,
+## #   performance_boot &lt;dbl&gt;, performance_boot_corr &lt;dbl&gt;</code></pre>
+<pre class="r"><code>source(&quot;rf_rfe_post/plot_performance.R&quot;)
+
+plot_performance(data = fit_list %&gt;% filter(ds_group == &quot;df_iris&quot; &amp; algo == &quot;ranger_mtry_default&quot;),
+                 axis_label = &quot;Accuracy (% correct)&quot;,
+                 plot_title = &quot;Adding 100 noise variables to the iris dataset&quot;, 
+                 facet_var = &quot;algo&quot;, x_var = &quot;ds_name&quot;)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-3-1.png" width="768" /></p>
+<p>Indeed, the performance (here i looked at <em>Accuracy</em> as percentage of observations correctly classified) is hardly affected.</p>
+<p>(As we will be doing a lot of model performance comparison, I added 90% bootstrapped confidence intervals for the performance metrics used in this post. This interval was generated from 1000 bootstrapped values of R2 using resampling on the vectors of (out-of-bag) predictions and the observed y-values (This deserves its own future blog post, if you can’t wait just check the <a href="https://github.com/gsverhoeven/hugo_source/blob/master/content/post/rf_rfe_post/prep_and_fit.Rmd"><code>prep_and_fit.Rmd</code> notebook</a> on my Github)).</p>
+<p>However, a counter example, where adding irrelevant features <strong>does hurt</strong> performance, is quickly found. In <a href="https://topepo.github.io/caret/recursive-feature-elimination.html">Chapter 20</a> of the documentation of <code>caret</code>, a popular ML package in <code>R</code>, Max Kuhn introduces the regression problem <strong>Friedman 1</strong> to illustrate the problem, as well as a possible solution. See for a different example in the literature <span class="citation">(<a href="#ref-genuer_etal10" role="doc-biblioref">Genuer, Poggi, and Tuleau-Malot 2010</a>)</span>.</p>
+<p><code>mlbench.friedman1()</code> simulates the regression problem <strong>Friedman 1</strong>. Inputs are 10 independent variables uniformly distributed on the interval [0,1], only 5 out of these 10 are actually used in the formula to generate the dependent variable <span class="math inline">\(y\)</span>:</p>
+<p><span class="math inline">\(y = 10 sin(\pi x_1 x_2) + 20 (x_3 - 0.5)^2 + 10 x_4 + 5 x_5 + \epsilon\)</span></p>
+<p>where <span class="math inline">\(\epsilon\)</span> is distributed <span class="math inline">\(Normal(0, 1)\)</span>.</p>
+<p>(source: <span class="citation">(<a href="#ref-friedman91" role="doc-biblioref">Friedman 1991</a>; <a href="#ref-breiman96" role="doc-biblioref">Breiman 1996</a>)</span>)</p>
+<p>Kuhn added 40 more noise variables to the dataset and simulated N = 100 observations. Now only five predictors contain signal, whereas the other 45 contain noise. Random Forest with its default setting of <code>mtry</code> shows poor performance, and only after performing feature selection (removing the irrelevant variables) optimal performance is achieved (see below for more about feature selection, here the point is the reduced performance after adding noise).</p>
+<p>I also reproduced this analysis, but with N = 1000 and with 0, 100 and 500 <strong>additional</strong> noise variables added (instead of 40).</p>
+<pre class="r"><code>plot_performance(data = fit_list %&gt;% filter(ds_group == &quot;df_friedman1&quot; &amp; algo %in% c(&quot;ranger_mtry_default&quot;)),
+                 axis_label = &quot;R-squared (%)&quot;,
+                 plot_title = &quot;Adding increasing amount of noise to the Friedman 1 dataset&quot;, facet_var = &quot;algo&quot;, x_var = &quot;ds_name&quot;)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-4-1.png" width="768" /></p>
+<p>We can check the optimal performance by only including the relevant predictors <span class="math inline">\(x_1, x_2,x_3,x_4, x_5\)</span> in the RF algorithm: such a model has an R-squared of around 88% (not shown). RF including both signal and five noise predictors, the original <strong>Friedman 1</strong> problem, shows a slight drop in performance to 84% with the default <code>mtry</code> value. After including an additional 100 noise variables, performance drops further to 56%. And if we add 500 instead of 100 additional noise variables, performance drops even further to 34% R2.</p>
+<p>So how to solve this? In this blog post, I will compare both RF <strong>hyperparameter tuning</strong> and <strong>feature selection</strong> in the presence of many irrelevant features.</p>
+</div>
+<div id="tuning-rf-or-removing-the-irrelevant-features" class="section level2">
+<h2>Tuning RF or removing the irrelevant features?</h2>
+<p>It seems that most practical guidance to improve RF performance is on <em>tuning the algorithm hyperparameters</em>, arguing that Random Forest as a tree-based method has built-in feature selection, alleviating the need to remove irrelevant features.</p>
+<p>This is demonstrated by the many guides on (RF/ML) algorithm tuning found online. For example, a currently popular book “Hands-On Machine Learning” <span class="citation">(<a href="#ref-geron19" role="doc-biblioref">Géron 2019</a>)</span> contains a short paragraph on the importance of selecting / creating relevant features, but then goes on to discuss hyperparameter tuning at great length for the remainder of the book.</p>
+<p>Some evidence that RF tuning is sufficient to deal with irrelevant features is provided by Kuhn &amp; Johnson <span class="citation">(<a href="#ref-kuhn_johnson19" role="doc-biblioref">Kuhn and Johnson 2019</a>)</span>.
+In their book available online, they have a section called <a href="http://www.feat.engineering/feature-selection-simulation.html">Effect of Irrelevant Features</a>. For simulated data with 20 informative predictors, they find that after RF tuning (which is not mentioned in the book but is clear from the <a href="https://github.com/topepo/FES_Selection_Simulation">R code provided on Github</a>), the algorithm is (mostly) robust to up to 200 extra noise variables.</p>
+<p>So let’s start with RF tuning.</p>
+</div>
+<div id="the-effect-of-rf-tuning-demonstrated-on-openml-datasets" class="section level2">
+<h2>The effect of RF tuning demonstrated on OpenML datasets</h2>
+<p>To experiment with RF tuning and compare it with RF feature selection, I needed datasets. Using simulated data is always an option, but with such data it is not always clear what the practical significance of our findings is.</p>
+<p>So I needed (regression) datasets that are not too big, nor too small, and where RF tuning has a substantial effect. Finding these was not easy: Surprisingly, online tutorials for RF hyperparameter tuning often only show small improvements in performance.</p>
+<p>Here the benchmarking study of Philipp Probst on RF tuning came to the rescue, as he identified three datasets where RF tuning has a significant effect. Probst created a suite of 29 regression datasets (<code>OpenML-Reg-19</code>), where he compared tuned ranger with default ranger. The selection of the datasets is described <a href="https://github.com/PhilippPro/OpenML-bench">here</a>. The datasets he used are all made available by <a href="https://new.openml.org/">OpenML.org</a>. This is a website dedicated to reproducible, open ML, with a large collection of datasets, focused on benchmarking and performance comparison.</p>
+<p>Furthermore, For the RF tuning, he created an R package, aptly called <code>tuneRanger</code>, available on CRAN as well as on <a href="https://github.com/PhilippPro/tuneRanger">Github</a>.</p>
+<p>Ignoring the red and green lines, and comparing the tuned vs default ranger, it is clear that on many datasets, tuning hardly improves things. Here we see the reputation of RF, that it works well straight out of the box, borne out in practice.</p>
+<p>However, a few did, and three stood out (blue line above dashed line).</p>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/probst_tuning_ranger.png" style="width:66.0%" /></p>
+<p><em>Figure created by Philipp Probst and reproduced from his TuneRanger Github repository</em></p>
+<p>As he made all his code available on Github, I could identify the three datasets as being <a href="https://www.openml.org/search?type=data&amp;sort=runs&amp;id=560&amp;status=active">bodyfat</a>, <a href="https://www.openml.org/search?type=data&amp;sort=runs&amp;id=505&amp;status=active">tecator</a> and <a href="https://www.openml.org/search?type=data&amp;sort=runs&amp;id=308&amp;status=active">puma32H</a>.
+<code>Puma32H</code> is noteworthy in that it is a classic ML dataset for a simulated PUMA 560 robotarm, that contains mostly irrelevant features (30 out of 32) <span class="citation">(<a href="#ref-geurts_etal06" role="doc-biblioref">Geurts, Ernst, and Wehenkel 2006</a>)</span>.</p>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/puma560_schematic.png" style="width:50.0%" /></p>
+<p>For these three datasets, I reproduced the results of default <code>ranger()</code> and tuned the <code>mtry</code> parameter.</p>
+<p>mtry? what try?</p>
+</div>
+<div id="rf-tuning-the-mtry-parameter" class="section level2">
+<h2>RF tuning: the mtry parameter</h2>
+<p>A great resource for tuning RF is a 2019 review paper by Probst <em>et al.</em> called ‘Hyperparameters and Tuning Strategies for Random Forest’ <span class="citation">(<a href="#ref-probst_etal19" role="doc-biblioref">Probst, Wright, and Boulesteix 2019</a>)</span>.</p>
+<p>They conclude:</p>
+<p><em>Out of these parameters, mtry is most influential both according to the literature and in our own experiments. The best value of mtry depends on the number of variables that are related to the outcome.</em></p>
+<p>In this blog post, we use <code>mtry</code> as the only tuning parameter of Random Forest. This is the number of randomly drawn features that is available to split on as the tree is grown. It can vary between 1 and the total number of features in the dataset. From the literature and my own experience, this is the hyperparameter that matters most. For an interesting discussion on the effect of <code>mtry</code> on the complexity of the final model (the tree ensemble) see <span class="citation">(<a href="#ref-goldstein_etal11" role="doc-biblioref">Goldstein, Polley, and Briggs 2011</a>)</span>.</p>
+<p>Reproducing the results using <code>ranger()</code> myself, and playing around with the <code>mtry</code> parameter, I discovered that the three datasets have something in common: they all contain only a few variables that are predictive of the outcome, in the presence of a lot of irrelevant variables. Furthermore, setting <code>mtry</code> at its maximum value was sufficient to achieve the performance found by Probst after using <code>tuneRanger</code> (blue line in the figure above).</p>
+<pre class="r"><code>plot_performance(data =fit_list %&gt;% filter(ds_group == &quot;openML&quot; &amp; algo %in% c(&quot;ranger_mtry_default&quot;, &quot;ranger_mtry_max&quot;)),
+                 axis_label = &quot;R-squared (%)&quot;,
+                 plot_title = &quot;mtry tuning for optimal performance on OpenML datasets&quot;)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
+<p>That tuning <code>mtry</code> for a Random Forest is important in the presence of many irrelevant features was already shown by Hastie <em>et al.</em> in their 2009 classic book “Elements of statistical Learning” (p615, Figure 15.7) <span class="citation">(<a href="#ref-hastie_etal09" role="doc-biblioref">Hastie et al. 2009</a>)</span>.</p>
+<p>They showed that if <code>mtry</code> is kept at its default (square root of <span class="math inline">\(p\)</span>, the total number of features), as more irrelevant variables are added, the probability of the <strong>relevant</strong> features being selected for splitting becomes too low, decreasing performance. So for datasets with a large proportion of irrelevant features, <code>mtry</code> tuning (increasing its value) is crucially important.</p>
+<p>Before we move on to RF feature selection, let’s see what else we can tune in RF apart from <code>mtry</code>.</p>
+</div>
+<div id="rf-tuning-what-else-can-we-tune" class="section level2">
+<h2>RF tuning: what else can we tune?</h2>
+<p>With respect to the other RF parameters, a quick rundown:</p>
+<p>I left the <code>num.trees</code> at its default (500), and chose “variance” as the <code>splitrule</code> for regression problems, and “gini” for classification problems (alternative is “extratrees” which implements the “Extremely Randomized Trees” method <span class="citation">(<a href="#ref-geurts_etal06" role="doc-biblioref">Geurts, Ernst, and Wehenkel 2006</a>)</span> but I have yet to see convincing results that demonstrate ERT performs substantially better). I checked a few key results at lower and higher <code>num.trees</code> as well (100 and 1000 respectively): 100 is a bit low for the Out-of-bag predictions to stabilize, 500 appears to be a sweet spot, with no improvement in R-squared mean or a significant reduction in R2 variance between runs either.</p>
+<p>I played around a bit with the <code>min.node.size</code> parameter, for which often the sequence 5,10,20 is mentioned to vary over. Setting this larger should reduce computation, since it leads to shorter trees, but for the datasets here, the effect is on the order of say 10% reduction, which does not warrant tuning it IMO. I left this at its default of 5 for regression and 1 for classification.</p>
+<p>Finally, Marvin Wright points to results from Probst <em>et al.</em><span class="citation">(<a href="#ref-probst_etal19" role="doc-biblioref">Probst, Wright, and Boulesteix 2019</a>)</span> that show <code>sample.fraction</code> to be an important parameter as well. This determines the number of samples from the dataset to draw for each tree. I have not looked into this, instead I used the default setting from <code>ranger()</code> which is to sample with replacement, and to use all samples for each tree, i.e <code>sample.fraction = 1</code>.</p>
+<p>To conclude: we focus on <code>mtry</code> and leave the rest alone.</p>
+</div>
+<div id="from-rf-tuning-to-rf-feature-selection" class="section level2">
+<h2>From RF tuning to RF feature selection</h2>
+<p>A natural question to ask is why not simply get rid of the irrelevant features? Why not perform feature selection?</p>
+<p>The classic book <em>Applied Predictive Modeling</em> <span class="citation">(<a href="#ref-kuhn_johnson13" role="doc-biblioref">Kuhn and Johnson 2013</a>)</span> contains a similar simulation experiment (on the <code>solubility</code> dataset, for RF I reproduce their results below) showing the negative effects of including many irrelevant features in a Random Forest model (chapter 18). And indeed, instead of tuning RF, they suggest <strong>removing the irrelevant features altogether</strong>, i.e. to perform feature selection. Also their follow up book on Feature engineering and selection by Kuhn &amp; Johnson from 2019 <span class="citation">(<a href="#ref-kuhn_johnson19" role="doc-biblioref">Kuhn and Johnson 2019</a>)</span> <a href="http://www.feat.engineering/recursive-feature-elimination.html">elaborates on this</a>.</p>
+</div>
+<div id="rf-feature-selection" class="section level2">
+<h2>RF Feature selection</h2>
+<p>To perform feature selection, we use the recursive feature elimination (RFE) procedure, implemented for <code>ranger</code> in <code>caret</code> as the function <code>rfe()</code>. This is a backward feature selection method, starting will all predictors and in stepwise manner dropping the least important features <span class="citation">(<a href="#ref-guyon_etal02" role="doc-biblioref">Guyon et al. 2002</a>)</span>.</p>
+<p><em>When the full model is created, a measure of variable importance is computed that ranks the predictors from most important to least. […] At each stage of the search, the least important predictors are iteratively eliminated prior to rebuilding the model.</em></p>
+<p>— Pages 494-495, Applied Predictive Modeling, 2013.</p>
+<p>(Computationally, I think it makes more sense to start with only the most relevant features and add more features in a stepwise fashion until performance no longer improves but reaches a plateau. But that would require writing my own “forward procedure”, which I save for another day.)</p>
+<p>As this is a procedure that drops predictors that do not correlate with the outcome, we have to be extremely careful that we end up with something that generalizes to unseen data. In <span class="citation">(<a href="#ref-kuhn_johnson13" role="doc-biblioref">Kuhn and Johnson 2013</a>)</span> they convincingly show that a special procedure is necessary, with two loops of cross validation first described by <span class="citation">(<a href="#ref-ambroise_mclachlan02" role="doc-biblioref">Ambroise and McLachlan 2002</a>)</span>. The outer loop sets aside one fold that is not used for feature selection (and optionally model tuning), whereas the inner loop selects features and tunes the model. See <a href="http://www.feat.engineering/selection-overfitting.html#selection-overfitting">Chapter 10.4</a> of their follow up book <span class="citation">(<a href="#ref-kuhn_johnson19" role="doc-biblioref">Kuhn and Johnson 2019</a>)</span> for detailed documentation and examples.</p>
+<p>Typically, as we start removing irrelevant features, performs either stays constant or even increases until we reach the point where performs drops. At this point features that are predictive of the outcome are getting removed.</p>
+<p>Note that we do not tune the <code>mtry</code> variable of RF in this procedure. Empirically, it has been observed that this either has no effect, or only leads to marginal improvements <span class="citation">(<a href="#ref-kuhn_johnson19" role="doc-biblioref">Kuhn and Johnson 2019</a>; <a href="#ref-svetnik_etal04" role="doc-biblioref">Svetnik, Liaw, and Tong 2004</a>)</span>. Conceptually, tuning (increasing) <code>mtry</code> is a way to reduce the effect of irrelevant features. Since we are applying a procedure to <strong>remove</strong> the irrelevant features instead, it makes sense that tuning has little benefit here.</p>
+<p>(As I was curious, I nevertheless created a set of custom helper functions for <code>rfe()</code> that tune <code>mtry</code> during the feature selection procedure, see the <code>RangerTuneFuncs.R</code> script, results not shown)</p>
+<!-- While mtry is a tuning parameter for random forest models, the default value of mtry≈sqrt(p) tends to provide good overall performance. While tuning this parameter may have led to better performance, our experience is that the improvement tends to be marginal -->
+<p>So we expect that either tuning <code>mtry</code> , OR performing feature selection solves the problem of irrelevant variables.
+Indeed, this is also what we find on the three OpenML datasets. Both the RF tuning approach (Setting <code>mtry</code> at its maximum value) as well as the RF feature selection using RFE result in optimal performance:</p>
+<pre class="r"><code>plot_performance(data =fit_list %&gt;% filter(ds_group == &quot;openML&quot;),
+                 axis_label = &quot;R-squared (%)&quot;,
+                 plot_title = &quot;mtry tuning vs feature selection for three OpenML datasets&quot;)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-6-1.png" width="768" /></p>
+<p>Can RF feature selection (“ranger-rfe” in the plot below) solve our problems with the “Friedman 1” simulated data as well?</p>
+<pre class="r"><code>plot_performance(data = fit_list %&gt;% filter(ds_group == &quot;df_friedman1&quot;),
+                 axis_label = &quot;R-squared (%)&quot;,
+                 plot_title = &quot;Feature selection vs tuning on simulated data with noise added&quot;)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-7-1.png" width="768" /></p>
+<p>Yes, it can! And here we see that RF tuning is not enough, we really need to identify and remove the irrelevant variables.</p>
+<p><strong>N.b.</strong> For <code>df_friedman1_N100</code>, the RFE tuning grid is based on equidistant steps starting with <span class="math inline">\(p = 2\)</span> and included as smallest values only <span class="math inline">\(p = 2\)</span> and <span class="math inline">\(p = 14\)</span>, so it skipped the optimal value <span class="math inline">\(p = 5\)</span>. This explains the sub optimal performance for RFE with 105 noise variables added. For <code>df_friedman1_N500</code>, the tuning grid was exponential and included 2, 3, 6 and 12 (up to <span class="math inline">\(p = 510\)</span>). The RFE procedure selected <span class="math inline">\(p = 6\)</span> as optimal, this included as top five variables the five predictors that contained the signal.</p>
+<p>A similar pattern is seen for the <code>solubility</code> dataset with noise added, an example taken from <span class="citation">(<a href="#ref-kuhn_johnson13" role="doc-biblioref">Kuhn and Johnson 2013</a>)</span>:</p>
+<pre class="r"><code>plot_performance(data = fit_list %&gt;% filter(ds_group == &quot;solubility&quot; &amp; ds_name != &quot;solubility_N500_perm&quot;),
+                 axis_label = &quot;R-squared (%)&quot;,
+                 plot_title = &quot;Feature selection vs tuning on Solubility data with noise added&quot;)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-8-1.png" width="768" /></p>
+<p>Note that on the original <code>solubility</code> dataset, neither tuning nor feature selection is needed, RF already performs well out of the box.</p>
+</div>
+<div id="doing-it-wrong-rf-tuning-after-rfe-feature-selection-on-the-same-dataset" class="section level2">
+<h2>Doing it wrong: RF tuning after RFE feature selection on the same dataset</h2>
+<p>Finally, we echo others in stressing the importance of using a special nested cross-validation loop to perform the feature selection and performance assessment, especially when a test set is not available. “If the model is refit using only the important predictors, model performance almost certainly improves” according to Kuhn &amp; Johnson (APM 2013). I also found a blog post [here] that references <span class="citation">(<a href="#ref-hastie_etal09" role="doc-biblioref">Hastie et al. 2009</a>)</span> regarding the dangers when using both feature selection and cross validation.</p>
+<p>To drive the point home, I have taken the <code>solubility</code> dataset with 500 noise predictors added (951 observation, with in total 228 + 500 = 728 predictors), and scrambled the <span class="math inline">\(y\)</span> variable we wish to predict. With scrambling I mean shuffling the values of <span class="math inline">\(y\)</span>, thereby removing any correlation with the predictors. This is an easy way to check our procedure for any data leakage from the training set to the test set where we evaluate performance.</p>
+<p>All three RF modeling approaches now correctly report an R-squared of approximately 0%.</p>
+<pre class="r"><code>plot_performance(fit_list %&gt;% filter(ds_name == &quot;solubility_N500_perm&quot;),
+                 axis_label = &quot;R-squared (%)&quot;,
+                 plot_title = &quot;Feature selection vs tuning on simulated data after scrambling y&quot;) + expand_limits(y = 90)</code></pre>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-9-1.png" width="768" /></p>
+<p>However, if we do RF tuning on this scrambled dataset, <strong>after</strong> we performed RFE feature selection, we get cross-validated R-squared values of 5-10%, purely based on noise variables “dredged” from the hundreds of variables we supplied to the algorithm. For full code see the <a href="https://github.com/gsverhoeven/hugo_source/blob/master/content/post/rf_rfe_post/prep_and_fit.Rmd">R notebook on my Github</a></p>
+<p>(Note that I had to play around a bit with the RFE settings to not have it pick either the model with <strong>all</strong> features or the model with only 1 feature: using <code>RMSE</code> as a metric, and setting <code>pickSizeTolerance</code> the procedure selected a model with 75 predictors.
+Retraining this model using <code>caret::train</code> gave me the result below)</p>
+<pre class="r"><code>trainObject &lt;- readRDS(&quot;rf_rfe_post/post_rfe_train.rds&quot;)
+
+trainObject</code></pre>
+<pre><code>## Random Forest 
+## 
+## 951 samples
+##  75 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 857, 855, 855, 856, 856, 858, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  RMSE      Rsquared    MAE     
+##    1    2.001946  0.07577078  1.562253
+##    2    1.997836  0.06977449  1.558831
+##    3    1.993046  0.07166917  1.559323
+##    5    1.983549  0.08801892  1.548190
+##    9    1.988541  0.06977760  1.551304
+##   15    1.987132  0.06717113  1.551576
+##   25    1.989876  0.06165605  1.552562
+##   44    1.985765  0.06707004  1.550177
+##   75    1.984745  0.06737729  1.548531
+## 
+## Tuning parameter &#39;splitrule&#39; was held constant at a value of variance
+## 
+## Tuning parameter &#39;min.node.size&#39; was held constant at a value of 5
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were mtry = 5, splitrule = variance
+##  and min.node.size = 5.</code></pre>
+<p>This illustrates the dangers of performing massive variable selection exercises without the proper safeguards.
+Aydin Demircioğlu wrote a paper that identifies several radiomics studies that performed cross-validation as a separate step after feature selection, and thus got it wrong <span class="citation">(<a href="#ref-demircioglu21" role="doc-biblioref">Demircioğlu 2021</a>)</span>.</p>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<p>To conclude: we have shown that for in the presence of (many) irrelevant variables, RF performance suffers and something needs to be done.
+This can be either tuning the RF, most importantly increasing the <code>mtry</code> parameter, or identifying and removing the irrelevant features using the RFE procedure <code>rfe()</code> part of the <code>caret</code> package in R. Selecting only relevant features has the added advantage of providing insight into which features contain the signal.</p>
+<p>Interestingly, on the “real” datasets (openML, the solubility QSAR data) both tuning and feature selection give the same result. Only when we use simulated data (Friedman1), or if we add noise to real datasets (iris, solubility)) we find that <code>mtry</code> tuning is not enough, and removal of the irrelevant features is needed to obtain optimal performance.</p>
+<p>The fact that tuning and feature selection are rarely compared head to head might be that both procedures have different implicit use cases: ML tuning is often performed on datasets that are thought to contain mostly relevant predictors. In this setting feature selection does not improve performance, as it primarily works through the removal of noise variables. On the other hand, feature selection is often performed on high-dimensional datasets where prior information is available telling us that relatively few predictors are related to the outcome, and the many noise variables in the data can negatively influence RF performance.</p>
+<p><strong>N.b.</strong> As is often the case with simulation studies, an open question is how far we can generalize our results. <span class="citation">(<a href="#ref-svetnik_etal03" role="doc-biblioref">Svetnik et al. 2003</a>)</span> identified a classification dataset <strong>Cox-2</strong> that exhibits unexpected behavior: The dataset gives optimal performance with <code>mtry</code> at its maximum setting, indicative of a many irrelevant predictors, so we expect feature selection to find a smaller model that gives the same performance at default <code>mtry</code>. However, surprisingly, performance only degraded after performing feature selection using RFE. I wrote the authors (Vladimir Svetnik and Andy Liaw) to ask for the dataset, unfortunately they suffered a data loss some time ago. They obtained the data from Greg Kauffman and Peter Jurs <span class="citation">(<a href="#ref-kauffman_jurs01" role="doc-biblioref">Kauffman and Jurs 2001</a>)</span>, I reached out to them as well but did not receive a reply.</p>
+<p><em><strong>Acknowledgements</strong>: I’d like to thank Philipp Probst and Anne-Laure Boulesteix for their constructive comments and suggestions on this blog post.</em></p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ambroise_mclachlan02" class="csl-entry">
+Ambroise, Christophe, and Geoffrey J. McLachlan. 2002. <span>“Selection Bias in Gene Extraction on the Basis of Microarray Gene-Expression Data.”</span> <em>Proceedings of the National Academy of Sciences</em> 99 (10): 6562–66.
+</div>
+<div id="ref-breiman96" class="csl-entry">
+Breiman, Leo. 1996. <span>“Bagging Predictors.”</span> <em>Machine Learning</em> 24 (2): 123–40.
+</div>
+<div id="ref-breiman01" class="csl-entry">
+———. 2001. <span>“Random Forests.”</span> <em>Machine Learning</em> 45 (1): 5–32.
+</div>
+<div id="ref-couronne_etal18" class="csl-entry">
+Couronné, Raphael, Philipp Probst, and Anne-Laure Boulesteix. 2018. <span>“Random Forest Versus Logistic Regression: A Large-Scale Benchmark Experiment.”</span> <em>BMC Bioinformatics</em> 19 (1): 1–14.
+</div>
+<div id="ref-demircioglu21" class="csl-entry">
+Demircioğlu, Aydin. 2021. <span>“Measuring the Bias of Incorrect Application of Feature Selection When Using Cross-Validation in Radiomics.”</span> <em>Insights into Imaging</em> 12 (1): 1–10.
+</div>
+<div id="ref-friedman91" class="csl-entry">
+Friedman, Jerome H. 1991. <span>“Multivariate Adaptive Regression Splines.”</span> <em>The Annals of Statistics</em> 19 (1): 1–67.
+</div>
+<div id="ref-genuer_etal10" class="csl-entry">
+Genuer, Robin, Jean-Michel Poggi, and Christine Tuleau-Malot. 2010. <span>“Variable Selection Using Random Forests.”</span> <em>Pattern Recognition Letters</em> 31 (14): 2225–36.
+</div>
+<div id="ref-geron19" class="csl-entry">
+Géron, Aurélien. 2019. <em>Hands-on Machine Learning with Scikit-Learn, Keras, and TensorFlow: Concepts, Tools, and Techniques to Build Intelligent Systems</em>. O’Reilly Media, Inc.
+</div>
+<div id="ref-geurts_etal06" class="csl-entry">
+Geurts, Pierre, Damien Ernst, and Louis Wehenkel. 2006. <span>“Extremely Randomized Trees.”</span> <em>Machine Learning</em> 63 (1): 3–42.
+</div>
+<div id="ref-goldstein_etal11" class="csl-entry">
+Goldstein, Benjamin A., Eric C. Polley, and Farren B. S. Briggs. 2011. <span>“Random forests for genetic association studies.”</span> <em>Statistical Applications in Genetics and Molecular Biology</em> 10 (1): 32. <a href="https://doi.org/10.2202/1544-6115.1691">https://doi.org/10.2202/1544-6115.1691</a>.
+</div>
+<div id="ref-guyon_etal02" class="csl-entry">
+Guyon, Isabelle, Jason Weston, Stephen Barnhill, and Vladimir Vapnik. 2002. <span>“Gene Selection for Cancer Classification Using Support Vector Machines.”</span> <em>Machine Learning</em> 46 (1): 389–422.
+</div>
+<div id="ref-hastie_etal09" class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, Jerome H. Friedman, and Jerome H. Friedman. 2009. <em>The Elements of Statistical Learning: Data Mining, Inference, and Prediction</em>. Vol. 2. Springer.
+</div>
+<div id="ref-kauffman_jurs01" class="csl-entry">
+Kauffman, Gregory W., and Peter C. Jurs. 2001. <span>“QSAR and k-Nearest Neighbor Classification Analysis of Selective Cyclooxygenase-2 Inhibitors Using Topologically-Based Numerical Descriptors.”</span> <em>Journal of Chemical Information and Computer Sciences</em> 41 (6): 1553–60. <a href="https://doi.org/10.1021/ci010073h">https://doi.org/10.1021/ci010073h</a>.
+</div>
+<div id="ref-kuhn_johnson13" class="csl-entry">
+Kuhn, Max, and Kjell Johnson. 2013. <em>Applied Predictive Modeling</em>. Vol. 26. Springer.
+</div>
+<div id="ref-kuhn_johnson19" class="csl-entry">
+———. 2019. <em>Feature Engineering and Selection: A Practical Approach for Predictive Models</em>. CRC Press.
+</div>
+<div id="ref-probst_etal19" class="csl-entry">
+Probst, Philipp, Marvin N. Wright, and Anne-Laure Boulesteix. 2019. <span>“Hyperparameters and Tuning Strategies for Random Forest.”</span> <em>Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery</em> 9 (3): e1301.
+</div>
+<div id="ref-svetnik_etal04" class="csl-entry">
+Svetnik, Vladimir, Andy Liaw, and Christopher Tong. 2004. <span>“Variable Selection in Random Forest with Application to Quantitative Structure-Activity Relationship.”</span> <em>Proceedings of the 7th Course on Ensemble Methods for Learning Machines</em>.
+</div>
+<div id="ref-svetnik_etal03" class="csl-entry">
+Svetnik, Vladimir, Andy Liaw, Christopher Tong, J. Christopher Culberson, Robert P. Sheridan, and Bradley P. Feuston. 2003. <span>“Random Forest: A Classification and Regression Tool for Compound Classification and QSAR Modeling.”</span> <em>Journal of Chemical Information and Computer Sciences</em> 43 (6): 1947–58.
+</div>
+<div id="ref-svetnik_etal05" class="csl-entry">
+Svetnik, Vladimir, Ting Wang, Christopher Tong, Andy Liaw, Robert P. Sheridan, and Qinghua Song. 2005. <span>“Boosting: An Ensemble Learning Tool for Compound Classification and QSAR Modeling.”</span> <em>Journal of Chemical Information and Modeling</em> 45 (3): 786–99.
+</div>
+<div id="ref-wright_ziegler17" class="csl-entry">
+Wright, Marvin N., and Andreas Ziegler. 2017. <span>“Ranger: A Fast Implementation of Random Forests for High Dimensional Data in C++ and R.”</span> <em>Journal of Statistical Software</em> 77 (March): 1–17. <a href="https://doi.org/10.18637/jss.v077.i01">https://doi.org/10.18637/jss.v077.i01</a>.
+</div>
+<div id="ref-xu_etal21" class="csl-entry">
+Xu, Haoyin, Kaleab A. Kinfu, Will LeVine, Sambit Panda, Jayanta Dey, Michael Ainsworth, Yu-Chung Peng, Madi Kusmanov, Florian Engert, and Christopher M. White. 2021. <span>“When Are Deep Networks Really Better Than Decision Forests at Small Sample Sizes, and How?”</span> <em>arXiv Preprint arXiv:2108.13637</em>.
+</div>
+</div>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/caret/">caret</a>
+  
+  <a class="badge badge-light" href="/tags/r/">R</a>
+  
+  <a class="badge badge-light" href="/tags/ranger/">ranger</a>
+  
+  <a class="badge badge-light" href="/tags/feature-selection/">Feature Selection</a>
+  
+  <a class="badge badge-light" href="/tags/recursive-feature-elimination/">Recursive Feature Elimination</a>
+  
+  <a class="badge badge-light" href="/tags/random-forest/">Random Forest</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/random-forest-rfe_vs_tuning/&amp;text=Optimal%20performance%20with%20Random%20Forests:%20does%20feature%20selection%20beat%20tuning?" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/random-forest-rfe_vs_tuning/&amp;t=Optimal%20performance%20with%20Random%20Forests:%20does%20feature%20selection%20beat%20tuning?" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Optimal%20performance%20with%20Random%20Forests:%20does%20feature%20selection%20beat%20tuning?&amp;body=/post/random-forest-rfe_vs_tuning/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/random-forest-rfe_vs_tuning/&amp;title=Optimal%20performance%20with%20Random%20Forests:%20does%20feature%20selection%20beat%20tuning?" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Optimal%20performance%20with%20Random%20Forests:%20does%20feature%20selection%20beat%20tuning?%20/post/random-forest-rfe_vs_tuning/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/random-forest-rfe_vs_tuning/&amp;title=Optimal%20performance%20with%20Random%20Forests:%20does%20feature%20selection%20beat%20tuning?" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hudb6f5a71508eb5317c72df2dc43608d9_19467_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
+      <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods. Follow me on <a href="https://twitter.com/GertjanVerhoev1">Twitter</a> to receive updates on new blog posts.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+        <i class="ai ai-google-scholar"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-stack-overflow"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/validation-set-approach-in-caret/">The validation set approach in caret</a></li>
+      
+      <li><a href="/post/simulating-fake-data/">Simulating Fake Data in R</a></li>
+      
+      <li><a href="/post/exploring-process-mining/">Exploring Process Mining in R</a></li>
+      
+      <li><a href="/post/causal-inference-course/">Designing an introductory course on Causal Inference</a></li>
+      
+      <li><a href="/post/interaction_detection/interaction-detection/">Improving a parametric regression model using machine learning</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.3/mermaid.min.js" integrity="" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/python.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.a0d331bcd05dbe8b31e244f796710f08.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © 2019-2022 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
