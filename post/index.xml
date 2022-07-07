@@ -6314,14 +6314,6 @@ summary(my_glm_hr_int2)&lt;/code&gt;&lt;/pre&gt;
       <link>/post/fumbbl_blogpost_src/nufflytics_blog_post/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>/post/fumbbl_blogpost_src/nufflytics_blog_post/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>/post/fumbbl_blogpost_src/nufflytics_blog_post/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>/post/fumbbl_blogpost_src/nufflytics_blog_post/</guid>
       <description>&lt;h1 id=&#34;nufflytics-analyzing-blood-bowl-matches-from-fumbbl-using-python&#34;&gt;Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python&lt;/h1&gt;
 &lt;p&gt;This blogpost is about &lt;strong&gt;Blood Bowl&lt;/strong&gt;, a strategic boardgame invented in the late 80&amp;rsquo;s, that I finally started playing last year. Blood bowl is a game of Fantasy Football, where fantasy team races (think &amp;ldquo;Orcs&amp;rdquo;, or &amp;ldquo;Elves&amp;rdquo;) are pitted against each other. Interestingly, the various teams (there are over 20 different ones) require different play styles, and not all team races are equally strong. On tournaments, this gives rise to various compensation schemes to make all teams &amp;ldquo;viable&amp;rdquo; for competition. There exists a lively tournament scene, with thousands of matches played each year.&lt;/p&gt;
 &lt;p&gt;The idea of this blog post is to showcase some possible analyses that can be done on the &lt;a href=&#34;https://gsverhoeven.github.io/post/blood-bowl-fumbbl-dataset/&#34;&gt;FUMBBL match data I&amp;rsquo;ve compiled&lt;/a&gt;. The idea is to make Blood Bowl data analysis (also know as &lt;a href=&#34;https://nufflytics.com&#34;&gt;Nufflytics&lt;/a&gt;, a term coined by Blood Bowler &amp;ldquo;Schlice&amp;rdquo; in reference to Nuffle, the god of Blood Bowl) easier and more accessible to others. I took inspiration from various sources, detailed at the end of this post. So lets dive in the world of Blood Bowl stats nerdery.&lt;/p&gt;
