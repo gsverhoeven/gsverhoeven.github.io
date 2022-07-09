@@ -5,7 +5,7 @@
     <link>/tags/recursive-feature-elimination/</link>
       <atom:link href="/tags/recursive-feature-elimination/index.xml" rel="self" type="application/rss+xml" />
     <description>Recursive Feature Elimination</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Mon, 20 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Recursive Feature Elimination</title>
@@ -15,7 +15,7 @@
     <item>
       <title>Optimal performance with Random Forests: does feature selection beat tuning?</title>
       <link>/post/random-forest-rfe_vs_tuning/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/post/random-forest-rfe_vs_tuning/</guid>
       <description>
 
@@ -52,7 +52,7 @@ plot_performance(data = fit_list %&amp;gt;% filter(ds_group == &amp;quot;df_iris
                  axis_label = &amp;quot;Accuracy (% correct)&amp;quot;,
                  plot_title = &amp;quot;Adding 100 noise variables to the iris dataset&amp;quot;, 
                  facet_var = &amp;quot;algo&amp;quot;, x_var = &amp;quot;ds_name&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Indeed, the performance (here i looked at &lt;em&gt;Accuracy&lt;/em&gt; as percentage of observations correctly classified) is hardly affected.&lt;/p&gt;
 &lt;p&gt;(As we will be doing a lot of model performance comparison, I added 90% bootstrapped confidence intervals for the performance metrics used in this post. This interval was generated from 1000 bootstrapped values of R2 using resampling on the vectors of (out-of-bag) predictions and the observed y-values (This deserves its own future blog post, if you can’t wait just check the &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/blob/master/content/post/rf_rfe_post/prep_and_fit.Rmd&#34;&gt;&lt;code&gt;prep_and_fit.Rmd&lt;/code&gt; notebook&lt;/a&gt; on my Github)).&lt;/p&gt;
 &lt;p&gt;However, a counter example, where adding irrelevant features &lt;strong&gt;does hurt&lt;/strong&gt; performance, is quickly found. In &lt;a href=&#34;https://topepo.github.io/caret/recursive-feature-elimination.html&#34;&gt;Chapter 20&lt;/a&gt; of the documentation of &lt;code&gt;caret&lt;/code&gt;, a popular ML package in &lt;code&gt;R&lt;/code&gt;, Max Kuhn introduces the regression problem &lt;strong&gt;Friedman 1&lt;/strong&gt; to illustrate the problem, as well as a possible solution. See for a different example in the literature &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-genuer_etal10&#34; role=&#34;doc-biblioref&#34;&gt;Genuer, Poggi, and Tuleau-Malot 2010&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;
@@ -65,7 +65,7 @@ plot_performance(data = fit_list %&amp;gt;% filter(ds_group == &amp;quot;df_iris
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_performance(data = fit_list %&amp;gt;% filter(ds_group == &amp;quot;df_friedman1&amp;quot; &amp;amp; algo %in% c(&amp;quot;ranger_mtry_default&amp;quot;)),
                  axis_label = &amp;quot;R-squared (%)&amp;quot;,
                  plot_title = &amp;quot;Adding increasing amount of noise to the Friedman 1 dataset&amp;quot;, facet_var = &amp;quot;algo&amp;quot;, x_var = &amp;quot;ds_name&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;We can check the optimal performance by only including the relevant predictors &lt;span class=&#34;math inline&#34;&gt;\(x_1, x_2,x_3,x_4, x_5\)&lt;/span&gt; in the RF algorithm: such a model has an R-squared of around 88% (not shown). RF including both signal and five noise predictors, the original &lt;strong&gt;Friedman 1&lt;/strong&gt; problem, shows a slight drop in performance to 84% with the default &lt;code&gt;mtry&lt;/code&gt; value. After including an additional 100 noise variables, performance drops further to 56%. And if we add 500 instead of 100 additional noise variables, performance drops even further to 34% R2.&lt;/p&gt;
 &lt;p&gt;So how to solve this? In this blog post, I will compare both RF &lt;strong&gt;hyperparameter tuning&lt;/strong&gt; and &lt;strong&gt;feature selection&lt;/strong&gt; in the presence of many irrelevant features.&lt;/p&gt;
 &lt;/div&gt;
@@ -103,7 +103,7 @@ In their book available online, they have a section called &lt;a href=&#34;http:
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_performance(data =fit_list %&amp;gt;% filter(ds_group == &amp;quot;openML&amp;quot; &amp;amp; algo %in% c(&amp;quot;ranger_mtry_default&amp;quot;, &amp;quot;ranger_mtry_max&amp;quot;)),
                  axis_label = &amp;quot;R-squared (%)&amp;quot;,
                  plot_title = &amp;quot;mtry tuning for optimal performance on OpenML datasets&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;That tuning &lt;code&gt;mtry&lt;/code&gt; for a Random Forest is important in the presence of many irrelevant features was already shown by Hastie &lt;em&gt;et al.&lt;/em&gt; in their 2009 classic book “Elements of statistical Learning” (p615, Figure 15.7) &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-hastie_etal09&#34; role=&#34;doc-biblioref&#34;&gt;Hastie et al. 2009&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;They showed that if &lt;code&gt;mtry&lt;/code&gt; is kept at its default (square root of &lt;span class=&#34;math inline&#34;&gt;\(p\)&lt;/span&gt;, the total number of features), as more irrelevant variables are added, the probability of the &lt;strong&gt;relevant&lt;/strong&gt; features being selected for splitting becomes too low, decreasing performance. So for datasets with a large proportion of irrelevant features, &lt;code&gt;mtry&lt;/code&gt; tuning (increasing its value) is crucially important.&lt;/p&gt;
 &lt;p&gt;Before we move on to RF feature selection, let’s see what else we can tune in RF apart from &lt;code&gt;mtry&lt;/code&gt;.&lt;/p&gt;
@@ -137,19 +137,19 @@ Indeed, this is also what we find on the three OpenML datasets. Both the RF tuni
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_performance(data =fit_list %&amp;gt;% filter(ds_group == &amp;quot;openML&amp;quot;),
                  axis_label = &amp;quot;R-squared (%)&amp;quot;,
                  plot_title = &amp;quot;mtry tuning vs feature selection for three OpenML datasets&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Can RF feature selection (“ranger-rfe” in the plot below) solve our problems with the “Friedman 1” simulated data as well?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_performance(data = fit_list %&amp;gt;% filter(ds_group == &amp;quot;df_friedman1&amp;quot;),
                  axis_label = &amp;quot;R-squared (%)&amp;quot;,
                  plot_title = &amp;quot;Feature selection vs tuning on simulated data with noise added&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Yes, it can! And here we see that RF tuning is not enough, we really need to identify and remove the irrelevant variables.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;N.b.&lt;/strong&gt; For &lt;code&gt;df_friedman1_N100&lt;/code&gt;, the RFE tuning grid is based on equidistant steps starting with &lt;span class=&#34;math inline&#34;&gt;\(p = 2\)&lt;/span&gt; and included as smallest values only &lt;span class=&#34;math inline&#34;&gt;\(p = 2\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(p = 14\)&lt;/span&gt;, so it skipped the optimal value &lt;span class=&#34;math inline&#34;&gt;\(p = 5\)&lt;/span&gt;. This explains the sub optimal performance for RFE with 105 noise variables added. For &lt;code&gt;df_friedman1_N500&lt;/code&gt;, the tuning grid was exponential and included 2, 3, 6 and 12 (up to &lt;span class=&#34;math inline&#34;&gt;\(p = 510\)&lt;/span&gt;). The RFE procedure selected &lt;span class=&#34;math inline&#34;&gt;\(p = 6\)&lt;/span&gt; as optimal, this included as top five variables the five predictors that contained the signal.&lt;/p&gt;
 &lt;p&gt;A similar pattern is seen for the &lt;code&gt;solubility&lt;/code&gt; dataset with noise added, an example taken from &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-kuhn_johnson13&#34; role=&#34;doc-biblioref&#34;&gt;Kuhn and Johnson 2013&lt;/a&gt;)&lt;/span&gt;:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_performance(data = fit_list %&amp;gt;% filter(ds_group == &amp;quot;solubility&amp;quot; &amp;amp; ds_name != &amp;quot;solubility_N500_perm&amp;quot;),
                  axis_label = &amp;quot;R-squared (%)&amp;quot;,
                  plot_title = &amp;quot;Feature selection vs tuning on Solubility data with noise added&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Note that on the original &lt;code&gt;solubility&lt;/code&gt; dataset, neither tuning nor feature selection is needed, RF already performs well out of the box.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;doing-it-wrong-rf-tuning-after-rfe-feature-selection-on-the-same-dataset&#34; class=&#34;section level2&#34;&gt;
@@ -160,7 +160,7 @@ Indeed, this is also what we find on the three OpenML datasets. Both the RF tuni
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot_performance(fit_list %&amp;gt;% filter(ds_name == &amp;quot;solubility_N500_perm&amp;quot;),
                  axis_label = &amp;quot;R-squared (%)&amp;quot;,
                  plot_title = &amp;quot;Feature selection vs tuning on simulated data after scrambling y&amp;quot;) + expand_limits(y = 90)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;/post/2022-01-03-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-07-09-random_forest_rfe_vs_tuning_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;However, if we do RF tuning on this scrambled dataset, &lt;strong&gt;after&lt;/strong&gt; we performed RFE feature selection, we get cross-validated R-squared values of 5-10%, purely based on noise variables “dredged” from the hundreds of variables we supplied to the algorithm. For full code see the &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/blob/master/content/post/rf_rfe_post/prep_and_fit.Rmd&#34;&gt;R notebook on my Github&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;(Note that I had to play around a bit with the RFE settings to not have it pick either the model with &lt;strong&gt;all&lt;/strong&gt; features or the model with only 1 feature: using &lt;code&gt;RMSE&lt;/code&gt; as a metric, and setting &lt;code&gt;pickSizeTolerance&lt;/code&gt; the procedure selected a model with 75 predictors.
 Retraining this model using &lt;code&gt;caret::train&lt;/code&gt; gave me the result below)&lt;/p&gt;

@@ -5,7 +5,7 @@
     <link>/tags/</link>
       <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Mon, 20 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
@@ -15,7 +15,7 @@
     <item>
       <title>caret</title>
       <link>/tags/caret/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/tags/caret/</guid>
       <description></description>
     </item>
@@ -23,7 +23,7 @@
     <item>
       <title>Feature Selection</title>
       <link>/tags/feature-selection/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/tags/feature-selection/</guid>
       <description></description>
     </item>
@@ -31,7 +31,7 @@
     <item>
       <title>R</title>
       <link>/tags/r/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/tags/r/</guid>
       <description></description>
     </item>
@@ -39,7 +39,7 @@
     <item>
       <title>Random Forest</title>
       <link>/tags/random-forest/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/tags/random-forest/</guid>
       <description></description>
     </item>
@@ -47,7 +47,7 @@
     <item>
       <title>ranger</title>
       <link>/tags/ranger/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/tags/ranger/</guid>
       <description></description>
     </item>
@@ -55,7 +55,7 @@
     <item>
       <title>Recursive Feature Elimination</title>
       <link>/tags/recursive-feature-elimination/</link>
-      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       <guid>/tags/recursive-feature-elimination/</guid>
       <description></description>
     </item>
