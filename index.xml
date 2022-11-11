@@ -36,23 +36,23 @@
 &lt;/ul&gt;
 &lt;p&gt;To formally classify a team we can use the follow decision tree, taking as input the most common roster choices for a team:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Does the team roster has a lot of Stunty players and a few Big Guys with negatrait?
+&lt;li&gt;Does the team roster have a lot of Stunty players and a few Big Guys with negatrait?
 &lt;ul&gt;
 &lt;li&gt;yes classify as &lt;strong&gt;Stunty&lt;/strong&gt;&lt;/li&gt;
 &lt;li&gt;no continue&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Does the team roster has 4+ players with Strength skill access but &amp;lt; 4 players with Agility access?
+&lt;li&gt;Does the team roster have 4+ players with Strength skill access but &amp;lt; 4 players with Agility access?
 &lt;ul&gt;
 &lt;li&gt;yes classify as &lt;strong&gt;Bash&lt;/strong&gt;&lt;/li&gt;
 &lt;li&gt;no continue&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Does the team roster has 4+ players with Agility skill access but &amp;lt; 4 players with Strength access?
+&lt;li&gt;Does the team roster have 4+ players with Agility skill access but &amp;lt; 4 players with Strength access?
 &lt;ul&gt;
 &lt;li&gt;yes classify as &lt;strong&gt;Agile / Dash&lt;/strong&gt;&lt;/li&gt;
 &lt;li&gt;no classify as &lt;strong&gt;Hybrid&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;As an example, &lt;strong&gt;Shambling Undead&lt;/strong&gt; are typically played with 2 wights and 2 blitzers (4 players with Strength access), but also with four Ghoul runners (4 players with Agility access), so this team is classified as &lt;strong&gt;Hybrid&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;As an example, &lt;strong&gt;Shambling Undead&lt;/strong&gt; are typically played with 2 wights and 2 mummies (4 players with Strength access), but also with four Ghoul runners (4 players with Agility access), so this team is classified as &lt;strong&gt;Hybrid&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Main source for this scheme is &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-dode17&#34; role=&#34;doc-biblioref&#34;&gt;Dode 2017&lt;/a&gt;)&lt;/span&gt;, but the bash/dash/hybrid/stunty categorization is widespread, for example at &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-breidr15&#34; role=&#34;doc-biblioref&#34;&gt;Breidr 2015&lt;/a&gt;)&lt;/span&gt;, &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-amiral17&#34; role=&#34;doc-biblioref&#34;&gt;Amiral 2017&lt;/a&gt;)&lt;/span&gt; and &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-schlice18a&#34; role=&#34;doc-biblioref&#34;&gt;Schlice 2018&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;It will be interesting to compare the patterns in the data with this categorization.
 In the next section we’ll discuss the various match statistics available from FUMBBL, but first we need to prep the data.&lt;/p&gt;
