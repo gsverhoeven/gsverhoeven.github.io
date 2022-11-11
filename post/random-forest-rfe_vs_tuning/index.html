@@ -691,11 +691,11 @@ In their book available online, they have a section called <a href="http://www.f
 <p>Furthermore, For the RF tuning, he created an R package, aptly called <code>tuneRanger</code>, available on CRAN as well as on <a href="https://github.com/PhilippPro/tuneRanger">Github</a>.</p>
 <p>Ignoring the red and green lines, and comparing the tuned vs default ranger, it is clear that on many datasets, tuning hardly improves things. Here we see the reputation of RF, that it works well straight out of the box, borne out in practice.</p>
 <p>However, a few did, and three stood out (blue line above dashed line).</p>
-<p><img src="/post/2022-07-09-random_forest_rfe_vs_tuning_files/probst_tuning_ranger.png" style="width:66.0%" /></p>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/probst_tuning_ranger.png" style="width:66.0%" /></p>
 <p><em>Figure created by Philipp Probst and reproduced from his TuneRanger Github repository</em></p>
 <p>As he made all his code available on Github, I could identify the three datasets as being <a href="https://www.openml.org/search?type=data&amp;sort=runs&amp;id=560&amp;status=active">bodyfat</a>, <a href="https://www.openml.org/search?type=data&amp;sort=runs&amp;id=505&amp;status=active">tecator</a> and <a href="https://www.openml.org/search?type=data&amp;sort=runs&amp;id=308&amp;status=active">puma32H</a>.
 <code>Puma32H</code> is noteworthy in that it is a classic ML dataset for a simulated PUMA 560 robotarm, that contains mostly irrelevant features (30 out of 32) <span class="citation">(<a href="#ref-geurts_etal06" role="doc-biblioref">Geurts, Ernst, and Wehenkel 2006</a>)</span>.</p>
-<p><img src="/post/2022-07-09-random_forest_rfe_vs_tuning_files/puma560_schematic.png" style="width:50.0%" /></p>
+<p><img src="/post/2022-01-03-random_forest_rfe_vs_tuning_files/puma560_schematic.png" style="width:50.0%" /></p>
 <p>For these three datasets, I reproduced the results of default <code>ranger()</code> and tuned the <code>mtry</code> parameter.</p>
 <p>mtry? what try?</p>
 </div>
@@ -1024,7 +1024,7 @@ Xu, Haoyin, Kaleab A. Kinfu, Will LeVine, Sambit Panda, Jayanta Dey, Michael Ain
     <div class="media-body">
       <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
       <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
-      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods. Follow me on <a href="https://twitter.com/GertjanVerhoev1">Twitter</a> to receive updates on new blog posts. Statistics posts using R are featured on <a href="https://www.r-bloggers.com">R-Bloggers</a>.</p>
+      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods. Follow me on <a href="https://twitter.com/GertjanVerhoev1">Twitter</a> or <a href="https://bayes.club/@gsverhoeven">Mastodon</a> to receive updates on new blog posts. Statistics posts using R are featured on <a href="https://www.r-bloggers.com">R-Bloggers</a>.</p>
       <ul class="network-icon" aria-hidden="true">
   
     
@@ -1058,6 +1058,23 @@ Xu, Haoyin, Kaleab A. Kinfu, Will LeVine, Sambit Panda, Jayanta Dey, Michael Ain
     <li>
       <a href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
         <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://bayes.club/@gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-mastodon"></i>
       </a>
     </li>
   
