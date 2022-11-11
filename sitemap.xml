@@ -3,12 +3,67 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/tags/caret/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
+    <loc>/categories/blood-bowl/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/blood-bowl-cluster-heatmap/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/clustering/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/hclust/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/heatmap/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/machine-learning/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/r/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/statistics/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/caret/</loc>
     <lastmod>2022-07-09T00:00:00+00:00</lastmod>
   </url>
   
@@ -18,27 +73,7 @@
   </url>
   
   <url>
-    <loc>/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/machine-learning/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/post/random-forest-rfe_vs_tuning/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/r/</loc>
     <lastmod>2022-07-09T00:00:00+00:00</lastmod>
   </url>
   
@@ -55,21 +90,6 @@
   <url>
     <loc>/tags/recursive-feature-elimination/</loc>
     <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/statistics/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/blood-bowl/</loc>
-    <lastmod>2022-03-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>

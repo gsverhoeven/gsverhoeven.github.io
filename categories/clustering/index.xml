@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Clustering | Gertjan Verhoeven</title>
+    <link>/categories/clustering/</link>
+      <atom:link href="/categories/clustering/index.xml" rel="self" type="application/rss+xml" />
+    <description>Clustering</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Tue, 01 Nov 2022 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Clustering</title>
+      <link>/categories/clustering/</link>
+    </image>
+    
+    <item>
+      <title>Classifying Blood Bowl teams using clustered heatmaps</title>
+      <link>/post/blood-bowl-cluster-heatmap/</link>
+      <pubDate>Tue, 01 Nov 2022 00:00:00 +0000</pubDate>
+      <guid>/post/blood-bowl-cluster-heatmap/</guid>
+      <description>
+
+
+&lt;p&gt;&lt;em&gt;(Photo by &lt;a href=&#34;https://twitter.com/erikcats&#34;&gt;Erik Cats&lt;/a&gt;)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;“If you graph the numbers of any system, patterns emerge” is one of my favorite movie quotes (from Darren Aronofsky’s cult movie about mathematics &lt;span class=&#34;math inline&#34;&gt;\(\pi\)&lt;/span&gt; (“pi”)). In this post we’ll graph the numbers from the Blood Bowl Fantasy football game, and see what patterns emerge. Blood Bowl is a board game that can be summarized as “fantasy-chess-with-dice”, but this would hardly do the game justice. For example, in chess both players play with the same pieces, but in Blood Bowl, almost 30 different teams (e.g. orcs, elves, etc) are available to choose from, each team with different skills that require different playing styles. In addition, Blood Bowl coaches must assemble and paint their playing pieces themselves, making it a creative hobby as well.&lt;/p&gt;
+&lt;p&gt;For this blog post, we have a look at similarities and differences between the different Blood Bowl 2020 teams, and see where the newly introduced &lt;strong&gt;Black Orc&lt;/strong&gt; and &lt;strong&gt;Khorne&lt;/strong&gt; teams fit in. Using data analysis, we can cluster teams that have similar (average) match performance statistics and graph the data using &lt;strong&gt;heatmaps&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Heatmaps are a graphical representation of the data, with for example darker colors representing higher numbers. This allows patterns to emerge visually, and deviations on the patterns are also easy to spot. (Fun fact: a hundred years ago, people already “shaded matrices” but did not call it a heatmap yet &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-wilkinson_friendly09&#34; role=&#34;doc-biblioref&#34;&gt;Wilkinson and Friendly 2009&lt;/a&gt;)&lt;/span&gt;.)&lt;/p&gt;
+&lt;p&gt;We use match performance data from &lt;a href=&#34;https://fumbbl.com&#34;&gt;FUMBBL.com&lt;/a&gt; where Blood Bowl 2020 can be played online. For a previous blog post that describes the process of scraping the data &lt;a href=&#34;https://gsverhoeven.github.io/post/blood-bowl-fumbbl-dataset/&#34;&gt;see here&lt;/a&gt;. I made the match data (currently from August 2020 up to June 2022) publicly available in a &lt;a href=&#34;https://github.com/gsverhoeven/fumbbl_datasets&#34;&gt;Github repository&lt;/a&gt;.&lt;/p&gt;
+&lt;div id=&#34;team-play-style-categories&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Team play style categories&lt;/h1&gt;
+&lt;p&gt;The most common way to classify the 25-30 different Blood Bowl teams is to distinguish four categories:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bash (e.g. Orcs)&lt;/li&gt;
+&lt;li&gt;Agile (or Dash) (e.g. Wood Elf)&lt;/li&gt;
+&lt;li&gt;Hybrid (e.g. Humans)&lt;/li&gt;
+&lt;li&gt;Stunty (e.g. Halflings)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To formally classify a team we can use the follow decision tree, taking as input the most common roster choices for a team:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Does the team roster has a lot of Stunty players and a few Big Guys with negatrait?
+&lt;ul&gt;
+&lt;li&gt;yes classify as &lt;strong&gt;Stunty&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;no continue&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Does the team roster has 4+ players with Strength skill access but &amp;lt; 4 players with Agility access?
+&lt;ul&gt;
+&lt;li&gt;yes classify as &lt;strong&gt;Bash&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;no continue&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Does the team roster has 4+ players with Agility skill access but &amp;lt; 4 players with Strength access?
+&lt;ul&gt;
+&lt;li&gt;yes classify as &lt;strong&gt;Agile / Dash&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;no classify as &lt;strong&gt;Hybrid&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As an example, &lt;strong&gt;Shambling Undead&lt;/strong&gt; are typically played with 2 wights and 2 blitzers (4 players with Strength access), but also with four Ghoul runners (4 players with Agility access), so this team is classified as &lt;strong&gt;Hybrid&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Main source for this scheme is &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-dode17&#34; role=&#34;doc-biblioref&#34;&gt;Dode 2017&lt;/a&gt;)&lt;/span&gt;, but the bash/dash/hybrid/stunty categorization is widespread, for example at &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-breidr15&#34; role=&#34;doc-biblioref&#34;&gt;Breidr 2015&lt;/a&gt;)&lt;/span&gt;, &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-amiral17&#34; role=&#34;doc-biblioref&#34;&gt;Amiral 2017&lt;/a&gt;)&lt;/span&gt; and &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-schlice18a&#34; role=&#34;doc-biblioref&#34;&gt;Schlice 2018&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;It will be interesting to compare the patterns in the data with this categorization.
+In the next section we’ll discuss the various match statistics available from FUMBBL, but first we need to prep the data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;read-and-prep-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Read and prep the data&lt;/h1&gt;
+&lt;p&gt;We start with reading in the scraped FUMBBL match data, see my previous blog posts mentioned above for details.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Load packages
+library(tidyverse)
+library(ggfortify)
+library(ggrepel)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df_mbt &amp;lt;- read.csv(file = &amp;quot;../../../fumbbl_datasets/datasets/current/df_mbt.csv&amp;quot;)
+
+race_types &amp;lt;- unique(df_mbt %&amp;gt;% 
+                       select(race_name, race_type) %&amp;gt;%
+                       filter(race_type != &amp;quot;&amp;quot;) %&amp;gt;%
+                       arrange(race_type))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This blog post focusses on the Blood Bowl 2020 ruleset, for this we need the “Competitive” division from FUMBBL.
+(I performed the analysis for the older divisions using the 2016 ruleset as well, the plots can be found at the end of this blog post. )&lt;/p&gt;
+&lt;p&gt;A blog post from Schlice &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-schlice18a&#34; role=&#34;doc-biblioref&#34;&gt;Schlice 2018&lt;/a&gt;)&lt;/span&gt; got me interested in BB team classification using data. In his post, he makes heavy use of functional programming using R’s &lt;code&gt;purrr&lt;/code&gt; package. This allows us to write a function and have this function work in parallel on a list of objects, and have it return the results also in list form.&lt;/p&gt;
+&lt;p&gt;As this was new to me, I decided to adapt his code to process the four divisions simultaneously. To do so, I wrote a function &lt;code&gt;filter_division()&lt;/code&gt; that takes the source data and selects only matches from a particular division:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;divisions &amp;lt;- c(&amp;quot;Competitive&amp;quot;, &amp;quot;Blackbox&amp;quot;, &amp;quot;Ranked&amp;quot;, &amp;quot;Regular_league&amp;quot;)
+
+filter_division &amp;lt;- function(div_name){
+  df_mbt %&amp;gt;% 
+  filter(division_name == div_name) %&amp;gt;%
+  filter(race_name != &amp;quot;Treeman&amp;quot;) %&amp;gt;%
+  filter(race_name != &amp;quot;Simyin&amp;quot;)
+}
+
+data_tables &amp;lt;- purrr::map(divisions, filter_division)
+names(data_tables) &amp;lt;- divisions&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;data_tables&lt;/code&gt; now contains a list of four datasets, one for each division.&lt;/p&gt;
+&lt;p&gt;Next step is to select the variables we are interested in.
+Again we use the &lt;code&gt;purrr::map()&lt;/code&gt; function to apply our selection function at once to all four datasets:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;select_stats &amp;lt;- function(df) {
+  df %&amp;gt;% 
+  select(race_name, race_type, team_score, away_team_score:away_cas_rip) %&amp;gt;%
+  select(-(home_cas_bh:home_cas_rip), -(away_cas_bh:away_cas_rip))
+}
+
+data_tables &amp;lt;- map(data_tables, select_stats)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We end up with the following set of variables:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data_tables$Competitive %&amp;gt;% colnames()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##  [1] &amp;quot;race_name&amp;quot;       &amp;quot;race_type&amp;quot;       &amp;quot;team_score&amp;quot;      &amp;quot;away_team_score&amp;quot;
+##  [5] &amp;quot;home_comp&amp;quot;       &amp;quot;home_pass&amp;quot;       &amp;quot;home_rush&amp;quot;       &amp;quot;home_block&amp;quot;     
+##  [9] &amp;quot;home_foul&amp;quot;       &amp;quot;home_cas&amp;quot;        &amp;quot;away_comp&amp;quot;       &amp;quot;away_pass&amp;quot;      
+## [13] &amp;quot;away_rush&amp;quot;       &amp;quot;away_block&amp;quot;      &amp;quot;away_foul&amp;quot;       &amp;quot;away_cas&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-quick-summary-of-the-fummbl-match-statistics&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A quick summary of the FUMMBL match statistics&lt;/h1&gt;
+&lt;p&gt;The match statistics that are made available by FUMBBL are all related to important events during Blood Bowl gameplay.
+Of course, teams with similar stats can still be different on some aspect not captured in the data, so we keep that in mind.&lt;/p&gt;
+&lt;p&gt;The most obvious one is &lt;strong&gt;scoring Touchdowns&lt;/strong&gt; (&lt;code&gt;team_score&lt;/code&gt; and &lt;code&gt;away_team_score&lt;/code&gt;). As this involves getting the ball in the end zone of the opposing player, stats for actions that contribute to scoring such as &lt;strong&gt;passing the ball&lt;/strong&gt; are also present. There is the number of &lt;strong&gt;completed passes&lt;/strong&gt; (&lt;code&gt;home_comp&lt;/code&gt; and &lt;code&gt;away_comp&lt;/code&gt;) as well as the &lt;strong&gt;net passing distance&lt;/strong&gt; (with distance towards the opposing endzone counted positive and counted negative for passes in the opposite direction) (&lt;code&gt;home_pass&lt;/code&gt; and &lt;code&gt;away_pass&lt;/code&gt;). As passing is risky, running the ball into the endzone is the most common way to score. For running with the ball FUMBBL has the &lt;strong&gt;rushing&lt;/strong&gt; statistic. This name was chosen some 20 years ago, and now may lead to confusion as under the BB2020 rules moving extra squares is called “rushing” (previously called “Going-for-it” or GFI).&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;rushing&lt;/strong&gt; statistic is described in a &lt;a href=&#34;https://www.fumbbl.com/index.php?name=PNphpBB2&amp;amp;file=viewtopic&amp;amp;t=1344&amp;amp;postdays=0&amp;amp;postorder=asc&amp;amp;start=15&#34;&gt;2004 (!) FUMBBL forum post by SkiJunkie (the author of the predecessor of FUMBBL)&lt;/a&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;running/passing in the wrong direction counts negative. 
+So if you run one step forward then one step back, your net rushing is 0.
+
+Running/passing up and down neither adds nor subtracts. Getting pushed/thrown does not count. 
+Only movement made during the players move who has the ball counts.
+
+So, you can end up with negative rushing/passing. &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is great! The rushing statistic captures both &lt;strong&gt;ball possession&lt;/strong&gt; as well as &lt;strong&gt;the maximum movement of typical ball handlers in each team&lt;/strong&gt;. For example, in a Skaven team, the ball is typically handled by Gutter Runners, that have a maximum movement of 9. Compare this to the Dwarf team, where the Dwarf runner only has movement 6.&lt;/p&gt;
+&lt;p&gt;Finally, we have the statistics related towards &lt;strong&gt;taking out opposing players&lt;/strong&gt;. This involves &lt;strong&gt;blocking&lt;/strong&gt;, leading to blocking &lt;strong&gt;casualties&lt;/strong&gt;, as well as &lt;strong&gt;fouling&lt;/strong&gt; (illegally hitting players that are already down). For blocking, the total number of blocks thrown is tracked (&lt;code&gt;home_block&lt;/code&gt; and &lt;code&gt;away_block&lt;/code&gt;), for casualties we have the number of players who suffer a casualty (&lt;code&gt;home_cas&lt;/code&gt; , &lt;code&gt;away_cas&lt;/code&gt;) and for fouling we have the number of fouls performed by each team (&lt;code&gt;home_foul&lt;/code&gt;, &lt;code&gt;away_foul&lt;/code&gt;). For casualties, we use both the number of casualties &lt;strong&gt;inflicted&lt;/strong&gt; as well as casualties &lt;strong&gt;suffered&lt;/strong&gt; (&lt;code&gt;home_cas&lt;/code&gt; and &lt;code&gt;away_cas&lt;/code&gt;). The average amount of casualties suffered quantifies the vulnerability of a team, and will likely be related to the average armour value (AV) of a team.&lt;/p&gt;
+&lt;p&gt;As we are interested in statistics at the team level (not for individual matches), we take the average of all the statistics by team:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;divisions &amp;lt;- c(&amp;quot;Competitive&amp;quot;, &amp;quot;Blackbox&amp;quot;, &amp;quot;Ranked&amp;quot;, &amp;quot;Regular_league&amp;quot;)
+
+df_agg &amp;lt;- data_tables$Competitive %&amp;gt;% 
+  group_by(race_name, race_type) %&amp;gt;% 
+  summarise(Blocks = mean(home_block), 
+            Completions = mean(home_comp),
+            Fouls = mean(home_foul),
+            Distance_passed = mean(home_pass), 
+            Running_w_ball = mean(home_rush), 
+            Cas_inflicted = mean(home_cas),
+            Cas_suffered = mean(away_cas), 
+            Touchdowns = mean(team_score),
+            size = n())&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `summarise()` has grouped output by &amp;#39;race_name&amp;#39;. You can override using the
+## `.groups` argument.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dim(df_agg)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 28 11&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This gives us 11 numbers for 28 different BB2020 teams.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;so-which-teams-have-similar-stats&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;So which teams have similar stats?&lt;/h1&gt;
+&lt;p&gt;Next, we want to compare the different Blood Bowl teams on their match statistics with each other, and see which races have comparable stats.&lt;/p&gt;
+&lt;p&gt;If we have only one statistic, it is easy: we can just plot the different teams on one axis, the value of the statistic on the other axis, sort them and see which races are closest by.&lt;/p&gt;
+&lt;p&gt;Lets do that for the &lt;strong&gt;number of blocks made&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;options(dplyr.summarise.inform = FALSE)
+
+ggplot(df_agg, aes(x = reorder(race_name, Blocks), y = Blocks, size = size, col = race_type)) +
+         geom_point() + scale_size_area() + coord_flip() + labs(x = &amp;quot;team name&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;
+The different colors visualize the Team classification described above.
+We can see that the average number of blocks is already pretty predictive of team type.&lt;/p&gt;
+&lt;p&gt;But races can be similar if we look at &lt;strong&gt;blocks&lt;/strong&gt;, but dissimilar if we look at e.g. &lt;strong&gt;passing&lt;/strong&gt;. So lets make a few plots with each plot comparing two different metrics (code hidden for readability):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(patchwork)
+
+(p1 | p2)/(p3 | p4) / (p5 | plot_spacer()) +   plot_layout(guides = &amp;#39;collect&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Looking at the plots, we can see that there are clear patterns here. Some metrics are inherently related: Teams that make more passes during a match also cover more passing distance, that is only logical. But there are also patterns that are related to what makes teams different: teams that make more blocks tend to pass less (because they are less good at it).&lt;/p&gt;
+&lt;p&gt;Given these patterns, we also see teams that do not conform to the pattern: For example, in the top left plot, the &lt;strong&gt;Goblin&lt;/strong&gt; and &lt;strong&gt;Snotling&lt;/strong&gt; teams tend to make less blocks, but also less passes compared to other teams. And for the top middle plot we see that &lt;strong&gt;Halflings&lt;/strong&gt; are an exception: Given how much they pass, we would expect a higher passing distance. (A quick look at their roster explains this: Halflings have dedicated Catchers (making passing attractive), but also the &lt;strong&gt;Stunty&lt;/strong&gt; trait, making long distance passes more risky, decreasing the average passing distance).&lt;/p&gt;
+&lt;p&gt;Finally, which teams are similar depends on which plot we look at! Take for example the &lt;strong&gt;Black Orc&lt;/strong&gt; team: Based on fouling and distance passed (Bottom left plot), it is very similar to the four &lt;strong&gt;Stunty&lt;/strong&gt; teams. However, In the plot that combines Fouls and Blocks (lower right), it suddenly becomes unique!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pca-versus-clustered-heatmaps&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;PCA versus clustered heatmaps&lt;/h1&gt;
+&lt;p&gt;So how can we compare the teams on all stats simultaneously? We can try to reduce the number of variables by looking at correlations between variables. For example, we observed a strong (negative) correlation between the number of blocks and the number of passes. We could take these two variables together and map (“project”) each team on a single new “axis” (the straight line in the top left plot). For this a commonly used technique is PCA (“principal component analysis”). The original variables are combined into “principle components” along which the most variation occurs. A nufflytics blog post by &lt;strong&gt;Schlice&lt;/strong&gt; &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-schlice18a&#34; role=&#34;doc-biblioref&#34;&gt;Schlice 2018&lt;/a&gt;)&lt;/span&gt; applies this technique to classify the Blood Bowl teams of the online &lt;strong&gt;Blood Bowl 2&lt;/strong&gt; variant of the game. Another example of this approach is &lt;a href=&#34;https://www.diva-portal.org/smash/get/diva2:1541669/FULLTEXT02.pdf&#34;&gt;the master thesis project of Tadas Ivanauskas&lt;/a&gt; &lt;span class=&#34;citation&#34;&gt;(&lt;a href=&#34;#ref-ivanauskas20&#34; role=&#34;doc-biblioref&#34;&gt;Ivanauskas 2020&lt;/a&gt;)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;With PCA, a common approach is to focus on the first two principal components, as these can be visualized on a 2D coordinate system (i.e. a scatter plot). However, a big disadvantage of PCA is that the new dimensions are difficult to interpret, because the original data is transformed and combined, and therefore no longer recognizable. In the above mentioned blog post, this becomes apparent when the author puts in serious effort to understand the first four principal components, see &lt;a href=&#34;https://www.nufflytics.com/post/bash-dash-hybrid-diving-deeper/&#34;&gt;his “diving deeper” follow up post&lt;/a&gt;. Because each component is a (different) linear combination of ALL 17 variables (!), interpreting the principal components becomes very difficult. To do so requires a high cognitive load, and it is unclear where the signal ends and noise starts.&lt;/p&gt;
+&lt;p&gt;An attractive alternative is performing a cluster analysis on the original data, and using the cluster order to directly visualize the data as a heatmap. This technique is called &lt;strong&gt;clustered heatmaps&lt;/strong&gt;, and is widely used in bioinformatics to display patterns in data.&lt;/p&gt;
+&lt;p&gt;Two of the most popular clustering algorithms are &lt;strong&gt;Hierarchical clustering&lt;/strong&gt; and &lt;strong&gt;k-means clustering&lt;/strong&gt;. For example we can ask the computer to cluster the 28 teams into e.g. 5 clusters using the K-means algorithm. This assigns each team to one of &lt;span class=&#34;math inline&#34;&gt;\(k = 5\)&lt;/span&gt; clusters, with the cluster centers chosen such that teams within a cluster are close by the cluster center and far away from the other cluster centers. However, this forces us to pick the number of clusters, AND it does not provide information on team similarity WITHIN a cluster.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;clustered-heatmaps-for-the-win&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Clustered heatmaps for the win&lt;/h1&gt;
+&lt;p&gt;Hierarchical clustering circumvents both drawbacks as it clusters ALL the observations in such a way that the most similar observations end up next to each other, and thus provide a complete ordering of all observations. All that remains is to plot the data in this order on a colored grid, and BAM the patterns hit us right between the eyes!&lt;/p&gt;
+&lt;p&gt;The basic functionality to make a heatmap is provided in the R package &lt;code&gt;ggplot2&lt;/code&gt; by the &lt;code&gt;geom_tile()&lt;/code&gt; geometric object.
+Many wrapper functions around &lt;code&gt;geom_tile()&lt;/code&gt; exist to make clustered heatmaps, however they all combine the clustering step with the plotting step.&lt;/p&gt;
+&lt;p&gt;I am currently experimenting with my own wrapper function &lt;code&gt;ggorder_heatmap()&lt;/code&gt;, which I turned into an R package called &lt;code&gt;ggoheatmap&lt;/code&gt;. See for details the GitHub repository for &lt;a href=&#34;https://github.com/gsverhoeven/ggoheatmap&#34;&gt;the ggoheatmap R package&lt;/a&gt;.
+Note that it is unstable, under development, and possible not even a good idea, so do not use it yourself.
+Instead use &lt;code&gt;pheatmap&lt;/code&gt; by Raivo Kolde, available from CRAN, with the official repo &lt;a href=&#34;https://github.com/raivokolde/pheatmap&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggoheatmap)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;varnames &amp;lt;- c(&amp;quot;Blocks&amp;quot;, &amp;quot;Fouls&amp;quot;, &amp;quot;Cas_inflicted&amp;quot;,  &amp;quot;Distance_passed&amp;quot;, &amp;quot;Completions&amp;quot;, &amp;quot;Running_w_ball&amp;quot;, &amp;quot;Cas_suffered&amp;quot;)
+yorder &amp;lt;- data.frame(yorder = 1:length(varnames), variable = varnames)
+
+df_long &amp;lt;- df_agg %&amp;gt;%
+  pivot_longer(cols = !c(race_name, race_type, size), names_to = &amp;quot;variable&amp;quot;) %&amp;gt;%
+  group_by(variable) %&amp;gt;%
+  mutate(sd_value = scale(value)) %&amp;gt;%
+  left_join(yorder, by = &amp;quot;variable&amp;quot;)
+
+df_long &amp;lt;- ggoheatmap::hclust_order(df_long, 
+                        xvar = &amp;quot;race_name&amp;quot;, 
+                        yvar = &amp;quot;variable&amp;quot;, 
+                        value_var = &amp;quot;value&amp;quot;,
+                   clust_method = &amp;quot;complete&amp;quot;,
+                   dist_method = &amp;quot;euclidean&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(patchwork)
+
+p1 &amp;lt;- ggplot(df_long, aes(x = reorder(race_name, cluster_order), y = 1, fill = race_type)) +
+  geom_tile() + 
+  coord_flip() + 
+  labs(x = &amp;quot;&amp;quot;, y = NULL) + 
+  scale_y_discrete(labels = NULL, breaks = NULL) 
+
+p2 &amp;lt;- ggorder_heatmap(df_long, 
+                xvar = &amp;quot;race_name&amp;quot;, 
+                yvar = &amp;quot;variable&amp;quot;, 
+                col_var = &amp;quot;sd_value&amp;quot;, 
+                order_var = &amp;quot;cluster_order&amp;quot;,
+                yorder_var =&amp;quot;yorder&amp;quot;,
+                legend = FALSE,
+                label_var = &amp;quot;value&amp;quot;, round.digits = 1) + coord_flip() +
+  scale_y_discrete(position = &amp;quot;right&amp;quot;)
+
+p1 + p2 + 
+  plot_layout(widths = c(1, 6), guides = &amp;quot;collect&amp;quot;) + 
+  plot_annotation(title = &amp;#39;BB2020 team typology&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;1344&#34; /&gt;
+And there we have it, our main result.&lt;/p&gt;
+&lt;p&gt;First, we see that the existing team categorization does a good job, with the different categories showing different patterns in the match statistics.
+Note that I did not pre-specify the sort order here, it emerged naturally from the match statistics by the hierarchical clustering algorithm. So the quote from the Pi movie was correct (at least for Blood Bowl): we graphed the numbers, and patterns emerged!&lt;/p&gt;
+&lt;p&gt;What else can we learn from this plot?
+The difference between Bash and Hybrid appears not so clear cut: for example: Are Norse (the old BB2020 roster, not the new one) and Chaos Chosen bash or hybrid?
+Agile and Stunty teams on the other hand are very distinct.
+Underworld Denizens are an interesting edge case:
+In BB2020, they cluster right in between Goblin and Skaven teams, I ended up classifying them as Agile.
+Finally, it is apparent that Vampires indeed are a category of their own.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusions&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Conclusions&lt;/h1&gt;
+&lt;p&gt;And now for the question we set out to answer: Where do the new Khorne and Black Orc teams fit in?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Khorne&lt;/strong&gt; are clearly a hybrid team (because of the lack of skills and frenzy reduces base contact and thus blocks).
+&lt;strong&gt;Black Orcs&lt;/strong&gt; appear to be quite unique, being a combination of Bashy Hybrid and Fouling.&lt;/p&gt;
+&lt;p&gt;Finally we produce the clustered heatmap for all four divisions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;heatmap_post/make_heatmap.R&amp;quot;)
+
+for(i in 1:length(divisions)){
+  print(make_heatmap(data_tables[[divisions[i]]], division_name = divisions[i]))
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;1152&#34; /&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-14-2.png&#34; width=&#34;1152&#34; /&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-14-3.png&#34; width=&#34;1152&#34; /&gt;&lt;img src=&#34;/post/2022-11-01_clustered_heatmaps_blood_bowl_files/figure-html/unnamed-chunk-14-4.png&#34; width=&#34;1152&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1 unnumbered&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;div id=&#34;refs&#34; class=&#34;references csl-bib-body hanging-indent&#34;&gt;
+&lt;div id=&#34;ref-amiral17&#34; class=&#34;csl-entry&#34;&gt;
+Amiral, Taureau. 2017. &lt;span&gt;“Blood Bowl Teams Strength.”&lt;/span&gt; &lt;em&gt;Blood Bowl Strategies&lt;/em&gt; (blog). November 24, 2017. &lt;a href=&#34;https://bloodbowlstrategies.com/en/relative-strength-of-teams/&#34;&gt;https://bloodbowlstrategies.com/en/relative-strength-of-teams/&lt;/a&gt;.
+&lt;/div&gt;
+&lt;div id=&#34;ref-breidr15&#34; class=&#34;csl-entry&#34;&gt;
+Breidr. 2015. &lt;span&gt;“Cyanide - &lt;span&gt;‘Bashy’&lt;/span&gt; Race Choice for League Play.”&lt;/span&gt; Blood Bowl Tactics Forum. 2015. &lt;a href=&#34;https://bbtactics.com/forum/threads/bashy-race-choice-for-league-play.4961/&#34;&gt;https://bbtactics.com/forum/threads/bashy-race-choice-for-league-play.4961/&lt;/a&gt;.
+&lt;/div&gt;
+&lt;div id=&#34;ref-dode17&#34; class=&#34;csl-entry&#34;&gt;
+Dode. 2017. &lt;span&gt;“What Is the Bashiest Agility Team After Dark Elves? :: Blood Bowl 2 General Discussions.”&lt;/span&gt; 2017. &lt;a href=&#34;https://steamcommunity.com/app/236690/discussions/0/135512931355543270/&#34;&gt;https://steamcommunity.com/app/236690/discussions/0/135512931355543270/&lt;/a&gt;.
+&lt;/div&gt;
+&lt;div id=&#34;ref-ivanauskas20&#34; class=&#34;csl-entry&#34;&gt;
+Ivanauskas, Tadas. 2020. &lt;em&gt;BloodBowl 2 race clustering by different playstyles&lt;/em&gt;. &lt;a href=&#34;http://urn.kb.se/resolve?urn=urn:nbn:se:mau:diva-41540&#34;&gt;http://urn.kb.se/resolve?urn=urn:nbn:se:mau:diva-41540&lt;/a&gt;.
+&lt;/div&gt;
+&lt;div id=&#34;ref-schlice18a&#34; class=&#34;csl-entry&#34;&gt;
+Schlice. 2018. &lt;span&gt;“Bash/Dash/Hybrid by the Numbers.”&lt;/span&gt; February 27, 2018. &lt;a href=&#34;http://www.nufflytics.com/post/bash-dash-hybrid-by-the-numbers/&#34;&gt;http://www.nufflytics.com/post/bash-dash-hybrid-by-the-numbers/&lt;/a&gt;.
+&lt;/div&gt;
+&lt;div id=&#34;ref-wilkinson_friendly09&#34; class=&#34;csl-entry&#34;&gt;
+Wilkinson, Leland, and Michael Friendly. 2009. &lt;span&gt;“The History of the Cluster Heat Map.”&lt;/span&gt; &lt;em&gt;The American Statistician&lt;/em&gt; 63 (2): 179–84. &lt;a href=&#34;https://doi.org/10.1198/tas.2009.0033&#34;&gt;https://doi.org/10.1198/tas.2009.0033&lt;/a&gt;.
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
