@@ -5,7 +5,7 @@
     <link>/tags/</link>
       <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Tue, 01 Nov 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Mon, 27 Feb 2023 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
@@ -15,7 +15,7 @@
     <item>
       <title>hclust</title>
       <link>/tags/hclust/</link>
-      <pubDate>Tue, 01 Nov 2022 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
       <guid>/tags/hclust/</guid>
       <description></description>
     </item>
@@ -23,7 +23,7 @@
     <item>
       <title>heatmap</title>
       <link>/tags/heatmap/</link>
-      <pubDate>Tue, 01 Nov 2022 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
       <guid>/tags/heatmap/</guid>
       <description></description>
     </item>
@@ -31,7 +31,7 @@
     <item>
       <title>R</title>
       <link>/tags/r/</link>
-      <pubDate>Tue, 01 Nov 2022 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
       <guid>/tags/r/</guid>
       <description></description>
     </item>

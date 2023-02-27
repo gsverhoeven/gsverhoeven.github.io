@@ -5,12 +5,159 @@
     <link>/categories/statistics/</link>
       <atom:link href="/categories/statistics/index.xml" rel="self" type="application/rss+xml" />
     <description>Statistics</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Tue, 01 Nov 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Mon, 27 Feb 2023 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Statistics</title>
       <link>/categories/statistics/</link>
     </image>
+    
+    <item>
+      <title>Visualizing Blood Bowl Tournament rosters</title>
+      <link>/post/blood-bowl-eurobowl-rosters/</link>
+      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
+      <guid>/post/blood-bowl-eurobowl-rosters/</guid>
+      <description>
+
+
+&lt;p&gt;&lt;em&gt;(Photo by &lt;a href=&#34;https://twitter.com/erikcats&#34;&gt;Erik Cats&lt;/a&gt;)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Yet another Blood Bowl post! This one is to warm up to the upcoming World Cup, analyzing variation in Roster choices by top coaches. For the uninitiated: In my spare time I like to play Blood Bowl, a chess-like board game where two teams play a match of fantasy football. It is set in the Warhammer universe, with teams populated by Orcs, Dwarves, Elves etc. See my &lt;a href=&#34;https://gsverhoeven.github.io/categories/blood-bowl/&#34;&gt;previous blog posts on Blood Bowl&lt;/a&gt; for more background and stats. To get an estimate of the player base: a popular Blood Bowl channel on Youtube called “Bonehead podcast” currently has some 16K subscribers.&lt;/p&gt;
+&lt;p&gt;So the cool thing of Blood Bowl is that it has a highly competitive Tournament scene. With the ultimate tournament of course being the World Cup! The previous World Cup was held in 2019 in Dornbirn, Austria, and attracted 1400 coaches. This year the World Cup is hosted by Spain, and at least as many coaches are expected in Alicante to battle it out.&lt;/p&gt;
+&lt;p&gt;Blood Bowl tournaments typically come with a “Rule pack”. This describes which teams are allowed, how much gold coaches have to buy players, and how much skills can be allotted to players to improve their ball handling, or ability to knock other players down.&lt;/p&gt;
+&lt;p&gt;It turns out that the World Cup is pretty similar to the Eurobowl ruleset, so we can learn from the Eurobowl rosters to prepare for the World Cup. Bad roster choices will put you at a disadvantage even before the actual game has started.
+So let’s check out what the pro’s are using!&lt;/p&gt;
+&lt;div id=&#34;online-blood-bowl-tournaments-on-fumbbl&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Online Blood Bowl Tournaments on FUMBBL&lt;/h1&gt;
+&lt;p&gt;Blood Bowl can also be played online. Here we focus on &lt;a href=&#34;https://fumbbl.com/&#34;&gt;FUMBBL.com&lt;/a&gt;, consisting of a Game client (a Java app), linked to a website that performs match making, calculates rankings, provides a forum for discussions etc.&lt;/p&gt;
+&lt;p&gt;There are many things great with respect to FUMBBL. Here I like to mention three key elements that allow for this post:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Online Blood Bowl tournaments are organized on FUMBBL that use exactly the same rules as large tabletop tournaments such as Eurobowl,&lt;/li&gt;
+&lt;li&gt;FUMBBL has an API where we can fetch the data we need for roster analysis,&lt;/li&gt;
+&lt;li&gt;FUMBBL stores full replays of all FUMBBL matches, so we can observe how successful rosters can be played&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-2022-road-to-malta-online-naf-tournament&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The 2022 Road to Malta Online NAF tournament&lt;/h1&gt;
+&lt;p&gt;Last November, Eurobowl took place in Malta. To get an impression check &lt;a href=&#34;https://www.youtube.com/watch?v=G2JCLe7nikM&#34;&gt;this vid on Youtube&lt;/a&gt;. A few months before Eurobowl 2022, the &lt;a href=&#34;thenaf.net&#34;&gt;Nuffle Amorical Football (NAF)&lt;/a&gt; organized an online Tournament “Road to Malta” on FUMBBL to warm up to this event. The Online Tournament used the exact same ruleset as the Eurobowl itself, and the Rulepack for the 2023 World cup is highly similar.&lt;/p&gt;
+&lt;p&gt;The rulepack for the Road to Malta can be found &lt;a href=&#34;https://member.thenaf.net/index.php?module=NAF&amp;amp;type=tournaments&amp;amp;func=view&amp;amp;id=7005&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This blog post’s main goal is to share the analysis results. &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/fumbbl_rosters_post&#34;&gt;Check my Github&lt;/a&gt; for the technical stuff (R/Python web scraping and visualization of FUMBBL data).&lt;/p&gt;
+&lt;p&gt;I’ll discuss the most popular races, and leave the rest for the interested reader. I created &lt;a href=&#34;https://github.com/gsverhoeven/hugo_source/tree/master/content/post/fumbbl_rosters_post/roster_book.pdf&#34;&gt;a PDF rosterbook&lt;/a&gt; containing all 29 different races that participated in the tournament. For each race I made a plot (a clustered heatmap) displaying the roster as a colorcoded matrix, where teams that are similar (based on a cost weighted similarity score) are put side by side. To give some information about the performance of the various builds, I added the tournament points scored behind the coach name.&lt;/p&gt;
+&lt;p&gt;Of course, roster build is only one factor influencing tournament results, with skill being much more important, so we have to keep that in mind. Occasionaly, I’ll compare with the Eurobowl rosters and their performance, for this I use the great &lt;a href=&#34;https://public.tableau.com/app/profile/mike.sann0638.davies/viz/Eurobowl22/Introduction&#34;&gt;Tableau resource&lt;/a&gt; compiled by Mike Davies.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;top-10-races-in-road-to-malta&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Top 10 races in Road To Malta&lt;/h1&gt;
+&lt;p&gt;The Road to Malta tournament featured 46 teams of 4 coaches each, supplying a total of 184 rosters for our analysis.
+Here we focus on the top 10 most popular teams:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;768&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The two most popular teams with 16 rosters each were &lt;strong&gt;Underworld Denizens&lt;/strong&gt; and &lt;strong&gt;High Elf&lt;/strong&gt;.&lt;/p&gt;
+&lt;div id=&#34;underworld-denizens-tier-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Underworld Denizens (Tier 2)&lt;/h2&gt;
+&lt;p&gt;We start with Underworld Denizens. Even after the nerf to UW by GW in November 2021 they kept their popularity.
+And 10 out of 16 rosters include a star player! All rosters pick the full allowance of Blitzer, Thrower, Runner and three clan rats. From the plot below, we see that the Morg plus Troll build was most popular, but that there were various other “Big guy + star player” builds, with the big guy being either a Troll or the Rat Ogre, and the star player being either Varag, Glart, or Kreek.&lt;/p&gt;
+&lt;p&gt;Surprisingly, there are no Hakflem builds ! This might be due to the additional skill cost, although Morg too had an additional skill cost, leaving only a single skill left, that was unanimously used to gain an extra re-roll by putting the &lt;code&gt;leader&lt;/code&gt; skill on the thrower.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/uw_roster_malta.png&#34; style=&#34;width:150.0%&#34; /&gt;
+The roster with the best performance (by Sandune) was the Varag plus Troll build.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;high-elf-tier-4&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;High elf (Tier 4)&lt;/h2&gt;
+&lt;p&gt;UW shared the top spot for most popular team with High Elves. High Elf’s recent popularity is likely related to their low tier placement, for this tournament it was Tier 4. This allowed for 8 primary skills and 1 secondary skill (or 6 primary skills and 2 secondary skills), on a 12 player line up.
+From the rosters, it appears that there are two roster variants popular. Both variants have the same lineup wrt players (2 blitzers, 3 catcher, 1 thrower).
+Coaches either choose three rerolls without an apo, or two rerolls with apo. The two-reroll builds all use leader to compensate for the “missing” reroll.&lt;/p&gt;
+&lt;p&gt;The best performing roster here was by Hartl78, who fielded a Sneaky Git/ Dirty player lineman, a most unelvish thing to do :) For the World cup, High elves moved from Tier 4 to Tier 2, so performance of the team will likely suffer.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/he_roster.png&#34; style=&#34;width:100.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;necromantic-horror-tier-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Necromantic Horror (Tier 2)&lt;/h2&gt;
+&lt;p&gt;Necro was in tier 2, allowing for seven primary skills. All rosters went for this skill pack.
+Skill wise, well, a lot of guard and block!
+For Necro, there where three variants popular:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;One werewolf, 6 zombies, 3 rerolls&lt;/li&gt;
+&lt;li&gt;Two werewolves, 4 zombies, 2 rerolls&lt;/li&gt;
+&lt;li&gt;Two werewolves, 3 zombies, 3 rerolls&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Performance-wise, no clear differences to be seen.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/nh_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;shambling-undead-tier-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Shambling Undead (Tier 1)&lt;/h2&gt;
+&lt;p&gt;The Shambling Undead rosters are all surprisingly similar:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;2 mummies with guard,&lt;/li&gt;
+&lt;li&gt;2 wights (one guard, one tackle or mighty blow),&lt;/li&gt;
+&lt;li&gt;4 ghoul runners (two with block, 1 wrestle), and&lt;/li&gt;
+&lt;li&gt;three rerolls.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The only noticable variation is whether to complement that lineup with 5 zombies, 4 zombies plus 1 skeleton, or 3 zombies plus 2 skeletons. Performance wise there is little to guide that last judgement, as all three variants performed similar.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/su_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dark-elf-tier-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Dark Elf (Tier 1)&lt;/h2&gt;
+&lt;p&gt;All coaches selected the skill pack with 6 primary skills.
+Skill wise, there appears to be strong consensus: dodge on the blitzers, block and wrestle on the Witch Elves, and if you pick a runner put leader on it for that extra reroll.&lt;/p&gt;
+&lt;p&gt;There is &lt;strong&gt;some&lt;/strong&gt; variation in the positional choices, we can distinguish three builds:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No assassins, 1 runner, 4-5 linemen&lt;/li&gt;
+&lt;li&gt;1 assassin, 1 runner, 3 linemen&lt;/li&gt;
+&lt;li&gt;2 assassins, no runners, 3 linemen&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;No clear performance differences between the three builds.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/de_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;chaos-dwarf-tier-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Chaos Dwarf (Tier 1)&lt;/h2&gt;
+&lt;p&gt;For chaos dwarves, the big question is whether to take a minotaur or not. The teams without minotaur did slightly worse.
+Without a minotaur, the full set of five hobgoblins can be fielded, as well as an additional reroll and apothecary.
+Skill wise, we can see that the three rosters with sure hands on a hobgoblin underperformed, suggesting that this skill choice is subtoptimal here.
+We can see that the most common skill allocation is to put block on the bull centaurs and guard on the dwarf blockers.&lt;/p&gt;
+&lt;p&gt;Interestingly, the highest scoring build by Liam has an uncommon skill choice, with guard on the bull centaurs and two blockers with Mighty Blow.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/cd_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;skaven-tier-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Skaven (Tier 2)&lt;/h2&gt;
+&lt;p&gt;Skaven did very well during the Eurobowl, with three Skaven teams in the top 10 best performing coaches.
+Two of those coaches also participated in Road to Malta, Olivierdulac and Sokratez (Tank).&lt;/p&gt;
+&lt;p&gt;First the commonalities: All rosters have the Rat ogre (Block or Juggernaut) and at least three gutter runners, of which one has strip ball.
+For Skaven I highlighted three variants:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Star player builds without blitzer (Either Kreek or Glart, this leaves 4 skills)&lt;/li&gt;
+&lt;li&gt;3 reroll builds without Thrower&lt;/li&gt;
+&lt;li&gt;2 reroll build with thrower (+ leader)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/sk_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;lizardmen-tier-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Lizardmen (Tier 1)&lt;/h2&gt;
+&lt;p&gt;For lizardmen coaches life is simple. 6 saurusses, 5 skinks, krox and an apo. Put block on all saurusses, done.
+That leaves time to bicker on about bigger questions in life, such a whether or not to swap one regular skink for a &lt;strong&gt;Chameleon skink&lt;/strong&gt; :)
+Just as with all the previous roster variants, performance wise there is no clear winner.
+Some coaches swap one to three blocks for other skills such as guard, tackle or wrestle.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/lz_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;orc-tier-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Orc (Tier 1)&lt;/h2&gt;
+&lt;p&gt;Orcs also did very well in Malta, with three teams in the top 10.
+The orcs show some serious roster variation! Agreed, all rosters take four blitzers with mighty blow and tackle, and four big uns with block and guard, but apart from that we see rosters with and without the Troll, with and without an apo, with and without a Thrower, and with varying amounts of goblins. Interestingly, the most exotic roster, with three goblins, and no thrower, performed best here.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/orc_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;wood-elf-tier-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Wood Elf (Tier 1)&lt;/h2&gt;
+&lt;p&gt;Wood elf coaches always take the treeman, two wardancers, and at least two catchers.
+Typical skills choices are one wardancer with tackle, and one wardancer with strip ball.&lt;/p&gt;
+&lt;p&gt;As the wood elf players are expensive, to get at least 2 rerolls requires a lineup with only 11 players.
+Variation is in the number of catchers (2-4) and taking a thrower, versus taking ordinary linemen.
+On one end, we see rosters that take all four catchers and a thrower, with only three linemen.
+At the other end, we see rosters that take only two catchers and a thrower, or three catchers, and take five linemen.
+This allows for three rerolls or two rerolls and an apothecary.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2023-03-01_fumbbl_rosters_blood_bowl_files/we_roster_malta.png&#34; style=&#34;width:200.0%&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;final-remarks&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Final remarks&lt;/h1&gt;
+&lt;p&gt;For now my curiosity on roster variation has been satisfied, and I really looking forward to playing more and learning the finesses of this great game. The World cup in Alicante will be my first international tournament, hope to see you all there!&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Classifying Blood Bowl teams using clustered heatmaps</title>
