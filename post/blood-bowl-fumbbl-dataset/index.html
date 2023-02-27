@@ -595,7 +595,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/categories/data-paper/">Data paper</a></span>
+    <i class="fas fa-folder mr-1"></i><a href="/categories/data-paper/">Data paper</a>, <a href="/categories/blood-bowl/">Blood Bowl</a></span>
   
 
 </div>
@@ -624,10 +624,10 @@
 
     <div class="article-style">
       
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>This blogpost is about <strong>Blood Bowl</strong>, a boardgame of fantasy football that can also be played online at <a href="https://fumbbl.com">FUMBBL.com</a>. The goal of this blog post is to use Python API and HTML scraping to fetch online Blood Bowl match outcome data, and to create a publicly available dataset ready for analysis and visualization. In a <a href="link/to/blog">separate blog post</a> I’ll showcase some analyses on this dataset (also known as <a href="https://www.nufflytics.com">Nufflytics</a> in reference to Nuffle, the god of Blood Bowl). The dataset is primarily constructed to analyze rule changes that were introduced on FUMBBL.com last year, and how these affected the relative strengths of the different teams coaches can pick to field against each other.</p>
+<p>This blogpost is about <strong>Blood Bowl</strong>, a boardgame of fantasy football that can also be played online at <a href="https://fumbbl.com">FUMBBL.com</a>. The goal of this blog post is to use Python API and HTML scraping to fetch online Blood Bowl match outcome data, and to create a publicly available dataset ready for analysis and visualization. In a <a href="https://gsverhoeven.github.io/post/blood-bowl-nufflytics/">separate blog post</a> I’ll showcase some analyses on this dataset (also known as <a href="https://www.nufflytics.com">Nufflytics</a> in reference to Nuffle, the god of Blood Bowl). The dataset is primarily constructed to analyze rule changes that were introduced on FUMBBL.com last year, and how these affected the relative strengths of the different teams coaches can pick to field against each other.</p>
+<p><strong>N.b. an updated version of this post is available as a Jupyter Notebook in a separate Github Repository <a href="https://github.com/gsverhoeven/fumbbl_datasets/blob/main/fumbbl_dataset.ipynb">fumbbl_datasets</a>.</strong></p>
 <p>In writing this blog post, I took inspiration from a relatively new development in Open Science, that of the <strong>Data paper</strong> (Chavan &amp; Penev, 2011). A data paper is a (ideally peer reviewed) publication of a dataset as a stand alone research output. A Data paper can be thought of similar to the “Methods” section of a traditional research article, though with greater detail. A data paper describes the contents of the dataset, the data acquisition process, and includes a discussion of the motivation and considerations regarding experimental design (if applicable). Data papers do not provide any analysis nor results / conclusions. The dataset itself should be online available at a data repository such as <strong>Zenodo</strong>, <strong>Figshare</strong> or <strong>Dryad</strong>.</p>
 <p>To give an impression of how this works out in practice, here are two examples: The first data paper, <a href="https://www.nature.com/articles/s41597-019-0247-7"><em>A public data set of spatio-temporal match events in soccer competitions</em></a>, was published in “Scientific data” with the dataset hosted at <a href="https://doi.org/10.6084/m9.figshare.c.4415000.v5">Figshare</a>. The second is collected from Twitter: <a href="https://arxiv.org/abs/2004.03688"><em>A large-scale COVID-19 Twitter chatter dataset for open scientific research – an international collaboration</em></a>, with the open dataset published on <a href="https://doi.org/10.5281/zenodo.5775023">Zenodo</a>.</p>
 <p>*Chavan, V., and Penev, L. (2011). The data paper: a mechanism to incentivize data publishing in biodiversity science. BMC Bioinformatics 12(Suppl. 15):S2. <a href="doi:10.1186/1471-2105-12-S15-S2" class="uri">doi:10.1186/1471-2105-12-S15-S2</a></p>
@@ -849,7 +849,7 @@ Some keys contain simple values, such as <code>name</code>,</p>
 <pre class="python"><code>response.json()[&#39;name&#39;]</code></pre>
 <pre><code>&#39;gsverhoeven&#39;</code></pre>
 <p>but some return as value a new list of key-value pairs, such as <code>teams</code>.
-Actually this is a “list of”lists of key-value pairs", since we have a separate list for each team.
+Actually this is a “list of”lists of key-value pairs”, since we have a separate list for each team.
 Even the list of a single team contains new structure, for example under the key <code>raceLogos</code>.</p>
 <pre class="python"><code>response.json()[&#39;teams&#39;][2][&#39;raceLogos&#39;]</code></pre>
 <pre><code>[{&#39;size&#39;: 32, &#39;logo&#39;: 486290},
@@ -883,7 +883,7 @@ These would include:</p>
 <h1>Step 1: API scraping the match data: df_matches</h1>
 <p>So we are mostly interested in the current ruleset, this is <code>BB2020</code>. This ruleset became available for play on <strong>FUMBBL</strong> at september 1st 2021, and two months later, already some 5000 games have been played. We also want to compare with the previous ruleset, where we have much more data available. How far do we go back?
 Let’s go for roughly 12 months of <code>BB2016</code> ruleset matches, and a few months of <code>BB2020</code> matches.</p>
-<p>The easiest way to collect match data over a particular period of time is to just loop over <code>match_id</code>. The most recent match at the time of writing was 4.347.800, and since rougly 100.000 matches are played each year, we can fiddle about and we find match 4.216.258 played on august 1st, 2020. So that means we need to collect some 130K matches.</p>
+<p>The easiest way to collect match data over a particular period of time is to just loop over <code>match_id</code>. The most recent match at the time of writing was 4.347.800, and since roughly 100.000 matches are played each year, we can fiddle about and we find match 4.216.258 played on august 1st, 2020. So that means we need to collect some 130K matches.</p>
 <p><strong>VERY IMPORTANT</strong>: We do not want to overload the <strong>FUMBBL</strong> server, so we make only three API requests per second. In this way, the server load is hardly affected and it can continue functioning properly for all the Blood Bowl coaches playing their daily games!</p>
 <p>To collect 130K matches, we will need 130000*0.333/3600 = 12 hours.</p>
 <pre class="python"><code># estimated hours fetching data
@@ -990,7 +990,7 @@ df_matches.loc[df_matches[&#39;team1_race_name&#39;] == &quot;Khorne&quot;, &#39
 df_matches.loc[df_matches[&#39;team2_race_name&#39;] == &quot;Khorne&quot;, &#39;team2_race_name&#39;] = &#39;Daemons of Khorne&#39;</code></pre>
 <div id="dataprep-transforming-the-team-values" class="section level2">
 <h2>Dataprep: transforming the team values</h2>
-<p>In Blood Bowl, teams can develop themselves over the course of multiple matches. The winnings of each match can be spend on buying new, stronger players, or replace the players that ended up getting injured or even killed. In addition, players receive so-called <em>star points</em> for important events, such as scoring, or inflicting a casualty on the opponent. Therefore, a balancing mechanism is needed when a newly created “rookie” team is facing a highly developed opposing team with lots of extra skills and strong players.</p>
+<p>In Blood Bowl, teams can develop themselves over the course of multiple matches. The winnings of each match can be spend on buying new, stronger players, or replace the players that ended up getting injured or even killed. In addition, players receive so-called <em>star player points (SPP)</em> for important events, such as scoring, or inflicting a casualty on the opponent. Therefore, a balancing mechanism is needed when a newly created “rookie” team is facing a highly developed opposing team with lots of extra skills and strong players.</p>
 <p>Blood Bowl solves this by calculating for both teams their <strong>Current team value</strong>.
 The <strong>Team value difference</strong> for a match determines the amount of gold that the weaker team can use to buy so-called <strong>inducements</strong>.
 These inducements are temporary, and can consists of a famous “star player” who joins the team just for this match. Another popular option is to hire a wizard that can be used to turn one of the opposing players into a frog.</p>
