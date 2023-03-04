@@ -3498,7 +3498,6 @@ Seaman et al 2019 &lt;a href=&#34;https://pubmed.ncbi.nlm.nih.gov/31400670/&#34;
       <pubDate>Sun, 02 May 2021 00:00:00 +0000</pubDate>
       <guid>/post/zotero-rmarkdown-csl/</guid>
       <description>
-&lt;script src=&#34;/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;&lt;em&gt;(This blog post is mainly for my future self, and for people that ask me about my workflow for scientific papers. Please contact me if you spot ways to improve this!)&lt;/em&gt;&lt;/p&gt;
@@ -3574,6 +3573,8 @@ CSL-JSON is an emerging standard that is recommended by Yihui Xie, author of Rma
 &lt;p&gt;In Rstudio, we add to following line to our YAML header:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;bibliography: references.json&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;code&gt;rbbt&lt;/code&gt; has the functionality to automatically create a bib/json file that ONLY contains the references that are cited in the Rmd document. I haven’t tested this yet, but this would be the icing on the cake. Instructions for this are on the &lt;a href=&#34;https://github.com/paleolimbot/rbbt&#34;&gt;rbbt Github page&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 03/2023&lt;/strong&gt; You can try adding the following entry to your YAML header:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bibliography: &amp;quot;`r rbbt::bbt_write_bib(&amp;#39;bibliography.json&amp;#39;, overwrite = TRUE)`&amp;quot; &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div id=&#34;step-8-getting-the-references-in-the-proper-format&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Step 8: Getting the references in the proper format&lt;/h2&gt;

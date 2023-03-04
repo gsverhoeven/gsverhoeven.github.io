@@ -624,7 +624,6 @@
 
     <div class="article-style">
       
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p><em>(This blog post is mainly for my future self, and for people that ask me about my workflow for scientific papers. Please contact me if you spot ways to improve this!)</em></p>
@@ -700,6 +699,8 @@ CSL-JSON is an emerging standard that is recommended by Yihui Xie, author of Rma
 <p>In Rstudio, we add to following line to our YAML header:</p>
 <pre><code>bibliography: references.json</code></pre>
 <p><code>rbbt</code> has the functionality to automatically create a bib/json file that ONLY contains the references that are cited in the Rmd document. I haven’t tested this yet, but this would be the icing on the cake. Instructions for this are on the <a href="https://github.com/paleolimbot/rbbt">rbbt Github page</a>.</p>
+<p><strong>Update 03/2023</strong> You can try adding the following entry to your YAML header:</p>
+<pre class="r"><code>bibliography: &quot;`r rbbt::bbt_write_bib(&#39;bibliography.json&#39;, overwrite = TRUE)`&quot; </code></pre>
 </div>
 <div id="step-8-getting-the-references-in-the-proper-format" class="section level2">
 <h2>Step 8: Getting the references in the proper format</h2>
