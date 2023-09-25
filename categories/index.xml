@@ -5,7 +5,7 @@
     <link>/categories/</link>
       <atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     <description>Categories</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Mon, 27 Feb 2023 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Thu, 21 Sep 2023 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Categories</title>
@@ -15,8 +15,16 @@
     <item>
       <title>Blood Bowl</title>
       <link>/categories/blood-bowl/</link>
-      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 21 Sep 2023 00:00:00 +0000</pubDate>
       <guid>/categories/blood-bowl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Statistics</title>
+      <link>/categories/statistics/</link>
+      <pubDate>Thu, 21 Sep 2023 00:00:00 +0000</pubDate>
+      <guid>/categories/statistics/</guid>
       <description></description>
     </item>
     
@@ -25,14 +33,6 @@
       <link>/categories/clustering/</link>
       <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
       <guid>/categories/clustering/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Statistics</title>
-      <link>/categories/statistics/</link>
-      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
-      <guid>/categories/statistics/</guid>
       <description></description>
     </item>
     
