@@ -120,6 +120,8 @@ For me, this contains at the moment three things: A4 page size, double line spac
 In short, you let Rstudio’s pandoc generate a Word document from a &lt;code&gt;.Rmd&lt;/code&gt; file, and tweak the formatting styles of that document. Name the document &lt;code&gt;style_template.docx&lt;/code&gt; and keep it with your &lt;code&gt;.Rmd&lt;/code&gt; manuscript.
 I can confirm that this also works when you edit this document using LibreOffice / OpenOffice.&lt;/p&gt;
 &lt;p&gt;The great thing for me: now I have this blog post, I can forget about all this stuff, and finally get to the scientific writing part!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;N.b.&lt;/strong&gt; see also this repository from Kenneth Rioja with an operationalisation of the workflow described above:
+&lt;a href=&#34;https://github.com/kennethrioja/rmdzoteroword_workflow&#34; class=&#34;uri&#34;&gt;https://github.com/kennethrioja/rmdzoteroword_workflow&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>

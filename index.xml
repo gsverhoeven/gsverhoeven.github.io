@@ -5,12 +5,539 @@
     <link>/</link>
       <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <description>Gertjan Verhoeven</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Thu, 21 Sep 2023 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Mon, 15 Jan 2024 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Gertjan Verhoeven</title>
       <link>/</link>
     </image>
+    
+    <item>
+      <title>Statistical computing on a shoestring: Stan in the Azure cloud using Cloud-init</title>
+      <link>/post/azure-stan-linux/</link>
+      <pubDate>Mon, 15 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>/post/azure-stan-linux/</guid>
+      <description>
+
+
+&lt;p&gt;&lt;small&gt;
+&lt;em&gt;Photo source: cropped from original by Taylor van Riper &lt;a href=&#34;https://unsplash.com/@taylorvanriper925&#34; class=&#34;uri&#34;&gt;https://unsplash.com/@taylorvanriper925&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Graphics source: Michael Betancourt at &lt;a href=&#34;https://github.com/stan-dev/propaganda/tree/master/moore-sloan_sell_sheet/figures&#34;&gt;stan-dev/propaganda&lt;/a&gt;&lt;/em&gt;
+&lt;/small&gt;&lt;/p&gt;
+&lt;p&gt;Time to explore what the public cloud is all about.
+Our goal is to write code (i.e. scripts) using open-source tools to automatically set up cloud infrastructure. In short, we want &lt;strong&gt;Infrastructure as code&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;For this I chose a specific use case, which is &lt;strong&gt;spinning up a low cost data analysis development environment with R, Rstudio and Stan tools&lt;/strong&gt; installed and configured.&lt;/p&gt;
+&lt;p&gt;This has two big advantages, &lt;strong&gt;reproducibility&lt;/strong&gt; and &lt;strong&gt;lower switching cost&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Scripting the compute resources that made a data analysis possible is the next level in reproducibility.&lt;/li&gt;
+&lt;li&gt;Ideally, we want our scripts to be independent of a particular cloud provider. This would allow us to easily change from e.g. Azure to Amazon AWS if things stagnate or we can get a better deal elsewhere.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I ended up writing Linux shell scripts that use the &lt;strong&gt;Azure command-line interface (Azure CLI)&lt;/strong&gt; to deploy a Linux VM configured using &lt;strong&gt;Cloud-init&lt;/strong&gt;. While doing so I discovered that being able to test changes locally first before deploying to the cloud speeds up development significantly.&lt;/p&gt;
+&lt;p&gt;To summarize and motivate the tech choices I made:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;I chose &lt;strong&gt;Azure&lt;/strong&gt; since my employer recently moved to Azure and me learning it would be beneficial for work.&lt;/li&gt;
+&lt;li&gt;I chose &lt;strong&gt;Azure CLI&lt;/strong&gt; to write simple shell scripts without the additional abstraction layer introduced by more generic tools like Terraform/OpenTofu or Ansible&lt;/li&gt;
+&lt;li&gt;I chose &lt;strong&gt;Linux Ubuntu OS&lt;/strong&gt; to keep cost down, as it is free and needs less resources than &lt;strong&gt;Windows 10/11&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;I chose &lt;strong&gt;Cloud-init&lt;/strong&gt; as it has emerged as the standard way to configure Linux cloud images across all cloud platforms&lt;/li&gt;
+&lt;li&gt;I chose the &lt;strong&gt;QEMU Quick Emulator&lt;/strong&gt; to run VMs locally to speed up development&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The blog uses Linux throughout, but the Azure CLI commands should work for Windows as well.
+All scripts mentioned in this blog are available in a separate Github repository, &lt;a href=&#34;https://github.com/gsverhoeven/azure_cli_scripts&#34;&gt;gsverhoeven/azure_cli_scripts&lt;/a&gt;.&lt;/p&gt;
+&lt;div id=&#34;cloud-computing-in-azure-on-a-shoestring&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Cloud computing in Azure on a shoestring&lt;/h1&gt;
+&lt;p&gt;So what do we need to pay for this low cost cloud computing data analytics VM?&lt;/p&gt;
+&lt;p&gt;For a single VM the main cost driver is the VM itself. We need at least 8GB of RAM and a minimum of 2 CPU, so we end up with a &lt;code&gt;Standard D2s&lt;/code&gt; VM. At the time of writing, monthly cost, assuming 24/7 usage is 73 euro.&lt;/p&gt;
+&lt;p&gt;(To find out about these prices in the first place: Azure shows them when you select “create new VM” in the portal)&lt;/p&gt;
+&lt;p&gt;We have two additional small cost drivers, the associated disk (“storage”), and we need to pay for a public IP address, each roughly 0.1 euro per day.&lt;/p&gt;
+&lt;p&gt;If we would bring the VM up and keep it on for a whole day we pay around 2.5 euro a day.
+If we only use it for 8 hours, cost is reduced to an estimated 1 euro per day.
+If we stop the VM such that the resources are released (deallocated), we only need to pay for the IP and disk storage, which is 0.2 euro per day, or 6 euro on a monthly basis. This allows us a “fast resume” option that avoids waiting 30 min to install and configure all the software. I tried this, it is a feasible strategy, it takes a minute or so to boot up.&lt;/p&gt;
+&lt;p&gt;Ok let’s do it!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;setting-up-our-local-iaas-dev-environment&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Setting up our local IaaS dev environment&lt;/h1&gt;
+&lt;p&gt;As mentioned above, we use both &lt;strong&gt;Azure CLI&lt;/strong&gt; and &lt;strong&gt;QEMU virtual emulator&lt;/strong&gt; for local VM development.&lt;/p&gt;
+&lt;p&gt;I started with creating a free account on Azure. This comes with 200 Euro free credit to spent within a month.&lt;/p&gt;
+&lt;p&gt;Then I installed &lt;code&gt;azure-cli&lt;/code&gt; on my local system (Ubuntu 18.04 LTS):&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;#downloads the signing key from Microsoft
+curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg &amp;gt; /dev/null 
+## creates a file called microsoft.gpg in the folder where keys are stored
+
+AZ_REPO=$(lsb_release -cs) ## outputs the codename for the linux distribution i.e. Ubuntu 18.04 = bionic
+echo &amp;quot;deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main&amp;quot; | sudo tee /etc/apt/sources.list.d/azure-cli.list 
+## writes that URL to the package resource list
+sudo apt-get update
+sudo apt-get install azure-cli&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First time we use &lt;code&gt;azure-cli&lt;/code&gt; locally we need authenticate:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;# Log in interactively using the browser.
+az login&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Test if it works by creating and deleting a new resource group:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;az group create --location westeurope --resource-group MyCoolRG -o table&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Location    Name
+----------  --------
+westeurope  MyCoolRG
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Great! that worked. Now let’s get rid of it.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;az group delete --resource-group MyCoolRG&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next we install &lt;strong&gt;QEMU&lt;/strong&gt;, which stands for Quick Emulator. The documentation for Cloud-init contains a section on &lt;a href=&#34;https://cloudinit.readthedocs.io/en/23.3.3/tutorial/qemu.html&#34;&gt;how to work with QEMU&lt;/a&gt;. This will be our local development environment to test Cloud-init scripts before launching them on the cloud.&lt;/p&gt;
+&lt;p&gt;Install QEMU:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;sudo apt install qemu-kvm&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This installs QEMU 2.11 (2018) that plays well with Ubuntu 18.04.&lt;/p&gt;
+&lt;p&gt;QEMU on Ubuntu works with hypervisor KVM to run virtual machines locally. Each virtual machine has private virtualized hardware: a network card, disk, graphics adapter, etc. For windows VMware is a popular alternative.&lt;/p&gt;
+&lt;p&gt;QEMU upon first use threw an error “/dev/kvm device: permission denied” that I fixed by adding my own user account to the &lt;code&gt;kvm&lt;/code&gt; group &lt;a href=&#34;https://16shuklarahul.medium.com/how-to-fix-kvm-permission-denied-error-on-ubuntu-18-04-16-04-14-04-f04a6e23c0cd&#34;&gt;after reading this explanation&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;sudo adduser gertjan kvm&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On my machine, all users in group &lt;code&gt;kvm&lt;/code&gt; have &lt;code&gt;rw&lt;/code&gt; access for &lt;code&gt;/dev/kvm&lt;/code&gt;, thereby fixing the permission error.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(base) gertjan:~$ qemu-system-x86_64 --version
+QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.41)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;creating-the-azure-infrastucture&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Creating the Azure infrastucture&lt;/h1&gt;
+&lt;p&gt;Azure is organized as a hierarchical structure. See the schematic below.
+All the components that make up the infrastructure are called &lt;em&gt;resources&lt;/em&gt;. Traversing upwards through the hierarchy:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Resources&lt;/strong&gt; are contained within &lt;strong&gt;resource groups&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Resource groups&lt;/strong&gt; exist within a &lt;strong&gt;subscription&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;Finally, &lt;strong&gt;subscriptions&lt;/strong&gt; exist within &lt;strong&gt;management groups&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;azure_scope-levels.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In this blog post, we will create the infrastructure we need from scratch.
+Our desired infrastructure consists of a single virtual network that contains a single virtual machine (VM)
+The VM will be configured to be accessible through the internet using SSH and “Microsoft Remote Desktop” (RDP).&lt;/p&gt;
+&lt;p&gt;To quickly create a VM in Azure, it is possible to use a single Azure CLI command with default values that automatically creates any required supporting resources.
+However, to really understand the Azure building blocks and their dependencies, it is better to create each Azure resource separately.
+In doing so we gradually build up the infrastructure step by step.
+(An official Azure tutorial by Cynthia Nottingham and others that takes a similar approach can be found &lt;a href=&#34;https://learn.microsoft.com/en-us/azure/virtual-machines/linux/create-cli-complete&#34;&gt;here&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;Special attention is given to secure our network and VM, because it is exposed to the public internet.
+Hackers are continuously scanning the Azure network IP address ranges for vulnerable systems, so we need to defend ourselves.
+We use a basic Firewall called “Network Security Group” that works with &lt;strong&gt;Security Rules&lt;/strong&gt;.
+More on our security measures below. I chose not to use an “Availability Set” as this only makes sense for groups of VMs.&lt;/p&gt;
+&lt;p&gt;I use Linux shell Environment Variables to separate the &lt;strong&gt;Azure configuration parameters&lt;/strong&gt; (which image, which VM type etc) from the actual Azure CLI commands that create the resources.
+To view my current configuration file containing all Azure parameters: &lt;a href=&#34;https://raw.githubusercontent.com/gsverhoeven/azure_cli_scripts/main/azure_config_ubuntu.sh&#34;&gt;gsverhoeven/azure_cli_scripts/main/azure_config_ubuntu.sh&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-by-step-guide-to-set-up-the-vm&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Step-by-step guide to set up the VM&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;First we create a new &lt;strong&gt;Resource group&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Then we create a &lt;strong&gt;Virtual Network&lt;/strong&gt; with a &lt;strong&gt;Subnet&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Then we create a &lt;strong&gt;Public IP&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Then we create a &lt;strong&gt;Network Security Group&lt;/strong&gt; &amp;amp; Rules&lt;/li&gt;
+&lt;li&gt;Then we create a &lt;strong&gt;Network Interface Card (NIC)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Then we choose the &lt;strong&gt;VM image&lt;/strong&gt;, &lt;strong&gt;VM size&lt;/strong&gt; and &lt;strong&gt;VM storage type&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Then we write a &lt;strong&gt;Cloud-init script&lt;/strong&gt; to initialize the VM&lt;/li&gt;
+&lt;li&gt;Finally we &lt;strong&gt;create the VM&lt;/strong&gt; and enjoy the show&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div id=&#34;create-resource-group&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create resource Group&lt;/h2&gt;
+&lt;p&gt;First we create a new &lt;em&gt;Resource Group&lt;/em&gt;, &lt;code&gt;myRGtest&lt;/code&gt;.
+This needs a location. Since I am in West Europe, let’s choose &lt;code&gt;westeurope&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;# create shell variables
+resourceGroup=myRGtest
+location=westeurope
+az group create --name $resourceGroup --location $location
+az group show --resource-group $resourceGroup&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-virtual-network&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create Virtual Network&lt;/h2&gt;
+&lt;p&gt;Next we create a &lt;em&gt;Virtual Network&lt;/em&gt; and a &lt;em&gt;Subnet&lt;/em&gt;, as explained in &lt;a href=&#34;https://learn.microsoft.com/en-us/cli/azure/azure-cli-vm-tutorial-2&#34;&gt;the Azure documentation&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;# create shell variables
+vnetName=StanDEV-VNet1
+subnetName=StanDEV-Subnet1
+vnetAddressPrefix=10.0.0.0/16
+subnetAddressPrefix=10.0.0.0/24
+
+az network vnet create \
+  --name $vnetName \
+  --resource-group $resourceGroup \
+  --address-prefixes $vnetAddressPrefix \
+  --subnet-name $subnetName \
+  --subnet-prefixes $subnetAddressPrefix&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-public-ip-address&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create Public IP address&lt;/h2&gt;
+&lt;p&gt;Now let’s create a public IP address with &lt;code&gt;az network public-ip create&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;publicIP=TEST-public-ip
+mypublicdns=gsverhoeven
+
+echo &amp;quot;creating public IP address ..&amp;quot;
+az network public-ip create \
+    --resource-group $resourceGroup \
+    --name $publicIP \
+    --sku standard \
+    --dns-name $mypublicdns \
+    --output $azOutput \
+    --zone 1 # non-zonal IP&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This public IP address enables us to connect to the VM from the Internet.&lt;/p&gt;
+&lt;p&gt;This command results in an IP address with a Fully qualified domain name (FQDN) of &lt;code&gt;gsverhoeven.westeurope.cloudapp.azure.com&lt;/code&gt;&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;nslookup  gsverhoeven.westeurope.cloudapp.azure.com
+#Server:        127.0.0.53
+#Address:   127.0.0.53#53
+
+#Non-authoritative answer:
+#Name:  gsverhoeven.westeurope.cloudapp.azure.com
+#Address: 68.219.248.112&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;az network public-ip list -o table&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Name            ResourceGroup    Location    Zones    Address        IdleTimeoutInMinutes    ProvisioningState
+--------------  ---------------  ----------  -------  -------------  ----------------------  -------------------
+TEST-public-ip  myRGtest         westeurope           104.46.41.142  4                       Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-network-security-group-rules&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create network security group &amp;amp; Rules&lt;/h2&gt;
+&lt;p&gt;To control the flow of traffic in and out of our VM, we use a so-called &lt;strong&gt;network security group&lt;/strong&gt;. The following example uses &lt;code&gt;az network nsg create&lt;/code&gt; to create a network security group named &lt;code&gt;myNSG&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;NetworkSecurityGroup=myNSG
+
+az network nsg create \
+    --resource-group $resourceGroup \
+    --name $NetworkSecurityGroup&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This works by defining rules that allow or deny specific traffic.
+A new NSG starts with a set of default rules, among which is the rule that all inbound traffic is blocked.
+Rules are processed in priority order, with lower numbers processed before higher numbers, because lower numbers have higher priority. Once traffic matches a rule, processing stops.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;To allow inbound connections on port 22 (to enable SSH access)&lt;/strong&gt;, create an inbound rule with &lt;code&gt;az network nsg rule create&lt;/code&gt;. The following example creates a rule named &lt;code&gt;myNetworkSecurityGroupRuleSSH&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;echo &amp;quot;create SSH rule ..&amp;quot;
+az network nsg rule create \
+    --resource-group $resourceGroup \
+    --nsg-name $NetworkSecurityGroup \
+    --name myNetworkSecurityGroupRuleSSH \
+    --description &amp;quot;Allow SSH at port 22&amp;quot; \
+    --protocol tcp \
+    --priority 1000 \
+    --destination-port-range 22 \
+    --access allow \
+    --output $azOutput&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To allow &lt;strong&gt;Remote Desktop traffic&lt;/strong&gt; to reach your Linux VM, add another network security group rule.
+The following example creates a rule named &lt;code&gt;myNetworkSecurityGroupRuleRDP&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;echo &amp;quot;create RDP rule ..&amp;quot;
+az network nsg rule create \
+    --resource-group $resourceGroup \
+    --nsg-name $NetworkSecurityGroup \
+    --name myNetworkSecurityGroupRuleRDP \
+    --description &amp;quot;Allow RDP at port 3389&amp;quot; \
+    --direction Inbound \
+    --protocol tcp \
+    --priority 1001 \
+    --destination-port-range 3389 \
+    --access allow \
+    --output $azOutput \
+    --source-address-prefixes $trustedIPAdress&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Examine the network security group and rules with &lt;code&gt;az network nsg rule list&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;echo &amp;quot;check NSG rules ..&amp;quot;
+az network nsg rule list \
+    --resource-group $resourceGroup \
+    --nsg-name $NetworkSecurityGroup \
+    --output table&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-nic&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Create NIC&lt;/h2&gt;
+&lt;p&gt;Virtual network interface cards (NICs) are programmatically available because you can apply rules to their use.
+In the following &lt;code&gt;az network nic create&lt;/code&gt; command, we create a NIC named &lt;code&gt;myNic&lt;/code&gt; and associate it with our network security group. The public IP address we created above is also associated with the virtual NIC.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;echo &amp;quot;create NIC ..&amp;quot;
+az network nic create \
+    --resource-group $resourceGroup \
+    --name $NICName \
+    --vnet-name $vnetName \
+    --subnet $subnetName \
+    --public-ip-address $publicIP \
+    --output $azOutput \
+    --network-security-group $NetworkSecurityGroup&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From the dependencies, we can see that a NIC ties together:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A Network Security Group,&lt;/li&gt;
+&lt;li&gt;A public IP,&lt;/li&gt;
+&lt;li&gt;A VNet &amp;amp; subnet,&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;all within a resource group. Later on, when we create the VM, we only need to specify the NIC to bring up the VM in the virtual network with the desired NSG.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;vm-image-choice&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;VM Image choice&lt;/h2&gt;
+&lt;p&gt;As VM image I chose &lt;strong&gt;Ubuntu Server 22.04 LTS&lt;/strong&gt; for reasons already mentioned above.
+But which one, how do we find the image we need?&lt;/p&gt;
+&lt;p&gt;Canonical, the company behind Ubuntu Linux, offers various preconfigured Ubuntu images in the Azure Marketplace.
+Azure CLI can be used to programmatically interact with Azure Marketplace. I used &lt;a href=&#34;https://powersj.io/posts/ubuntu-images-azure/&#34;&gt;this blog post by Joshua Powers&lt;/a&gt; to learn how this works.&lt;/p&gt;
+&lt;p&gt;All images published by Canonical are discoverable using the following command:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;az vm image list-skus \
+--publisher Canonical \
+--offer Ubuntu \
+--location westeurope \
+-o table&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Location    Name
+----------  ----------------------
+westeurope  18_04-lts
+westeurope  18_04-lts-gen2
+westeurope  18_04-lts-minimal
+westeurope  18_04-lts-minimal-gen2
+...
+westeurope  22_04-lts
+westeurope  22_04-lts-gen2
+westeurope  22_04-lts-minimal
+westeurope  22_04-lts-minimal-gen2
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I went with &lt;code&gt;22_04-lts&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;vm-size-choice&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;VM Size choice&lt;/h2&gt;
+&lt;p&gt;There is a bewildering amount of choice regarding &lt;a href=&#34;https://azure.microsoft.com/en-us/pricing/details/virtual-machines/series/&#34;&gt;different types of VMs offered by Microsoft&lt;/a&gt;. As my focus is on cheap, general purpose compute, I ended up with D-series VMs.&lt;/p&gt;
+&lt;p&gt;Azureprice.net shows regional price variation, however without subscription it only shows the extent of the price variation.
+My current heuristic is taking the median (i.e. middle) price, so far it seems to give a good estimate of monthly pay-as-you-go prices for west-europe.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://azureprice.net/vm/Standard_D2s_v3?currency=EUR&amp;amp;timeoption=day&amp;amp;paymentType=payasyougo&#34; class=&#34;uri&#34;&gt;https://azureprice.net/vm/Standard_D2s_v3?currency=EUR&amp;amp;timeoption=day&amp;amp;paymentType=payasyougo&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;To have a reasonable fast software install I found we need at least 8GB of mem and 2 vCPUs, this corresponds to &lt;code&gt;Standard_D2s_v3&lt;/code&gt;. With this VM, cloud-init installation finishes after 23 min, after which the VM is fully operational.
+This has a monthly cost of 78 euro (based on 24/7 usage).&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;`Standard` is recommended tier.
+D – General purpose compute
+2 – VM Size
+s – Premium Storage capable
+v3 – version&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;disk-storage-associated-with-the-vm&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Disk storage associated with the VM&lt;/h2&gt;
+&lt;p&gt;When an Azure virtual machine is created, two disks are automatically attached to the virtual machine.&lt;/p&gt;
+&lt;p&gt;The disk that holds the VM image (in our case Ubuntu 22) is called the &lt;strong&gt;OS disk&lt;/strong&gt;. In Azure, the &lt;a href=&#34;https://learn.microsoft.com/en-us/azure/virtual-machines/linux/expand-disks?tabs=ubuntu&#34;&gt;default OS disk size for Linux VMs&lt;/a&gt; is currently at 30 GB. This appears to also be the minimum OS disk size, there is only the option to expand them. The OS disk is labeled &lt;code&gt;/dev/sda&lt;/code&gt; by default.&lt;/p&gt;
+&lt;p&gt;In addition, there is a &lt;strong&gt;temp disk&lt;/strong&gt; mounted that is physically located on the Azure host where the VM is running. This can only be used for temporary data processing, and its size is given. It does not incur any extra cost. Temporary disks are labeled &lt;code&gt;/dev/sdb&lt;/code&gt; and have a mountpoint of &lt;code&gt;/mnt&lt;/code&gt;. More info on temp disks &lt;a href=&#34;https://www.cloudelicious.net/azure-vms-and-their-temporary-storage/&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;N.b.&lt;/strong&gt; I did not go so far as to attach a &lt;strong&gt;data disk&lt;/strong&gt;. So we need to make sure that work we do on the VM is pushed to e.g. Github, because if we tear the VM down, the user data is lost as well.&lt;/p&gt;
+&lt;p&gt;The Disk types are controlled by the &lt;code&gt;-storage-sku&lt;/code&gt; option when we create the VM.
+Allowed values for this option include &lt;code&gt;Standard_LRS&lt;/code&gt; for traditional hard disks (HDD), &lt;code&gt;StandardSSD_LRS&lt;/code&gt; and &lt;code&gt;Premium_LRS&lt;/code&gt; both consists of SSD disks but with differing performance characteristics. Locally redundant storage (LRS) replicates your data three times within a single data center in the selected region. More info at &lt;a href=&#34;https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types&#34;&gt;Azure disk types&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;We want the cheapest SSD option, this seems to be &lt;code&gt;StandardSSD_LRS&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;cloud-init-to-automate-software-installation-and-vm-configuration&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Cloud-init to automate software installation and VM configuration&lt;/h1&gt;
+&lt;p&gt;At this point we could stop, and create the VM. However, it would just be a plain out-of-the-box Linux installation.
+And our goal is to use the VM for data science, Bayesian modelling in particular!&lt;/p&gt;
+&lt;p&gt;So directly after creating the VM, we want to install additional software on it.
+For this we use the open source tool &lt;a href=&#34;https://cloud-init.io/&#34;&gt;Cloud-init&lt;/a&gt;. It typically runs directly after a cloud instance is created.
+Cloud-init is cross-platform across the public cloud, so in theory we should be able to easily move our instance from one cloud provider to another.&lt;/p&gt;
+&lt;p&gt;Already in the early days of cloud computing (2007), people recognized the need to automatically configure cloud instances using user defined scripts. Around that time Cloud-init was born (it was called &lt;code&gt;ec2-init&lt;/code&gt; at that time, because at that time AWS EC2 basically WAS the complete public cloud).&lt;/p&gt;
+&lt;p&gt;According to the documentation:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Cloud-init is an open source initialisation tool that was designed to make it easier to get your systems up and running with a minimum of effort, already configured according to your needs. […] During boot, cloud-init identifies the cloud it is running on and initialises the system accordingly. Cloud instances will automatically be provisioned during first boot with networking, storage, SSH keys, packages and various other system aspects already configured.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://cloudinit.readthedocs.io/en/latest/explanation/introduction.html#introduction&#34;&gt;Here&lt;/a&gt; is a nice overview introduction.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cloud-init&lt;/strong&gt; needs a script or cloud config that will be run directly after provisioning the VM.
+This is called “User data” by most cloud providers, M$ calls it &lt;code&gt;custom-data&lt;/code&gt;.
+Although it can run any shell script, there is also a declarative YAML based configuration file that works with modules to perform common tasks like adding users, updating and installing linux software packages etc.
+For this blog I went with a YAML file called &lt;code&gt;cloud_init_cfg.yaml&lt;/code&gt;.
+The content of this file can be inspected &lt;a href=&#34;https://raw.githubusercontent.com/gsverhoeven/azure_cli_scripts/main/cloud_init_cfg.yaml&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div id=&#34;testing-cloud-init-on-the-local-file-system-using-qemu&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Testing cloud-init on the local file system using QEMU&lt;/h2&gt;
+&lt;p&gt;As we are developing our cloud config script, we want to test it locally before deploying the whole shabam to the Azure cloud, as this is slow (you don’t want to wait 10 minutes to discover you made a typo .. AGAIN!!).
+Enter the &lt;strong&gt;QEMU virtualizer&lt;/strong&gt; (website &lt;a href=&#34;https://www.qemu.org/&#34;&gt;here&lt;/a&gt;), that can act as a virtualization host to run the instance locally.
+As the Cloud-init enabled instance is booted up inside QEMU, it needs a data source to fetch the cloud config script from.
+Cloud-init supports the &lt;a href=&#34;https://cloudinit.readthedocs.io/en/23.4.1/reference/datasources/nocloud.html#nocloud&#34;&gt;special data source “nocloud”&lt;/a&gt; that allows us to use the local file system to offer the data source to the instance in three variants. I use the variant with a local HTTP server running using the python built-in webserver at local port 8000:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;gnome-terminal -- python3 -m http.server --directory .&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The url of the webserver is communicated to the instance by &lt;strong&gt;Qemu&lt;/strong&gt; using a &lt;a href=&#34;https://github.com/canonical/cloud-init/issues/3133&#34;&gt;hack&lt;/a&gt;, which is putting it into the serial number field of the SMBIOS:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;-smbios type=1,serial=ds=&amp;#39;nocloud;s=http://10.0.2.2:8000/&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is example code that downloads a Cloud-init enabled Ubuntu 22.04 image (&lt;code&gt;jammy&lt;/code&gt;) for local testing.
+The initial (virtual) disk size of the image is 2.2 GB, which is too small to install all the software we need to run Rstudio.
+So we increase the image size to 30GB. After that we fire up the instance with QEMU:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+qemu-img info jammy-server-cloudimg-amd64.img 
+# 2.2 GB
+qemu-img resize jammy-server-cloudimg-amd64.img 30G
+
+qemu-system-x86_64                                            \
+    -net nic                                                    \
+    -net user
+    -machine accel=kvm                                          \ # use hardware acceleration
+    -cpu host                                                   \ # emulate host processor
+    -m 1024                                                      \ # use 1 GB RAM
+    -nographic                                                  \ # graphic window disabled
+    -hda jammy-server-cloudimg-amd64.img                        \ # Set a virtual hard drive and use the specified image file 
+    -smbios type=1,serial=ds=&amp;#39;nocloud;s=http://10.0.2.2:8000/&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;ubuntu@jammy:~$ sudo lsblk -d | grep disk
+fd0     2:0    1     4K  0 disk 
+sda     8:0    0    30G  0 disk &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I ended up writing a script &lt;a href=&#34;https://raw.githubusercontent.com/gsverhoeven/azure_cli_scripts/main/qemu/do_qemu.sh&#34;&gt;do_qemu.sh&lt;/a&gt; that starts a local VM using the same cloud-config YAML file that is also used to configure the actual Azure VM. This allowed for fast development and seamless switching between local and cloud testing.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-cloud-init-to-install-additional-packages&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Using cloud-init to install additional packages&lt;/h2&gt;
+&lt;p&gt;Using Cloud-init’s &lt;code&gt;packages&lt;/code&gt; module, we install the following software:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;inxi (system information tool)&lt;/li&gt;
+&lt;li&gt;Firefox&lt;/li&gt;
+&lt;li&gt;Fail2ban (Blocking of bad IP addresses)&lt;/li&gt;
+&lt;li&gt;XFCE4 desktop (default ubuntu image comes without a desktop)&lt;/li&gt;
+&lt;li&gt;xRDP (to use the VM as a remote desktop)&lt;/li&gt;
+&lt;li&gt;GNU make and g++ compiler (to compile R packages as well as Stan programs)&lt;/li&gt;
+&lt;li&gt;various dependencies for R packages, notably tidyverse&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-cloud-init-to-run-scripts-on-the-vm-during-late-boot&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Using cloud-init to run scripts on the VM during late boot&lt;/h2&gt;
+&lt;p&gt;To configure Fail2ban, xRDP, install R and Rstudio, I wrote separate scripts that perform the necessary steps.
+These scripts are contained within the &lt;code&gt;cloud_init_cfg.yaml&lt;/code&gt; file to be written to disk within the instance during early init. At late init, the scripts are then executed one after another.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;[bash, /enable_fail2ban.sh ]&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;[bash, /install_xrdp.sh ]&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;[bash, /install_r.sh ]&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;ul&gt;
+&lt;li&gt;[bash, /install_rstudio.sh ]&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;securing-our-vm&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Securing our VM&lt;/h1&gt;
+&lt;p&gt;For a VM with a public IP on the hostile internet, we need some security measures in place.
+“Hackers” will be using a list of azure IPs and will attempt brute force SSH to gain access.
+See for example this &lt;a href=&#34;https://superuser.com/questions/1112092/hacking-attempts-to-linux-vm-in-azure&#34;&gt;post on superuser.com&lt;/a&gt;.
+There are sites that document so called “bad IPs”, known culprits of e.g. unauthorized scanning for open ports:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/stamparm/ipsum&#34;&gt;IPsum Github repository&lt;/a&gt; list with bad IPs, including a Wall of Shame&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.abuseipdb.com/&#34;&gt;AbuseIPDB&lt;/a&gt;, a database of abusive IP addresses.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some of these were indeed scanning my VM as well.
+We take the following steps to secure our VM from outside attacks:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSH password authentication is disabled, access only through SSH keys&lt;/li&gt;
+&lt;li&gt;We generate an password (needed for RDP logon) on the fly from keyboard input when creating the VM&lt;/li&gt;
+&lt;li&gt;Only RDP connections from a single trusted IP address are allowed&lt;/li&gt;
+&lt;li&gt;All other ports are closed for inbound traffic using Azure NSG&lt;/li&gt;
+&lt;li&gt;Use &lt;strong&gt;Fail2ban&lt;/strong&gt; to ban IPs that have multiple unsuccessful SSH login attempts&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;NSG is a basic type of firewall, that is relatively dumb.
+It does not know about applications, it just filters network packets based on rules.
+So we use it to block all incoming connections from the internet, except SSH and RDP.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;To connect using SSH, a private key is needed that is only available on my local desktop system. When someone tries to brute force the SSH connection, their IP is banned after a few unsuccessful login attempts.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To connect using RDP, it only accepts connections from the IP address attached to my local desktop system via my ISP. It would be nice to add RDP to fail2ban, however this apparently is not easy.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hopefully this is enough security for a single VM without important secrets, and I did not make any mistake here :)&lt;/p&gt;
+&lt;p&gt;(Microsoft has created a product “Azure Bastion” for our use case, when we want to use RDP / remote desktop into a VM on Azure, but do not want to use a VPN or expose the VM using a public IP address. It seems expensive though ..)&lt;/p&gt;
+&lt;p&gt;To explain and document I will now describe my security measures in more detail, starting with SSH access.&lt;/p&gt;
+&lt;div id=&#34;ssh-access&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;SSH access&lt;/h2&gt;
+&lt;p&gt;A common, secure way of connecting to a VM is through a “secure shell” aka SSH connection.
+It is secure because all traffic is encrypted. We can either use passwords or work with “key pairs”. We choose SSH keys because it is safer, since passwords can be guessed or brute-force discovered.&lt;/p&gt;
+&lt;p&gt;SSH works with so-called “key pairs”, that consist of a public and private key. The private key is kept secret and is stored on our local system. The public key is passed to the VM when it is created. The VM uses this public key to encrypt all communication. To decrypt this communication, the private key is needed. Since nobody else has this key except we ourselves on our local system in a safe place, the connection is safeguarded.&lt;/p&gt;
+&lt;p&gt;We need to generate a public and private key for ourselves, and get it on the new VM.
+We use the &lt;code&gt;--generate-ssh-keys&lt;/code&gt; parameter to create them the first time we create the VM. After that, since we already have a key pair, this parameter uses existing keys in &lt;code&gt;~/.ssh&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Since SSH communication goes back and forth between our local system and the VM, we also need to encrypt the information we send to the VM. For that we need to use the &lt;strong&gt;VM’s public&lt;/strong&gt; key that it hands out to whoever wants to communicate with it. We fetch after VM creation using &lt;code&gt;ssh-keyscan&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;ssh-keyscan -H $mypublicdns.westeurope.cloudapp.azure.com &amp;gt;&amp;gt; ~/.ssh/known_hosts&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After all this, we can connect to the VM using SSH without the need to supply a password, the key-pairs in the background take care of the authentication process.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(base) gertjan:~$ ssh stanuser@gsverhoeven.westeurope.cloudapp.azure.com
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 6.2.0-1018-azure x86_64)
+
+[...]
+
+Last login: Sun Jan 14 22:02:30 2024 from 77.248.168.82
+stanuser@standev:~$ &lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;interactive-password-generation-for-rdp-access&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Interactive password generation for RDP access&lt;/h2&gt;
+&lt;p&gt;For remote desktop access with sufficient performance (no lags) we still need to set a password on the VM when we create it.
+Since we want a fully scripted process of VM creation, I needed a secure way to generate and set a password during VM creation. In the end, I figured out a way to accomplish this using a shell script with an interactive prompt, that dynamically inserts the hashed password into the Cloud-init config file. This config file is then used to set the password on the VM upon creation, after which the copy of the config file containing the hashed password is deleted.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;echo &amp;quot;generate cloud-config with encrypted password ..&amp;quot;
+read -sp &amp;#39;Enter password for Cloud-config: &amp;#39; SECRET
+HASHEDPW=$(mkpasswd $SECRET --method=SHA-512 --rounds=4096)
+cp $customDataScript $customDataScript.tmp
+sed -i -e &amp;quot;/password:/ s@:.*@: $HASHEDPW@&amp;quot; $customDataScript.tmp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This way, I do not have to store a hashed password, not in the Github code repository, or on my local computer.
+I have the password stored in my Keepass password manager in case I forget it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;remote-desktop-access-using-rdp&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Remote desktop access using RDP&lt;/h2&gt;
+&lt;p&gt;Since we want to use the VM as a remote desktop, we need a connection that supports graphics.
+Both RDP and VNC are popular protocols for remote desktop access. I went with RDP as it appears the faster of the two, and because RDP is natively supported in Windows.&lt;/p&gt;
+&lt;p&gt;I did not explore tunneling RDP over SSH or VPN because it would reduce performance too much, and it requires too much configuration on the client side, which is often not possible with company restricted laptops.&lt;/p&gt;
+&lt;p&gt;To be able to use RDP with Linux we need to install &lt;code&gt;xrdp&lt;/code&gt;. To be able to login to &lt;code&gt;xrdp&lt;/code&gt; requires setting a password for the user that logs in, introducing a security risk. To mitigate this risk, Azure NSG (our firewall) only accepts RDP connections from the IP address attached to my local desktop system via my ISP.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fail2ban-for-ssh&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Fail2ban for SSH&lt;/h2&gt;
+&lt;p&gt;fail2ban will dynamically block brute force attacks on the remote system. It is pre-configured for the default ssh port 22/tcp. As I am writing this blog, the VM is up and running, and every few hours an IP address get banned.
+It is configured to ban an IP after 5 login attempts. A ban lasts for 10 min, after which the ban is released again.
+Apparently this is for performance reasons, as we do not want to gather a very long list of IP addresses that needs to be scanned every time a new login attempt is made.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;sudo apt install fail2ban&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is not enabled by default.&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;sudo cp jail.conf jail.local
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+
+sudo systemctl status fail2ban.service&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;● fail2ban.service - Fail2Ban Service
+     Loaded: loaded (/lib/systemd/system/fail2ban.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2024-01-14 21:21:40 UTC; 1min 48s ago
+       Docs: man:fail2ban(1)
+   Main PID: 563 (fail2ban-server)
+      Tasks: 5 (limit: 9510)
+     Memory: 17.7M
+        CPU: 298ms
+     CGroup: /system.slice/fail2ban.service
+             └─563 /usr/bin/python3 /usr/bin/fail2ban-server -xf start
+
+Jan 14 21:21:40 standev systemd[1]: Started Fail2Ban Service.
+Jan 14 21:21:42 standev fail2ban-server[563]: Server ready&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It should be possibly to have fail2ban also monitor failed RDP login attempts, that would improve security even more.
+&lt;a href=&#34;https://stackoverflow.com/questions/75915624/xrdp-filter-setting-for-fail2ban&#34; class=&#34;uri&#34;&gt;https://stackoverflow.com/questions/75915624/xrdp-filter-setting-for-fail2ban&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;create-the-vm&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Create the VM&lt;/h1&gt;
+&lt;p&gt;We now are ready to bring it all together and create the VM. For this Azure CLI has the &lt;code&gt;az vm create&lt;/code&gt; command.
+The following example creates a VM that automatically starts up and runs our Cloud-init script:&lt;/p&gt;
+&lt;pre class=&#34;bash&#34;&gt;&lt;code&gt;az vm create \
+  --resource-group $resourceGroup \
+  --name $vmName \
+  --nics $NICName \
+  --image $vmImage \
+  --storage-sku $storagetype \
+  --size $vmSize \
+  --admin-username $AdminUsername \
+  --custom-data $customDataScript.tmp \
+  --generate-ssh-keys \
+  --output $azOutput \
+  --security-type Standard # no trusted launch&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Most options we already discussed above, except two:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--custom-data&lt;/code&gt;, this specifies the &lt;strong&gt;Cloud-init&lt;/strong&gt; script that will passed on to the cloud-init enabled VM image and contains instructions to create user accounts, install packages etc.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--generate-ssh-keys&lt;/code&gt;, this was described under “Securing the VM”.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Although there are Azure CLI commands to stop, start and deallocate the VM, I typically use a shell script &lt;code&gt;deploy_vm_ubuntu.sh&lt;/code&gt; to bring it up, leave it running while I need it, use the Azure Portal to manually stop and start the VM, and when no longer needed, tear it down using another script &lt;code&gt;delete_vm_ubuntu.sh&lt;/code&gt;. This script simply uses &lt;code&gt;az group delete&lt;/code&gt; to remove the Resource group containing the VM and related resources.&lt;/p&gt;
+&lt;p&gt;After running the deploy script, we can ssh into the VM and verify that cloud-init is still running in the background:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(base) gertjan:~/azure_cli_scripts$ ssh stanuser@gsverhoeven.westeurope.cloudapp.azure.com
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 6.2.0-1018-azure x86_64)
+
+[....]
+
+
+*** System restart required ***
+To run a command as administrator (user &amp;quot;root&amp;quot;), use &amp;quot;sudo &amp;lt;command&amp;gt;&amp;quot;.
+See &amp;quot;man sudo_root&amp;quot; for details.
+
+stanuser@standev:~$ cloud-init status
+status: running
+stanuser@standev:~$ exit&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After some 25 minutes of installing software, the VM is ready for use.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Cloud-init v. 23.3.3-0ubuntu0~22.04.1 finished at Mon, 01 Jan 2024 18:09:08 +0000. \
+Datasource DataSourceAzure [seed=/dev/sr0].  Up 1453.38 seconds&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For the finishing touch, we (manually) do all upgrades to get the latest security updates, and reboot the system.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;(base) gertjan:~/Werk/Github/gsverhoeven/azure_cli_scripts$  ssh stanuser@gsverhoeven.westeurope.cloudapp.azure.com
+[...]
+sudo apt upgrade
+sudo reboot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After this, we are in business, let the Bayesian modelling commence!
+&lt;img src=&#34;rdp_rstudio_stan.png&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;lessons-learned&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Lessons learned&lt;/h1&gt;
+&lt;p&gt;I learned several things from doing this.&lt;/p&gt;
+&lt;p&gt;First, infrastructure as code is a form of software development, and as such needs a suitable development environment.
+This means being able to rapidly test changes in e.g. configuration scripts, and to be able to debug stuff by stripping things to the core.&lt;/p&gt;
+&lt;p&gt;I improved the workflow by using QEMU, that allows me to work with Cloud-init enabled instances locally. This allowed me to figure out how cloud-init works without the overhead of doing a full cloud rollout, creating all the resources etc.&lt;/p&gt;
+&lt;p&gt;However, as my local machine is quite dated (4 GB mem, 2 core CPU, so even worse than the cheap D-compute from Azure) executing the full init takes even longer than in the cloud, and I ran into memory problems as I can only run QEMU with 2 GB mem.
+So repeating the full process every time we make a small change is not the way.&lt;/p&gt;
+&lt;p&gt;Ultimately we need a build tool that breaks down the whole image building process into a pipeline of steps, saving intermediate results. Basically a &lt;code&gt;make&lt;/code&gt; tool for VM (golden) image building. Then if we change some code, it could use graph dependencies to figure out which parts are affected and need to be rebuild. My next step here would be to look at &lt;a href=&#34;https://github.com/ansible/ansible&#34;&gt;Ansible&lt;/a&gt; or an open source alternative to HashiCorp Packer.&lt;/p&gt;
+&lt;p&gt;In addition, there is this &lt;a href=&#34;https://en.wikipedia.org/wiki/Containerization_(computing)&#34;&gt;Container thing&lt;/a&gt;, with Docker etc. This might offer a different way of “desktop computing” where I develop locally and run analyses in &lt;a href=&#34;https://en.wikipedia.org/wiki/Docker_(software)&#34;&gt;Docker&lt;/a&gt; containers in the cloud, managed by &lt;a href=&#34;https://en.wikipedia.org/wiki/Kubernetes&#34;&gt;Kubernetes&lt;/a&gt;. This is completely uncharted territory for me.&lt;/p&gt;
+&lt;p&gt;Another thing I found that Cloud computing is expensive. Even with the most low cost options, for a 24/7 desktop solution in the cloud we still end up paying around a 100 euro per month. And that’s with a 2 core 8GB RAM machine! This is the price we pay for the flexibility of renting without any long term commitment, the hardware already being there, it just works etc.&lt;/p&gt;
+&lt;p&gt;Finally, I am used to the relatively safe computing environment at home behind an ISP’s firewall. In the public cloud, we are fully exposed, and one can actually see the continuous break-in attempts occurring by the hour. That somehow feels a bit.. chilly.&lt;/p&gt;
+&lt;p&gt;To be continued …&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>The Super League: Tournament Blood Bowl online</title>
@@ -3672,6 +4199,8 @@ For me, this contains at the moment three things: A4 page size, double line spac
 In short, you let Rstudio’s pandoc generate a Word document from a &lt;code&gt;.Rmd&lt;/code&gt; file, and tweak the formatting styles of that document. Name the document &lt;code&gt;style_template.docx&lt;/code&gt; and keep it with your &lt;code&gt;.Rmd&lt;/code&gt; manuscript.
 I can confirm that this also works when you edit this document using LibreOffice / OpenOffice.&lt;/p&gt;
 &lt;p&gt;The great thing for me: now I have this blog post, I can forget about all this stuff, and finally get to the scientific writing part!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;N.b.&lt;/strong&gt; see also this repository from Kenneth Rioja with an operationalisation of the workflow described above:
+&lt;a href=&#34;https://github.com/kennethrioja/rmdzoteroword_workflow&#34; class=&#34;uri&#34;&gt;https://github.com/kennethrioja/rmdzoteroword_workflow&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>
