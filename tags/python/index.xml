@@ -5,12 +5,3046 @@
     <link>/tags/python/</link>
       <atom:link href="/tags/python/index.xml" rel="self" type="application/rss+xml" />
     <description>Python</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Sun, 20 Mar 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Thu, 25 Jul 2024 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Python</title>
       <link>/tags/python/</link>
     </image>
+    
+    <item>
+      <title>Introducing the fumbbl_replays Python package for Blood Bowl</title>
+      <link>/post/fumbbl-replays/</link>
+      <pubDate>Thu, 25 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>/post/fumbbl-replays/</guid>
+      <description>
+
+
+&lt;p&gt;The &lt;code&gt;fumbbl_replays&lt;/code&gt; package is a Python utility package for the board game Blood Bowl.
+It allows users to plot board positions, either from scratch, or from existing (FUMBBL) game logs.
+In addition, it has some functionality to analyze FUMBBL game logs.&lt;/p&gt;
+&lt;p&gt;On the FUMBBL website, a lot of high quality replay data is available as well as an API to conveniently fetch the data.
+In addition, the API provides up to date roster information.
+To do useful analyses (aka nufflytics) in Python with this data, we need a utility package / library.
+In R, a similar package exists to work with BB2 replays [&lt;a href=&#34;https://github.com/nufflytics/nufflytics&#34; class=&#34;uri&#34;&gt;https://github.com/nufflytics/nufflytics&lt;/a&gt;].
+To my knowledge, no work has been done yet on BB3 replay files.&lt;/p&gt;
+&lt;p&gt;We also need a standard way to describe Blood Bowl games in a compact way, that is both human and machine readable.
+In chess, there is the &lt;strong&gt;Portable Game Notation (PGN)&lt;/strong&gt;. PGN has become the de facto standard of describing Chess games.
+For Blood Bowl, already in 2002 some work has been done towards this end. David Morgan-Mar developed a notation for the purpose of sharing Blood Bowl game logs over the internet. [&lt;a href=&#34;https://www.dangermouse.net/games/bloodbowl/rules.html&#34; class=&#34;uri&#34;&gt;https://www.dangermouse.net/games/bloodbowl/rules.html&lt;/a&gt;]&lt;/p&gt;
+&lt;p&gt;If we could converge on a standard &lt;strong&gt;Fantasy Football Game Notation (FFGN)&lt;/strong&gt;, it would serve many purposes, e.g.:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It would allow us to interchange data between software&lt;/li&gt;
+&lt;li&gt;it would help to train AI engines.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So the package is being developed with this end goal in mind. As Blood Bowl is a much complexer game than Chess, and I am an amateur programmer, we need some intermediate goals that bring us closer to the end goal. Thus, I started with plotting (new or extracted) board positions using a short hand notation for board pieces (players) and codifying player moves.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;%pip install -e . --quiet&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;plotting-blood-bowl-board-positions&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Plotting Blood Bowl board positions&lt;/h1&gt;
+&lt;p&gt;If we want to describe (codify) a Blood Bowl board state, we need to describe the pieces (what type of player is it, what extra skills does it have), the location of the pieces as well as the “state” of the pieces. Player state in Blood Bowl can be either standing, prone, or stunned, and can be in various special states such as “Bone head”, “Rooted”, “Hypnotized” etc.
+(A full game state also contains additional information on rerolls, players on the bench etc. This is not yet implemented)&lt;/p&gt;
+&lt;p&gt;Let’s start with the location of the pieces. A grid reference system is needed.
+The game board of Blood Bowl has dimensions 15 x 26.
+It has cognitive benefit to use numbers for one dimension, and letters for the other dimensions. Fancy word: alphanumeric.
+Chess over the centuries has had various notations, and this notation is the one that became universally accepted.
+[&lt;a href=&#34;https://en.wikipedia.org/wiki/Algebraic_notation_(chess)&#34; class=&#34;uri&#34;&gt;https://en.wikipedia.org/wiki/Algebraic_notation_(chess)&lt;/a&gt;]
+The only choice left for us is then, which axis should have letters, and which axis should have the numbers.&lt;/p&gt;
+&lt;p&gt;A strong argument was made on the BotBowl discord that distance to the end zone is very important in BB.
+By using numbers for the long axis, we can easily deduce that a Gutter Runner at position c15 is in scoring position: It needs 11 movement to score a touchdown at c26.
+This notation is also used by Cow Daddy Gaming in his “What´s the play” puzzles.&lt;/p&gt;
+&lt;p&gt;I wrote a function &lt;code&gt;show_boardpos()&lt;/code&gt; that displays the name of all the board positions.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import fumbbl_replays as fb
+
+fb.show_boardpos(rotation = &amp;#39;H&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_3_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now we need a way to describe the playing pieces, and visualize them. In chess it is easy, there are only six different ones.
+In Blood Bowl, there are roughly 200 different playing pieces (30 teams, times 5 positionals, plus 50+ star players).
+Here the concept of a roster can help us out.
+I wrote a function &lt;code&gt;fetch_roster()&lt;/code&gt; that fetches rosters from FUMBBL and displays the positions.
+It also contains links to icons that can represent the piece on the board.&lt;/p&gt;
+&lt;p&gt;Take for example the High Elf roster.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;roster = fb.fetch_roster(&amp;quot;High Elf&amp;quot;)
+roster&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+positionId
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+skillArray
+&lt;/th&gt;
+&lt;th&gt;
+shorthand
+&lt;/th&gt;
+&lt;th&gt;
+icon_path
+&lt;/th&gt;
+&lt;th&gt;
+race
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+39330
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+L
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/585638.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/585638.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+39331
+&lt;/td&gt;
+&lt;td&gt;
+Thrower
+&lt;/td&gt;
+&lt;td&gt;
+[Cloud Burster, Pass, Safe Pass]
+&lt;/td&gt;
+&lt;td&gt;
+T
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/436284.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/436284.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+39332
+&lt;/td&gt;
+&lt;td&gt;
+Catcher
+&lt;/td&gt;
+&lt;td&gt;
+[Catch]
+&lt;/td&gt;
+&lt;td&gt;
+C
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/585639.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/585639.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+3
+&lt;/th&gt;
+&lt;td&gt;
+39333
+&lt;/td&gt;
+&lt;td&gt;
+Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+[Block]
+&lt;/td&gt;
+&lt;td&gt;
+Z
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/436286.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/436286.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;It has four different pieces or “positionals”. It turns out that FUMBBL has already solved our problem of denoting them, introducing a shorthand text reference.
+So if we want to describe some action involving a High Elf Catcher, and there are four of them on the board, we could denote them by C1, C2, C3 and C4.
+This is compact, and has meaning within the context of the High Elf roster.&lt;/p&gt;
+&lt;p&gt;If we combine the descriptions of the pieces, and their location, we have enough to describe for example an initial setup formation before kick-off.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;my_setup = [&amp;#39;setup&amp;#39;, [&amp;#39;L1: g13&amp;#39;, &amp;#39;L2: h13&amp;#39;, &amp;#39;L3: i13&amp;#39;, &amp;#39;Z1: c11&amp;#39;, &amp;#39;Z2: m11&amp;#39;, &amp;#39;T1: h6&amp;#39;, &amp;#39;L4: e11&amp;#39;, 
+                      &amp;#39;L5: k11&amp;#39;, &amp;#39;C1: l10&amp;#39;, &amp;#39;C2: d10&amp;#39;, &amp;#39;L6: h11&amp;#39;]]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I wrote a function &lt;code&gt;create_position()&lt;/code&gt; that combines the roster and the setup annotation to create an object that contains all the information to make a nice plot of the board state. The function &lt;code&gt;print_position()&lt;/code&gt; prints a nicely formatted summary of the position.
+As default, a position is created for the home team, denoted as “teamHome”.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;positions = fb.create_position(roster, my_setup)
+fb.print_position(positions)&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+home_away
+&lt;/th&gt;
+&lt;th&gt;
+race
+&lt;/th&gt;
+&lt;th&gt;
+short_name
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+boardpos
+&lt;/th&gt;
+&lt;th&gt;
+PlayerState
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+5
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+T1
+&lt;/td&gt;
+&lt;td&gt;
+Thrower
+&lt;/td&gt;
+&lt;td&gt;
+h6
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+9
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+C2
+&lt;/td&gt;
+&lt;td&gt;
+Catcher
+&lt;/td&gt;
+&lt;td&gt;
+d10
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+8
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+C1
+&lt;/td&gt;
+&lt;td&gt;
+Catcher
+&lt;/td&gt;
+&lt;td&gt;
+l10
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+3
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+Z1
+&lt;/td&gt;
+&lt;td&gt;
+Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+c11
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+6
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+L4
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+e11
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+10
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+L6
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+h11
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+7
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+L5
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+k11
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+4
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+Z2
+&lt;/td&gt;
+&lt;td&gt;
+Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+m11
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+L1
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+g13
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+L2
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+h13
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+High Elf
+&lt;/td&gt;
+&lt;td&gt;
+L3
+&lt;/td&gt;
+&lt;td&gt;
+Lineman
+&lt;/td&gt;
+&lt;td&gt;
+i13
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;Let’s suppose that the High Elf team is playing against a Gnome team. Let’s also fetch a Gnome roster and create a board position on the other half of the pitch.
+As we already have a home team, we refer to this team as “teamAway”.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;roster = fb.fetch_roster(&amp;quot;Gnome&amp;quot;)
+roster&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+positionId
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+skillArray
+&lt;/th&gt;
+&lt;th&gt;
+shorthand
+&lt;/th&gt;
+&lt;th&gt;
+icon_path
+&lt;/th&gt;
+&lt;th&gt;
+race
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+57706
+&lt;/td&gt;
+&lt;td&gt;
+Altern Forest Treeman
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow (+1), Stand Firm, Strong Arm, Thi…
+&lt;/td&gt;
+&lt;td&gt;
+T
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/733781.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/733781.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+57707
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Beastmaster
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Wrestle, Guard, Stunty]
+&lt;/td&gt;
+&lt;td&gt;
+B
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/735006.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/735006.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+57708
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Illusionist
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Wrestle, Stunty, Trickster]
+&lt;/td&gt;
+&lt;td&gt;
+I
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/735007.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/735007.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+3
+&lt;/th&gt;
+&lt;td&gt;
+57709
+&lt;/td&gt;
+&lt;td&gt;
+Woodland Fox
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge, Side Step, Stunty, My Ball]
+&lt;/td&gt;
+&lt;td&gt;
+F
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/735008.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/735008.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+4
+&lt;/th&gt;
+&lt;td&gt;
+57710
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Wrestle, Right Stuff, Stunty]
+&lt;/td&gt;
+&lt;td&gt;
+L
+&lt;/td&gt;
+&lt;td&gt;
+&lt;a href=&#34;https://fumbbl.com/i/735009.png&#34; class=&#34;uri&#34;&gt;https://fumbbl.com/i/735009.png&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;my_setup = [&amp;#39;setup&amp;#39;, [&amp;#39;T2: j14&amp;#39;, &amp;#39;T1: f14&amp;#39;, &amp;#39;F1: h20&amp;#39;, &amp;#39;I1: b14&amp;#39;, &amp;#39;I2: n14&amp;#39;, &amp;#39;L3: e14&amp;#39;, &amp;#39;L6: k14&amp;#39;, 
+                      &amp;#39;B2: m15&amp;#39;, &amp;#39;B1: c15&amp;#39;, &amp;#39;L4: g15&amp;#39;, &amp;#39;F2: i16&amp;#39;]]
+
+positions2 = fb.create_position(roster, my_setup, &amp;#39;teamAway&amp;#39;)
+
+fb.print_position(positions2)&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+home_away
+&lt;/th&gt;
+&lt;th&gt;
+race
+&lt;/th&gt;
+&lt;th&gt;
+short_name
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+boardpos
+&lt;/th&gt;
+&lt;th&gt;
+PlayerState
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+3
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+I1
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Illusionist
+&lt;/td&gt;
+&lt;td&gt;
+b14
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+5
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+L3
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+e14
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+T1
+&lt;/td&gt;
+&lt;td&gt;
+Altern Forest Treeman
+&lt;/td&gt;
+&lt;td&gt;
+f14
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+T2
+&lt;/td&gt;
+&lt;td&gt;
+Altern Forest Treeman
+&lt;/td&gt;
+&lt;td&gt;
+j14
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+6
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+L6
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+k14
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+4
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+I2
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Illusionist
+&lt;/td&gt;
+&lt;td&gt;
+n14
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+8
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+B1
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Beastmaster
+&lt;/td&gt;
+&lt;td&gt;
+c15
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+9
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+L4
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+g15
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+7
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+B2
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Beastmaster
+&lt;/td&gt;
+&lt;td&gt;
+m15
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+10
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+F2
+&lt;/td&gt;
+&lt;td&gt;
+Woodland Fox
+&lt;/td&gt;
+&lt;td&gt;
+i16
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+F1
+&lt;/td&gt;
+&lt;td&gt;
+Woodland Fox
+&lt;/td&gt;
+&lt;td&gt;
+h20
+&lt;/td&gt;
+&lt;td&gt;
+Standing
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;As a final step before plotting, we add both positions together.
+As both are &lt;code&gt;pandas&lt;/code&gt; DataFrames, we use the &lt;code&gt;concat()&lt;/code&gt; function from &lt;code&gt;pandas&lt;/code&gt; to combine (“concatenate”) them.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import pandas as pd
+
+positions = pd.concat([positions, positions2])&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The function &lt;code&gt;create_plot()&lt;/code&gt; plots the board position.
+By default, it plots a horizontal pitch, with the team denoted as “teamHome” in red, and the other team in blue.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.create_plot(positions)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_17_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;create_plot()&lt;/code&gt; function allows us the swap the color of the teams, to change the pitch orientation to vertical, and to add a layer of semi-transparant tacklezones.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.create_plot(positions, red_team = &amp;quot;teamAway&amp;quot;, orientation = &amp;#39;V&amp;#39;, tackle_zones = True)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_19_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The library also support moving single pieces (players). It currently only works for pieces that already exist in a board position.
+In the plot above, suppose we want to move the Woodland Fox F1 to board position &lt;code&gt;o26&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;positions = fb.move_piece(positions, &amp;quot;teamAway&amp;quot;, &amp;quot;F1&amp;quot;, &amp;quot;o26&amp;quot;)
+
+fb.create_plot(positions, red_team = &amp;quot;teamAway&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_21_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Each player also has an associated &lt;code&gt;PlayerState&lt;/code&gt;. This can either be &lt;code&gt;Standing&lt;/code&gt; (the default), &lt;code&gt;HasBall&lt;/code&gt;, &lt;code&gt;Prone&lt;/code&gt; or &lt;code&gt;Stunned&lt;/code&gt;.
+The function &lt;code&gt;set_piece_state()&lt;/code&gt; allows to set this for individual players:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;positions = fb.set_piece_state(positions, &amp;quot;teamAway&amp;quot;, &amp;quot;F1&amp;quot;, &amp;quot;HasBall&amp;quot;)
+positions = fb.set_piece_state(positions, &amp;quot;teamHome&amp;quot;, &amp;quot;T1&amp;quot;, &amp;quot;Prone&amp;quot;)
+positions = fb.set_piece_state(positions, &amp;quot;teamAway&amp;quot;, &amp;quot;B1&amp;quot;, &amp;quot;Stunned&amp;quot;)
+
+fb.create_plot(positions, red_team = &amp;quot;teamAway&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_23_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The compact setup description can also describe player states other than standing.
+&lt;code&gt;/&lt;/code&gt; is Prone, &lt;code&gt;X&lt;/code&gt; denotes stunned. &lt;code&gt;o&lt;/code&gt; denotes a player that has the ball.&lt;/p&gt;
+&lt;p&gt;The compact description for the Gnome position plotted above can be obtained using &lt;code&gt;get_position()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.get_position(positions, home_away = &amp;#39;teamAway&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[&amp;#39;setup&amp;#39;, [&amp;#39;T2: j14&amp;#39;, &amp;#39;T1: f14&amp;#39;, &amp;#39;F1: o26o&amp;#39;, &amp;#39;I1: b14&amp;#39;, &amp;#39;I2: n14&amp;#39;, &amp;#39;L3: e14&amp;#39;, &amp;#39;L6: k14&amp;#39;, &amp;#39;B2: m15&amp;#39;, &amp;#39;B1: c15X&amp;#39;, &amp;#39;L4: g15&amp;#39;, &amp;#39;F2: i16&amp;#39;]]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note the notation for Fox F1 with the ball (&lt;code&gt;F1: o26o&lt;/code&gt;) and the notation for the stunned Beastmaster B1 (&lt;code&gt;B1: c15X&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;As the &lt;code&gt;positions&lt;/code&gt; object is a table of players, I added an extra argument to &lt;code&gt;create_plot()&lt;/code&gt; to plot a free ball.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.create_plot(positions, red_team = &amp;quot;teamAway&amp;quot;, ballpos = &amp;#39;e5&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_27_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Star players can also be plotted. For this we need to fetch a separate star player “roster” and add it to the team roster.
+Lets add Rowana Forestfoot (“RF”) and Rodney Roachbait (“RR”) to the Gnome setup, replacing Gnome linemen L3 and L6.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;positions = positions.query(&amp;#39;home_away == &amp;quot;teamHome&amp;quot;&amp;#39;)
+
+roster = fb.fetch_roster(&amp;quot;Gnome&amp;quot;)
+stars = fb.fetch_stars()
+roster = pd.concat([roster, stars])
+
+my_setup = [&amp;#39;setup&amp;#39;, [&amp;#39;T2: j14&amp;#39;, &amp;#39;T1: f14&amp;#39;, &amp;#39;F1: o26o&amp;#39;, \
+                    &amp;#39;I1: b14&amp;#39;, &amp;#39;I2: n14&amp;#39;, \
+                    &amp;#39;RF1: e14&amp;#39;, &amp;#39;RR1: k14&amp;#39;, \
+                    &amp;#39;B2: m15&amp;#39;, &amp;#39;B1: c15X&amp;#39;, &amp;#39;L4: g15&amp;#39;, &amp;#39;F2: i16&amp;#39;]]
+
+positions2 = fb.create_position(roster, my_setup, &amp;#39;teamAway&amp;#39;)
+
+
+positions = pd.concat([positions, positions2])
+
+fb.create_plot(positions, red_team = &amp;quot;teamAway&amp;quot;, ballpos = &amp;#39;e5&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_29_0.png&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;plotting-player-skills-aka-digital-loom-color-bands&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Plotting player skills aka “digital loom color bands”&lt;/h1&gt;
+&lt;p&gt;Knowing what extra skills players have is often important in analyzing a given board position (what blocks are possible, can we use the Dodge skill or does the opponent has Tackle etc).
+In the FUMBBL client there is a function that allows automatic skill marking using text.
+When playing on tabletop there are various ways to mark / denote what extra skills players have.
+One popular way is to use colored elastic (“loom”) band.
+The most common skills have semi-standardized colors associated with them:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Guard is green&lt;/li&gt;
+&lt;li&gt;Block is blue&lt;/li&gt;
+&lt;li&gt;Wrestle is white&lt;/li&gt;
+&lt;li&gt;Dodge is yellow&lt;/li&gt;
+&lt;li&gt;Leader is purple&lt;/li&gt;
+&lt;li&gt;Mighty Blow is red&lt;/li&gt;
+&lt;li&gt;Tackle is orange&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;At a typical tournament (I checked this for Thrudball 2024) 80% of skills chosen are one of these seven skills.
+Here I decided to make a digital version of the colored elastic band, plotted below the player icon.
+If a player has more than one extra skill (“Skill stacking”), the colored bands are stacked on top of each other.&lt;/p&gt;
+&lt;p&gt;Here I will demonstrate by setting up the board for a Shambling Undead team with a set of 6 skills often chosen at tournaments.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import fumbbl_replays as fb
+roster = fb.fetch_roster(&amp;quot;Shambling Undead&amp;quot;)
+
+my_setup = [&amp;#39;setup&amp;#39;, [&amp;#39;Z1: g14&amp;#39;, &amp;#39;Z2: h14&amp;#39;, &amp;#39;Z3: i14&amp;#39;, 
+                      &amp;#39;W1: e16&amp;#39;, &amp;#39;W2: k16&amp;#39;, &amp;#39;G1: h16&amp;#39;, &amp;#39;G2: h17&amp;#39;, 
+                      &amp;#39;M1: c16&amp;#39;, &amp;#39;M2: m16&amp;#39;, &amp;#39;Z4: b17&amp;#39;, &amp;#39;Z5: n17&amp;#39;]]
+
+positions = fb.create_position(roster, my_setup)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.add_skill_to_player(positions, &amp;quot;M1&amp;quot;, &amp;quot;Guard&amp;quot;)
+fb.add_skill_to_player(positions, &amp;quot;M2&amp;quot;, &amp;quot;Guard&amp;quot;)
+fb.add_skill_to_player(positions, &amp;quot;G1&amp;quot;, &amp;quot;Block&amp;quot;)
+fb.add_skill_to_player(positions, &amp;quot;G2&amp;quot;, &amp;quot;Block&amp;quot;)
+fb.add_skill_to_player(positions, &amp;quot;W1&amp;quot;, &amp;quot;Tackle&amp;quot;)
+fb.add_skill_to_player(positions, &amp;quot;W1&amp;quot;, &amp;quot;Mighty Blow&amp;quot;)
+
+fb.create_plot(positions, red_team = &amp;quot;teamAway&amp;quot;, orientation = &amp;#39;H&amp;#39;, skill_bands = True)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_32_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;It is also possible to remove a (Gained) skill from a player.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.remove_skill_from_player(positions, &amp;quot;W1&amp;quot;, &amp;quot;Tackle&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;(positions
+ .filter([&amp;#39;short_name&amp;#39;, &amp;#39;positionName&amp;#39;, &amp;#39;skillArrayRoster&amp;#39;, &amp;#39;learned_skills&amp;#39;, &amp;#39;skill_colors&amp;#39;, &amp;#39;boardpos&amp;#39;])
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+short_name
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+skillArrayRoster
+&lt;/th&gt;
+&lt;th&gt;
+learned_skills
+&lt;/th&gt;
+&lt;th&gt;
+skill_colors
+&lt;/th&gt;
+&lt;th&gt;
+boardpos
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+Z1
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+g14
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+Z2
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+h14
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+Z3
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+i14
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+3
+&lt;/th&gt;
+&lt;td&gt;
+W1
+&lt;/td&gt;
+&lt;td&gt;
+Wight Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+[Block, Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow]
+&lt;/td&gt;
+&lt;td&gt;
+[red]
+&lt;/td&gt;
+&lt;td&gt;
+e16
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+4
+&lt;/th&gt;
+&lt;td&gt;
+W2
+&lt;/td&gt;
+&lt;td&gt;
+Wight Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+[Block, Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+k16
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+5
+&lt;/th&gt;
+&lt;td&gt;
+G1
+&lt;/td&gt;
+&lt;td&gt;
+Ghoul Runner
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[Block]
+&lt;/td&gt;
+&lt;td&gt;
+[blue]
+&lt;/td&gt;
+&lt;td&gt;
+h16
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+6
+&lt;/th&gt;
+&lt;td&gt;
+G2
+&lt;/td&gt;
+&lt;td&gt;
+Ghoul Runner
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[Block]
+&lt;/td&gt;
+&lt;td&gt;
+[blue]
+&lt;/td&gt;
+&lt;td&gt;
+h17
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+7
+&lt;/th&gt;
+&lt;td&gt;
+M1
+&lt;/td&gt;
+&lt;td&gt;
+Mummy
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow (+1), Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[Guard]
+&lt;/td&gt;
+&lt;td&gt;
+[lime]
+&lt;/td&gt;
+&lt;td&gt;
+c16
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+8
+&lt;/th&gt;
+&lt;td&gt;
+M2
+&lt;/td&gt;
+&lt;td&gt;
+Mummy
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow (+1), Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[Guard]
+&lt;/td&gt;
+&lt;td&gt;
+[lime]
+&lt;/td&gt;
+&lt;td&gt;
+m16
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+9
+&lt;/th&gt;
+&lt;td&gt;
+Z4
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+b17
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+10
+&lt;/th&gt;
+&lt;td&gt;
+Z5
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+n17
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;plotting-board-positions-from-fumbbl-replays&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Plotting board positions from FUMBBL replays&lt;/h1&gt;
+&lt;p&gt;Up until now, we created board positions from scratch, using rosters from FUMBBL and a simple way to describe a board position.&lt;/p&gt;
+&lt;p&gt;The package also allows us to plot board positions extracted from FUMBBL replay files.
+At this moment, only the board position right before kick-off can be plotted.
+Suppose we want to plot this position for &lt;a href=&#34;https://www.fumbbl.com/p/match?id=4550284&#34;&gt;match 4550284&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We first need to fetch the replay data. The &lt;code&gt;fetch_data()&lt;/code&gt; function takes the &lt;code&gt;match_id&lt;/code&gt; as argument and returns five objects:
+the &lt;code&gt;match_id&lt;/code&gt;, &lt;code&gt;replay_id&lt;/code&gt;, a &lt;code&gt;positions&lt;/code&gt; object containing the board state right before first kick-off, which team is the &lt;code&gt;receiving_team&lt;/code&gt; (i.e. playing offense), and a &lt;code&gt;metadata&lt;/code&gt; list (coach names, race names, and match touchdown result).&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;match_id, replay_id, positions, receiving_team, metadata = fb.fetch_data(match_id = 4550284)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To plot the board state right before kick-off, we can use the &lt;code&gt;create_plot()&lt;/code&gt; function in the same way as above.
+We plot the receiving team in red so we can see which team is playing offense and which team is playing defense.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.create_plot(positions, red_team = receiving_team)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_39_0.png&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;(positions.filter([&amp;#39;race&amp;#39;, &amp;#39;home_away&amp;#39;, &amp;#39;short_name&amp;#39;, &amp;#39;positionName&amp;#39;, &amp;#39;playerName&amp;#39;,  &amp;#39;skillArrayRoster&amp;#39;, &amp;#39;learned_skills&amp;#39;, &amp;#39;cost&amp;#39;, &amp;#39;recoveringInjury&amp;#39;])
+                    )&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+race
+&lt;/th&gt;
+&lt;th&gt;
+home_away
+&lt;/th&gt;
+&lt;th&gt;
+short_name
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+playerName
+&lt;/th&gt;
+&lt;th&gt;
+skillArrayRoster
+&lt;/th&gt;
+&lt;th&gt;
+learned_skills
+&lt;/th&gt;
+&lt;th&gt;
+cost
+&lt;/th&gt;
+&lt;th&gt;
+recoveringInjury
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+T2
+&lt;/td&gt;
+&lt;td&gt;
+Altern Forest Treeman
+&lt;/td&gt;
+&lt;td&gt;
+Caroline Rigol
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow, Stand Firm, Strong Arm, Take Roo…
+&lt;/td&gt;
+&lt;td&gt;
+[+MA]
+&lt;/td&gt;
+&lt;td&gt;
+120000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+T1
+&lt;/td&gt;
+&lt;td&gt;
+Altern Forest Treeman
+&lt;/td&gt;
+&lt;td&gt;
+Matthew Ir
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow, Stand Firm, Strong Arm, Take Roo…
+&lt;/td&gt;
+&lt;td&gt;
+[Pro]
+&lt;/td&gt;
+&lt;td&gt;
+120000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+L2
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Jaiden Netzigon
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Right Stuff, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+5
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+B1
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Beastmaster
+&lt;/td&gt;
+&lt;td&gt;
+Eloise Celorn
+&lt;/td&gt;
+&lt;td&gt;
+[Guard, Jump Up, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+55000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+6
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+L1
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Andre Drumma
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Right Stuff, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+7
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+B2
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Beastmaster
+&lt;/td&gt;
+&lt;td&gt;
+Sienna Rime
+&lt;/td&gt;
+&lt;td&gt;
+[Guard, Jump Up, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+55000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+8
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+L4
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Melanie Kayce
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Right Stuff, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+9
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+L5
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Eliza Elora
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Right Stuff, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+10
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+L7
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Gabriela Lacspor
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Right Stuff, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+11
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+I1
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Illusionist
+&lt;/td&gt;
+&lt;td&gt;
+Brynlee Tror
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Stunty, Trickster, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+50000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+12
+&lt;/th&gt;
+&lt;td&gt;
+Gnome
+&lt;/td&gt;
+&lt;td&gt;
+teamHome
+&lt;/td&gt;
+&lt;td&gt;
+L3
+&lt;/td&gt;
+&lt;td&gt;
+Gnome Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Chase Kavelin
+&lt;/td&gt;
+&lt;td&gt;
+[Jump Up, Right Stuff, Stunty, Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[Sneaky Git]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+14
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Z3
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Rylee Dager
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+15
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Z2
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Molly Harven
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+16
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Z1
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Asher Meridan
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+17
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+M1
+&lt;/td&gt;
+&lt;td&gt;
+Mummy
+&lt;/td&gt;
+&lt;td&gt;
+Brooklyn Biel
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow, Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+125000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+18
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+G1
+&lt;/td&gt;
+&lt;td&gt;
+Ghoul Runner
+&lt;/td&gt;
+&lt;td&gt;
+Noelle Vythethi
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+75000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+19
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Z5
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Asher Meegosh
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+20
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+M2
+&lt;/td&gt;
+&lt;td&gt;
+Mummy
+&lt;/td&gt;
+&lt;td&gt;
+Bailey Fer
+&lt;/td&gt;
+&lt;td&gt;
+[Mighty Blow, Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+125000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+21
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+Z4
+&lt;/td&gt;
+&lt;td&gt;
+Zombie Lineman
+&lt;/td&gt;
+&lt;td&gt;
+Haley Guilomar
+&lt;/td&gt;
+&lt;td&gt;
+[Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+40000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+22
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+W1
+&lt;/td&gt;
+&lt;td&gt;
+Wight Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+Corbin Aleemy
+&lt;/td&gt;
+&lt;td&gt;
+[Block, Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+90000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+23
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+W2
+&lt;/td&gt;
+&lt;td&gt;
+Wight Blitzer
+&lt;/td&gt;
+&lt;td&gt;
+Lucas Mickal
+&lt;/td&gt;
+&lt;td&gt;
+[Block, Regeneration]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+90000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+24
+&lt;/th&gt;
+&lt;td&gt;
+Shambling Undead
+&lt;/td&gt;
+&lt;td&gt;
+teamAway
+&lt;/td&gt;
+&lt;td&gt;
+G2
+&lt;/td&gt;
+&lt;td&gt;
+Ghoul Runner
+&lt;/td&gt;
+&lt;td&gt;
+Ivy Farate
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+75000
+&lt;/td&gt;
+&lt;td&gt;
+None
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;Adjusting this board position by moving players one-by-one works also in the same way as above.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;positions = fb.move_piece(positions, &amp;quot;teamAway&amp;quot;, &amp;quot;Z1&amp;quot;, &amp;quot;b26&amp;quot;)
+positions = fb.move_piece(positions, &amp;quot;teamAway&amp;quot;, &amp;quot;Z2&amp;quot;, &amp;quot;o26&amp;quot;)
+
+fb.create_plot(positions, red_team = receiving_team)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_42_0.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Suppose we think that this Gnome defensive setup is awesome, and we wish to share this setup with other coaches.
+Here the compact way to describe a setup using player abbreviations and the alphanumeric grid system comes in handy:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.get_position(positions, home_away = &amp;#39;teamHome&amp;#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[&amp;#39;setup&amp;#39;, [&amp;#39;T2: g13&amp;#39;, &amp;#39;T1: i13&amp;#39;, &amp;#39;L2: h13&amp;#39;, &amp;#39;B1: f10&amp;#39;, &amp;#39;L1: e11&amp;#39;, &amp;#39;B2: j10&amp;#39;, &amp;#39;L4: k11&amp;#39;, &amp;#39;L5: h11&amp;#39;, &amp;#39;L7: i10&amp;#39;, &amp;#39;I1: g10&amp;#39;, &amp;#39;L3: h10&amp;#39;]]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, suppose we think this setup is nice, but it would be even better if the illusionist in row &lt;code&gt;g&lt;/code&gt; would instead be a Woodland Fox.
+We can take the setup (copy-paste), change the setup slightly, and create a new position, with &lt;code&gt;F1: g10&lt;/code&gt;.
+As we now only have a single team, we can rotate the pitch and crop to show only the upper part of it.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;roster = fb.fetch_roster(&amp;quot;Gnome&amp;quot;)
+
+my_setup = [&amp;#39;setup&amp;#39;, [&amp;#39;T2: g13&amp;#39;, &amp;#39;T1: i13&amp;#39;, &amp;#39;L2: h13&amp;#39;, &amp;#39;B1: f10&amp;#39;, \
+                      &amp;#39;L1: e11&amp;#39;, &amp;#39;B2: j10&amp;#39;, &amp;#39;L4: k11&amp;#39;, &amp;#39;L5: h11&amp;#39;, \
+                        &amp;#39;L7: i10&amp;#39;, &amp;#39;F1: g10&amp;#39;, &amp;#39;L3: h10&amp;#39;]]
+
+positions = fb.create_position(roster, my_setup)
+
+fb.create_plot(positions, orientation= &amp;quot;V&amp;quot;, crop = &amp;quot;upper&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_46_0.png&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;working-with-raw-replays-directly&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Working with raw replays directly&lt;/h1&gt;
+&lt;p&gt;It is also possible to work with the raw FUMBBL replay files directly.
+I made a start with describing the replay file format in &lt;code&gt;doc/fumbbl_replay_file_format.md&lt;/code&gt;.
+We can use &lt;code&gt;fetch_replay()&lt;/code&gt; to retrieve a replay in JSON format.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import fumbbl_replays as fb
+
+my_replay = fb.fetch_replay(match_id = 4447439)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;JSON consists of key-value pairs.
+We can for example query the value of the key &lt;code&gt;gameStatus&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;my_replay[&amp;#39;gameStatus&amp;#39;]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&amp;#39;uploaded&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Or query the &lt;code&gt;rosterName&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;my_replay[&amp;#39;game&amp;#39;][&amp;#39;teamHome&amp;#39;][&amp;#39;roster&amp;#39;][&amp;#39;rosterName&amp;#39;]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&amp;#39;Necromantic Horror&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The replay contains both a game log, as well as full roster information on both teams.
+We can extract the roster information from the replay using the function &lt;code&gt;extract_rosters_from_replay()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;import pandas as pd
+pd.set_option(&amp;#39;display.max_colwidth&amp;#39;, None)
+
+df_positions = fb.extract_rosters_from_replay(my_replay)
+(df_positions
+ .query(&amp;quot;home_away == &amp;#39;teamAway&amp;#39;&amp;quot;)
+ .filter([&amp;#39;short_name&amp;#39;, &amp;#39;positionName&amp;#39;, &amp;#39;skillArrayRoster&amp;#39;, &amp;#39;learned_skills&amp;#39;, &amp;#39;skill_colors&amp;#39;])
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+short_name
+&lt;/th&gt;
+&lt;th&gt;
+positionName
+&lt;/th&gt;
+&lt;th&gt;
+skillArrayRoster
+&lt;/th&gt;
+&lt;th&gt;
+learned_skills
+&lt;/th&gt;
+&lt;th&gt;
+skill_colors
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+14
+&lt;/th&gt;
+&lt;td&gt;
+Tr1
+&lt;/td&gt;
+&lt;td&gt;
+Loren Forest Treeman
+&lt;/td&gt;
+&lt;td&gt;
+[Loner, Mighty Blow, Stand Firm, Strong Arm, Take Root, Thick Skull, Throw Team-Mate]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+15
+&lt;/th&gt;
+&lt;td&gt;
+W1
+&lt;/td&gt;
+&lt;td&gt;
+Wardancer
+&lt;/td&gt;
+&lt;td&gt;
+[Block, Dodge, Leap]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+16
+&lt;/th&gt;
+&lt;td&gt;
+W2
+&lt;/td&gt;
+&lt;td&gt;
+Wardancer
+&lt;/td&gt;
+&lt;td&gt;
+[Block, Dodge, Leap]
+&lt;/td&gt;
+&lt;td&gt;
+[Strip Ball]
+&lt;/td&gt;
+&lt;td&gt;
+[deeppink]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+17
+&lt;/th&gt;
+&lt;td&gt;
+T1
+&lt;/td&gt;
+&lt;td&gt;
+Thrower
+&lt;/td&gt;
+&lt;td&gt;
+[Pass]
+&lt;/td&gt;
+&lt;td&gt;
+[Leader]
+&lt;/td&gt;
+&lt;td&gt;
+[purple]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+18
+&lt;/th&gt;
+&lt;td&gt;
+C1
+&lt;/td&gt;
+&lt;td&gt;
+Catcher
+&lt;/td&gt;
+&lt;td&gt;
+[Catch, Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+19
+&lt;/th&gt;
+&lt;td&gt;
+C2
+&lt;/td&gt;
+&lt;td&gt;
+Catcher
+&lt;/td&gt;
+&lt;td&gt;
+[Catch, Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+20
+&lt;/th&gt;
+&lt;td&gt;
+L1
+&lt;/td&gt;
+&lt;td&gt;
+Wood Elf Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[yellow]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+21
+&lt;/th&gt;
+&lt;td&gt;
+L2
+&lt;/td&gt;
+&lt;td&gt;
+Wood Elf Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[Dodge]
+&lt;/td&gt;
+&lt;td&gt;
+[yellow]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+22
+&lt;/th&gt;
+&lt;td&gt;
+L3
+&lt;/td&gt;
+&lt;td&gt;
+Wood Elf Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+23
+&lt;/th&gt;
+&lt;td&gt;
+L4
+&lt;/td&gt;
+&lt;td&gt;
+Wood Elf Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[floralwhite]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+24
+&lt;/th&gt;
+&lt;td&gt;
+L5
+&lt;/td&gt;
+&lt;td&gt;
+Wood Elf Lineman
+&lt;/td&gt;
+&lt;td&gt;
+[]
+&lt;/td&gt;
+&lt;td&gt;
+[Wrestle]
+&lt;/td&gt;
+&lt;td&gt;
+[floralwhite]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;I wrote a replay parser that parses the gameLog section of a replay and transforms this into a &lt;code&gt;pandas&lt;/code&gt; DataFrame object, i.e. a flat 2D table with rows and columns.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;df = fb.parse_replay(my_replay)
+(df[0:4]
+ .filter([&amp;#39;commandNr&amp;#39;, &amp;#39;turnNr&amp;#39;, &amp;#39;turnMode&amp;#39;, &amp;#39;Half&amp;#39;, &amp;#39;modelChangeId&amp;#39;, &amp;#39;modelChangeValue&amp;#39;])
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+commandNr
+&lt;/th&gt;
+&lt;th&gt;
+turnNr
+&lt;/th&gt;
+&lt;th&gt;
+turnMode
+&lt;/th&gt;
+&lt;th&gt;
+Half
+&lt;/th&gt;
+&lt;th&gt;
+modelChangeId
+&lt;/th&gt;
+&lt;th&gt;
+modelChangeValue
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+0
+&lt;/th&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+startGame
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelAddPlayerMarker
+&lt;/td&gt;
+&lt;td&gt;
+{‘playerId’: ‘15440786’, ‘homeText’: ‘B’, ‘awayText’: ‘B’}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+1
+&lt;/th&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+startGame
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelAddPlayerMarker
+&lt;/td&gt;
+&lt;td&gt;
+{‘playerId’: ‘15440787’, ‘homeText’: ‘G’, ‘awayText’: ‘G’}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+2
+&lt;/th&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+startGame
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelAddPlayerMarker
+&lt;/td&gt;
+&lt;td&gt;
+{‘playerId’: ‘15440788’, ‘homeText’: ‘G’, ‘awayText’: ‘G’}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+3
+&lt;/th&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+startGame
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelAddPlayerMarker
+&lt;/td&gt;
+&lt;td&gt;
+{‘playerId’: ‘15440790’, ‘homeText’: ‘G’, ‘awayText’: ‘G’}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;We can use the &lt;code&gt;pandas&lt;/code&gt; &lt;code&gt;query()&lt;/code&gt; function to select rows based on conditions.
+This query selects all “fieldModelSetPlayerCoordinate” commands during setup before turn 1.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;positions = (df.query(&amp;#39;turnNr == 0 &amp;amp; turnMode == &amp;quot;setup&amp;quot; &amp;amp; Half == 1 &amp;amp; \
+                     modelChangeId == &amp;quot;fieldModelSetPlayerCoordinate&amp;quot;&amp;#39;)
+                     .groupby(&amp;#39;modelChangeKey&amp;#39;)
+                     .tail(1))
+
+(positions[0:4]
+ .filter([&amp;#39;commandNr&amp;#39;, &amp;#39;turnNr&amp;#39;, &amp;#39;turnMode&amp;#39;, &amp;#39;Half&amp;#39;, &amp;#39;modelChangeId&amp;#39;, &amp;#39;modelChangeValue&amp;#39;])
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+commandNr
+&lt;/th&gt;
+&lt;th&gt;
+turnNr
+&lt;/th&gt;
+&lt;th&gt;
+turnMode
+&lt;/th&gt;
+&lt;th&gt;
+Half
+&lt;/th&gt;
+&lt;th&gt;
+modelChangeId
+&lt;/th&gt;
+&lt;th&gt;
+modelChangeValue
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+77
+&lt;/th&gt;
+&lt;td&gt;
+20
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+setup
+&lt;/td&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelSetPlayerCoordinate
+&lt;/td&gt;
+&lt;td&gt;
+[12, 6]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+79
+&lt;/th&gt;
+&lt;td&gt;
+21
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+setup
+&lt;/td&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelSetPlayerCoordinate
+&lt;/td&gt;
+&lt;td&gt;
+[12, 7]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+81
+&lt;/th&gt;
+&lt;td&gt;
+22
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+setup
+&lt;/td&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelSetPlayerCoordinate
+&lt;/td&gt;
+&lt;td&gt;
+[12, 8]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+84
+&lt;/th&gt;
+&lt;td&gt;
+24
+&lt;/td&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+setup
+&lt;/td&gt;
+&lt;td&gt;
+1
+&lt;/td&gt;
+&lt;td&gt;
+fieldModelSetPlayerCoordinate
+&lt;/td&gt;
+&lt;td&gt;
+[10, 4]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;As I was interested in &lt;strong&gt;defensive&lt;/strong&gt; setup formations, I wrote a function &lt;code&gt;determine_receiving_team_at_start()&lt;/code&gt; that does exactly what you’d expect given its name :)&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;fb.determine_receiving_team_at_start(df)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&amp;#39;teamAway&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;towards-ffgn&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Towards FFGN&lt;/h1&gt;
+&lt;p&gt;Finally, there is a function &lt;code&gt;fumbbl2ffgn()&lt;/code&gt; that is very much a work in progress.
+The idea is to take a FUMBBL game log, and systematically strip away all information that is redundant regarding the actual logging of what happened during the game. A minimal game description would consist of all actions taken, all decisions that were made (i.e. to use the dodge skill) and all dice results.
+After we have such a description, we can transform it to a compact annotation that is readable both by humans and machines, and is still a complete description of the game, in that the full game can be reproduced.
+The compact annotation would then be candidate to become the official “Fantasy Football Game Notation”, or FFGN for short.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;my_game_log = fb.fumbbl2ffgn(match_id = 4447439)
+len(my_game_log)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;866&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is where it currently stands. A single gamelog is now roughly 1000 lines of text.
+The table below describes the first turn of a Wood Elf team against Necromantic.&lt;/p&gt;
+&lt;pre class=&#34;python&#34;&gt;&lt;code&gt;pd.set_option(&amp;#39;display.max_colwidth&amp;#39;, None)
+
+# Turn 1 for the offensive
+(my_game_log
+ .query(&amp;quot;Half == 1 &amp;amp; turnNr == 1 &amp;amp; commandNr &amp;gt; 88 &amp;amp; commandNr &amp;lt; 211&amp;quot;)
+ .filter([&amp;#39;modelChangeKey&amp;#39;, &amp;#39;modelChangeValue&amp;#39;])
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+&lt;/style&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+&lt;thead&gt;
+&lt;tr style=&#34;text-align: right;&#34;&gt;
+&lt;th&gt;
+&lt;/th&gt;
+&lt;th&gt;
+modelChangeKey
+&lt;/th&gt;
+&lt;th&gt;
+modelChangeValue
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;th&gt;
+29
+&lt;/th&gt;
+&lt;td&gt;
+[‘T1’]
+&lt;/td&gt;
+&lt;td&gt;
+[j17, i17, h17, g17, f17, e17]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+30
+&lt;/th&gt;
+&lt;td&gt;
+[‘C1’]
+&lt;/td&gt;
+&lt;td&gt;
+[g17, f17, e18, d17, c17, b17]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+31
+&lt;/th&gt;
+&lt;td&gt;
+[‘L1’]
+&lt;/td&gt;
+&lt;td&gt;
+[d14, e13, f13]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+32
+&lt;/th&gt;
+&lt;td&gt;
+[‘L4’]
+&lt;/td&gt;
+&lt;td&gt;
+Block roll:[‘!’, ‘!’] | block result: ! (POW/PUSH)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+33
+&lt;/th&gt;
+&lt;td&gt;
+[‘L5’]
+&lt;/td&gt;
+&lt;td&gt;
+[g12]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+34
+&lt;/th&gt;
+&lt;td&gt;
+[‘L4’]
+&lt;/td&gt;
+&lt;td&gt;
+[g13]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+35
+&lt;/th&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+Armour roll: [3, 5] | Armour of [‘L5’] is not broken
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+36
+&lt;/th&gt;
+&lt;td&gt;
+[‘Tr1’]
+&lt;/td&gt;
+&lt;td&gt;
+Confusion roll: 2 | [‘Tr1’] acts normally
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+37
+&lt;/th&gt;
+&lt;td&gt;
+[‘Tr1’]
+&lt;/td&gt;
+&lt;td&gt;
+Block roll:[‘&amp;gt;’, ‘%’, ’*’] | block result: * (POW)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+38
+&lt;/th&gt;
+&lt;td&gt;
+[‘L2’]
+&lt;/td&gt;
+&lt;td&gt;
+[i12]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+39
+&lt;/th&gt;
+&lt;td&gt;
+[‘Tr1’]
+&lt;/td&gt;
+&lt;td&gt;
+[h13]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+40
+&lt;/th&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+Armour roll: [4, 2] | Armour of [‘L2’] is not broken
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+41
+&lt;/th&gt;
+&lt;td&gt;
+[‘L5’]
+&lt;/td&gt;
+&lt;td&gt;
+Block roll:[‘&amp;gt;’, ‘!’] | block result: ! (POW/PUSH)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+42
+&lt;/th&gt;
+&lt;td&gt;
+[‘L4’]
+&lt;/td&gt;
+&lt;td&gt;
+[h12]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+43
+&lt;/th&gt;
+&lt;td&gt;
+0
+&lt;/td&gt;
+&lt;td&gt;
+Armour roll: [2, 5] | Armour of [‘L4’] is not broken
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+44
+&lt;/th&gt;
+&lt;td&gt;
+[‘L3’]
+&lt;/td&gt;
+&lt;td&gt;
+[m16, l16, k16, j16, i16, h16]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+45
+&lt;/th&gt;
+&lt;td&gt;
+[‘L2’]
+&lt;/td&gt;
+&lt;td&gt;
+[l15, k15, j15, i15, h15, g15, f15]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+46
+&lt;/th&gt;
+&lt;td&gt;
+[‘C2’]
+&lt;/td&gt;
+&lt;td&gt;
+[c15]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+47
+&lt;/th&gt;
+&lt;td&gt;
+[‘W1’]
+&lt;/td&gt;
+&lt;td&gt;
+[d16, c16, b16]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+48
+&lt;/th&gt;
+&lt;td&gt;
+[‘W2’]
+&lt;/td&gt;
+&lt;td&gt;
+[g18, f18, e18, d18, c18, b18]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+49
+&lt;/th&gt;
+&lt;td&gt;
+[‘W2’]
+&lt;/td&gt;
+&lt;td&gt;
+{‘reportId’: ‘pickUpRoll’, ‘playerId’: ‘[’W2’]’, ‘successful’: True, ‘roll’: 4, ‘minimumRoll’: 2, ‘reRolled’: False}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+50
+&lt;/th&gt;
+&lt;td&gt;
+[‘W2’]
+&lt;/td&gt;
+&lt;td&gt;
+[c18, d18]
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+51
+&lt;/th&gt;
+&lt;td&gt;
+___
+&lt;/td&gt;
+&lt;td&gt;
+End of Turn
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;Thrower 1 moves. Catcher 1 moves. Lineman 1 moves. Lineman 4 blocks, chooses pow/push, pows Zombie lineman L5 into square g12, follows up, does not break armor.&lt;/em&gt;
+&lt;em&gt;Treeman does not take root, does a 3D block on Zombie lineman 2, chooses pow into square i12, follows up to square h13, does not break armor.&lt;/em&gt;
+&lt;em&gt;Lineman 5 blocks zombie lineman L4, pows into h12, does not follow up, does not break armor. Then linemen L3, L2, catcher C2 and wardancer W1 all do a move action.&lt;/em&gt;
+&lt;em&gt;Finally Wardancer W2 moves, picks up the ball and moves a bit more. End turn.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This blog post describes the basic functionality of the &lt;code&gt;fumbbl_replays&lt;/code&gt; Python package. I have a second blog post coming up with three applications that use the &lt;code&gt;fumbbl_replays&lt;/code&gt; package to accomplish some Nufflytics goal.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python</title>

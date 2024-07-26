@@ -1,0 +1,4087 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Gertjan Verhoeven">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="The **fumbbl_replays** package is a Python utility package for the board game Blood Bowl. It allows users to plot board positions, either from scratch, or from existing (FUMBBL) game logs. In addition, it has some functionality to analyze FUMBBL game logs for the board game Blood Bowl.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/fumbbl-replays/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GQH76F5Q5R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           document.location = url;
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target);  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'G-GQH76F5Q5R', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/fumbbl-replays/">
+
+  
+  
+  
+  
+  
+    
+  
+  
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@GertjanVerhoev1">
+  <meta property="twitter:creator" content="@GertjanVerhoev1">
+  
+  <meta property="og:site_name" content="Gertjan Verhoeven">
+  <meta property="og:url" content="/post/fumbbl-replays/">
+  <meta property="og:title" content="Introducing the fumbbl_replays Python package for Blood Bowl | Gertjan Verhoeven">
+  <meta property="og:description" content="The **fumbbl_replays** package is a Python utility package for the board game Blood Bowl. It allows users to plot board positions, either from scratch, or from existing (FUMBBL) game logs. In addition, it has some functionality to analyze FUMBBL game logs for the board game Blood Bowl."><meta property="og:image" content="/img/headers/bb_heatmap_banner.png">
+  <meta property="twitter:image" content="/img/headers/bb_heatmap_banner.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2024-07-25T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2024-07-25T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/fumbbl-replays/"
+  },
+  "headline": "Introducing the fumbbl_replays Python package for Blood Bowl",
+  
+  "datePublished": "2024-07-25T00:00:00Z",
+  "dateModified": "2024-07-25T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Gertjan Verhoeven"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gertjan Verhoeven",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "The **fumbbl_replays** package is a Python utility package for the board game Blood Bowl. It allows users to plot board positions, either from scratch, or from existing (FUMBBL) game logs. In addition, it has some functionality to analyze FUMBBL game logs for the board game Blood Bowl."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Introducing the fumbbl_replays Python package for Blood Bowl | Gertjan Verhoeven</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Gertjan Verhoeven</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+<div class="article-header">
+  
+  
+  <img src="/img/headers/bb_heatmap_banner.png" class="article-banner" alt="">
+  
+
+  
+</div>
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Introducing the fumbbl_replays Python package for Blood Bowl</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Jul 25, 2024
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    19 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/categories/data-science/">Data science</a>, <a href="/categories/blood-bowl/">Blood Bowl</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+<p>The <code>fumbbl_replays</code> package is a Python utility package for the board game Blood Bowl.
+It allows users to plot board positions, either from scratch, or from existing (FUMBBL) game logs.
+In addition, it has some functionality to analyze FUMBBL game logs.</p>
+<p>On the FUMBBL website, a lot of high quality replay data is available as well as an API to conveniently fetch the data.
+In addition, the API provides up to date roster information.
+To do useful analyses (aka nufflytics) in Python with this data, we need a utility package / library.
+In R, a similar package exists to work with BB2 replays [<a href="https://github.com/nufflytics/nufflytics" class="uri">https://github.com/nufflytics/nufflytics</a>].
+To my knowledge, no work has been done yet on BB3 replay files.</p>
+<p>We also need a standard way to describe Blood Bowl games in a compact way, that is both human and machine readable.
+In chess, there is the <strong>Portable Game Notation (PGN)</strong>. PGN has become the de facto standard of describing Chess games.
+For Blood Bowl, already in 2002 some work has been done towards this end. David Morgan-Mar developed a notation for the purpose of sharing Blood Bowl game logs over the internet. [<a href="https://www.dangermouse.net/games/bloodbowl/rules.html" class="uri">https://www.dangermouse.net/games/bloodbowl/rules.html</a>]</p>
+<p>If we could converge on a standard <strong>Fantasy Football Game Notation (FFGN)</strong>, it would serve many purposes, e.g.:</p>
+<ul>
+<li>It would allow us to interchange data between software</li>
+<li>it would help to train AI engines.</li>
+</ul>
+<p>So the package is being developed with this end goal in mind. As Blood Bowl is a much complexer game than Chess, and I am an amateur programmer, we need some intermediate goals that bring us closer to the end goal. Thus, I started with plotting (new or extracted) board positions using a short hand notation for board pieces (players) and codifying player moves.</p>
+<pre class="python"><code>%pip install -e . --quiet</code></pre>
+<div id="plotting-blood-bowl-board-positions" class="section level1">
+<h1>Plotting Blood Bowl board positions</h1>
+<p>If we want to describe (codify) a Blood Bowl board state, we need to describe the pieces (what type of player is it, what extra skills does it have), the location of the pieces as well as the “state” of the pieces. Player state in Blood Bowl can be either standing, prone, or stunned, and can be in various special states such as “Bone head”, “Rooted”, “Hypnotized” etc.
+(A full game state also contains additional information on rerolls, players on the bench etc. This is not yet implemented)</p>
+<p>Let’s start with the location of the pieces. A grid reference system is needed.
+The game board of Blood Bowl has dimensions 15 x 26.
+It has cognitive benefit to use numbers for one dimension, and letters for the other dimensions. Fancy word: alphanumeric.
+Chess over the centuries has had various notations, and this notation is the one that became universally accepted.
+[<a href="https://en.wikipedia.org/wiki/Algebraic_notation_(chess)" class="uri">https://en.wikipedia.org/wiki/Algebraic_notation_(chess)</a>]
+The only choice left for us is then, which axis should have letters, and which axis should have the numbers.</p>
+<p>A strong argument was made on the BotBowl discord that distance to the end zone is very important in BB.
+By using numbers for the long axis, we can easily deduce that a Gutter Runner at position c15 is in scoring position: It needs 11 movement to score a touchdown at c26.
+This notation is also used by Cow Daddy Gaming in his “What´s the play” puzzles.</p>
+<p>I wrote a function <code>show_boardpos()</code> that displays the name of all the board positions.</p>
+<pre class="python"><code>import fumbbl_replays as fb
+
+fb.show_boardpos(rotation = &#39;H&#39;)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_3_0.png" /></p>
+<p>Now we need a way to describe the playing pieces, and visualize them. In chess it is easy, there are only six different ones.
+In Blood Bowl, there are roughly 200 different playing pieces (30 teams, times 5 positionals, plus 50+ star players).
+Here the concept of a roster can help us out.
+I wrote a function <code>fetch_roster()</code> that fetches rosters from FUMBBL and displays the positions.
+It also contains links to icons that can represent the piece on the board.</p>
+<p>Take for example the High Elf roster.</p>
+<pre class="python"><code>roster = fb.fetch_roster(&quot;High Elf&quot;)
+roster</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+positionId
+</th>
+<th>
+positionName
+</th>
+<th>
+skillArray
+</th>
+<th>
+shorthand
+</th>
+<th>
+icon_path
+</th>
+<th>
+race
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+0
+</th>
+<td>
+39330
+</td>
+<td>
+Lineman
+</td>
+<td>
+[]
+</td>
+<td>
+L
+</td>
+<td>
+<a href="https://fumbbl.com/i/585638.png" class="uri">https://fumbbl.com/i/585638.png</a>
+</td>
+<td>
+High Elf
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+39331
+</td>
+<td>
+Thrower
+</td>
+<td>
+[Cloud Burster, Pass, Safe Pass]
+</td>
+<td>
+T
+</td>
+<td>
+<a href="https://fumbbl.com/i/436284.png" class="uri">https://fumbbl.com/i/436284.png</a>
+</td>
+<td>
+High Elf
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+39332
+</td>
+<td>
+Catcher
+</td>
+<td>
+[Catch]
+</td>
+<td>
+C
+</td>
+<td>
+<a href="https://fumbbl.com/i/585639.png" class="uri">https://fumbbl.com/i/585639.png</a>
+</td>
+<td>
+High Elf
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+39333
+</td>
+<td>
+Blitzer
+</td>
+<td>
+[Block]
+</td>
+<td>
+Z
+</td>
+<td>
+<a href="https://fumbbl.com/i/436286.png" class="uri">https://fumbbl.com/i/436286.png</a>
+</td>
+<td>
+High Elf
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It has four different pieces or “positionals”. It turns out that FUMBBL has already solved our problem of denoting them, introducing a shorthand text reference.
+So if we want to describe some action involving a High Elf Catcher, and there are four of them on the board, we could denote them by C1, C2, C3 and C4.
+This is compact, and has meaning within the context of the High Elf roster.</p>
+<p>If we combine the descriptions of the pieces, and their location, we have enough to describe for example an initial setup formation before kick-off.</p>
+<pre class="python"><code>my_setup = [&#39;setup&#39;, [&#39;L1: g13&#39;, &#39;L2: h13&#39;, &#39;L3: i13&#39;, &#39;Z1: c11&#39;, &#39;Z2: m11&#39;, &#39;T1: h6&#39;, &#39;L4: e11&#39;, 
+                      &#39;L5: k11&#39;, &#39;C1: l10&#39;, &#39;C2: d10&#39;, &#39;L6: h11&#39;]]</code></pre>
+<p>I wrote a function <code>create_position()</code> that combines the roster and the setup annotation to create an object that contains all the information to make a nice plot of the board state. The function <code>print_position()</code> prints a nicely formatted summary of the position.
+As default, a position is created for the home team, denoted as “teamHome”.</p>
+<pre class="python"><code>positions = fb.create_position(roster, my_setup)
+fb.print_position(positions)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+home_away
+</th>
+<th>
+race
+</th>
+<th>
+short_name
+</th>
+<th>
+positionName
+</th>
+<th>
+boardpos
+</th>
+<th>
+PlayerState
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+5
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+T1
+</td>
+<td>
+Thrower
+</td>
+<td>
+h6
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+9
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+C2
+</td>
+<td>
+Catcher
+</td>
+<td>
+d10
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+8
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+C1
+</td>
+<td>
+Catcher
+</td>
+<td>
+l10
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+Z1
+</td>
+<td>
+Blitzer
+</td>
+<td>
+c11
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+L4
+</td>
+<td>
+Lineman
+</td>
+<td>
+e11
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+10
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+L6
+</td>
+<td>
+Lineman
+</td>
+<td>
+h11
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+L5
+</td>
+<td>
+Lineman
+</td>
+<td>
+k11
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+Z2
+</td>
+<td>
+Blitzer
+</td>
+<td>
+m11
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+0
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+L1
+</td>
+<td>
+Lineman
+</td>
+<td>
+g13
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+L2
+</td>
+<td>
+Lineman
+</td>
+<td>
+h13
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+teamHome
+</td>
+<td>
+High Elf
+</td>
+<td>
+L3
+</td>
+<td>
+Lineman
+</td>
+<td>
+i13
+</td>
+<td>
+Standing
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Let’s suppose that the High Elf team is playing against a Gnome team. Let’s also fetch a Gnome roster and create a board position on the other half of the pitch.
+As we already have a home team, we refer to this team as “teamAway”.</p>
+<pre class="python"><code>roster = fb.fetch_roster(&quot;Gnome&quot;)
+roster</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+positionId
+</th>
+<th>
+positionName
+</th>
+<th>
+skillArray
+</th>
+<th>
+shorthand
+</th>
+<th>
+icon_path
+</th>
+<th>
+race
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+0
+</th>
+<td>
+57706
+</td>
+<td>
+Altern Forest Treeman
+</td>
+<td>
+[Mighty Blow (+1), Stand Firm, Strong Arm, Thi…
+</td>
+<td>
+T
+</td>
+<td>
+<a href="https://fumbbl.com/i/733781.png" class="uri">https://fumbbl.com/i/733781.png</a>
+</td>
+<td>
+Gnome
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+57707
+</td>
+<td>
+Gnome Beastmaster
+</td>
+<td>
+[Jump Up, Wrestle, Guard, Stunty]
+</td>
+<td>
+B
+</td>
+<td>
+<a href="https://fumbbl.com/i/735006.png" class="uri">https://fumbbl.com/i/735006.png</a>
+</td>
+<td>
+Gnome
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+57708
+</td>
+<td>
+Gnome Illusionist
+</td>
+<td>
+[Jump Up, Wrestle, Stunty, Trickster]
+</td>
+<td>
+I
+</td>
+<td>
+<a href="https://fumbbl.com/i/735007.png" class="uri">https://fumbbl.com/i/735007.png</a>
+</td>
+<td>
+Gnome
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+57709
+</td>
+<td>
+Woodland Fox
+</td>
+<td>
+[Dodge, Side Step, Stunty, My Ball]
+</td>
+<td>
+F
+</td>
+<td>
+<a href="https://fumbbl.com/i/735008.png" class="uri">https://fumbbl.com/i/735008.png</a>
+</td>
+<td>
+Gnome
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+57710
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+[Jump Up, Wrestle, Right Stuff, Stunty]
+</td>
+<td>
+L
+</td>
+<td>
+<a href="https://fumbbl.com/i/735009.png" class="uri">https://fumbbl.com/i/735009.png</a>
+</td>
+<td>
+Gnome
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="python"><code>my_setup = [&#39;setup&#39;, [&#39;T2: j14&#39;, &#39;T1: f14&#39;, &#39;F1: h20&#39;, &#39;I1: b14&#39;, &#39;I2: n14&#39;, &#39;L3: e14&#39;, &#39;L6: k14&#39;, 
+                      &#39;B2: m15&#39;, &#39;B1: c15&#39;, &#39;L4: g15&#39;, &#39;F2: i16&#39;]]
+
+positions2 = fb.create_position(roster, my_setup, &#39;teamAway&#39;)
+
+fb.print_position(positions2)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+home_away
+</th>
+<th>
+race
+</th>
+<th>
+short_name
+</th>
+<th>
+positionName
+</th>
+<th>
+boardpos
+</th>
+<th>
+PlayerState
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+3
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+I1
+</td>
+<td>
+Gnome Illusionist
+</td>
+<td>
+b14
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+5
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+L3
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+e14
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+T1
+</td>
+<td>
+Altern Forest Treeman
+</td>
+<td>
+f14
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+0
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+T2
+</td>
+<td>
+Altern Forest Treeman
+</td>
+<td>
+j14
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+L6
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+k14
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+I2
+</td>
+<td>
+Gnome Illusionist
+</td>
+<td>
+n14
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+8
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+B1
+</td>
+<td>
+Gnome Beastmaster
+</td>
+<td>
+c15
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+9
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+L4
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+g15
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+B2
+</td>
+<td>
+Gnome Beastmaster
+</td>
+<td>
+m15
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+10
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+F2
+</td>
+<td>
+Woodland Fox
+</td>
+<td>
+i16
+</td>
+<td>
+Standing
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+teamAway
+</td>
+<td>
+Gnome
+</td>
+<td>
+F1
+</td>
+<td>
+Woodland Fox
+</td>
+<td>
+h20
+</td>
+<td>
+Standing
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>As a final step before plotting, we add both positions together.
+As both are <code>pandas</code> DataFrames, we use the <code>concat()</code> function from <code>pandas</code> to combine (“concatenate”) them.</p>
+<pre class="python"><code>import pandas as pd
+
+positions = pd.concat([positions, positions2])</code></pre>
+<p>The function <code>create_plot()</code> plots the board position.
+By default, it plots a horizontal pitch, with the team denoted as “teamHome” in red, and the other team in blue.</p>
+<pre class="python"><code>fb.create_plot(positions)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_17_0.png" /></p>
+<p>The <code>create_plot()</code> function allows us the swap the color of the teams, to change the pitch orientation to vertical, and to add a layer of semi-transparant tacklezones.</p>
+<pre class="python"><code>fb.create_plot(positions, red_team = &quot;teamAway&quot;, orientation = &#39;V&#39;, tackle_zones = True)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_19_0.png" /></p>
+<p>The library also support moving single pieces (players). It currently only works for pieces that already exist in a board position.
+In the plot above, suppose we want to move the Woodland Fox F1 to board position <code>o26</code>:</p>
+<pre class="python"><code>positions = fb.move_piece(positions, &quot;teamAway&quot;, &quot;F1&quot;, &quot;o26&quot;)
+
+fb.create_plot(positions, red_team = &quot;teamAway&quot;)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_21_0.png" /></p>
+<p>Each player also has an associated <code>PlayerState</code>. This can either be <code>Standing</code> (the default), <code>HasBall</code>, <code>Prone</code> or <code>Stunned</code>.
+The function <code>set_piece_state()</code> allows to set this for individual players:</p>
+<pre class="python"><code>positions = fb.set_piece_state(positions, &quot;teamAway&quot;, &quot;F1&quot;, &quot;HasBall&quot;)
+positions = fb.set_piece_state(positions, &quot;teamHome&quot;, &quot;T1&quot;, &quot;Prone&quot;)
+positions = fb.set_piece_state(positions, &quot;teamAway&quot;, &quot;B1&quot;, &quot;Stunned&quot;)
+
+fb.create_plot(positions, red_team = &quot;teamAway&quot;)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_23_0.png" /></p>
+<p>The compact setup description can also describe player states other than standing.
+<code>/</code> is Prone, <code>X</code> denotes stunned. <code>o</code> denotes a player that has the ball.</p>
+<p>The compact description for the Gnome position plotted above can be obtained using <code>get_position()</code>:</p>
+<pre class="python"><code>fb.get_position(positions, home_away = &#39;teamAway&#39;)</code></pre>
+<pre><code>[&#39;setup&#39;, [&#39;T2: j14&#39;, &#39;T1: f14&#39;, &#39;F1: o26o&#39;, &#39;I1: b14&#39;, &#39;I2: n14&#39;, &#39;L3: e14&#39;, &#39;L6: k14&#39;, &#39;B2: m15&#39;, &#39;B1: c15X&#39;, &#39;L4: g15&#39;, &#39;F2: i16&#39;]]</code></pre>
+<p>Note the notation for Fox F1 with the ball (<code>F1: o26o</code>) and the notation for the stunned Beastmaster B1 (<code>B1: c15X</code>).</p>
+<p>As the <code>positions</code> object is a table of players, I added an extra argument to <code>create_plot()</code> to plot a free ball.</p>
+<pre class="python"><code>fb.create_plot(positions, red_team = &quot;teamAway&quot;, ballpos = &#39;e5&#39;)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_27_0.png" /></p>
+<p>Star players can also be plotted. For this we need to fetch a separate star player “roster” and add it to the team roster.
+Lets add Rowana Forestfoot (“RF”) and Rodney Roachbait (“RR”) to the Gnome setup, replacing Gnome linemen L3 and L6.</p>
+<pre class="python"><code>positions = positions.query(&#39;home_away == &quot;teamHome&quot;&#39;)
+
+roster = fb.fetch_roster(&quot;Gnome&quot;)
+stars = fb.fetch_stars()
+roster = pd.concat([roster, stars])
+
+my_setup = [&#39;setup&#39;, [&#39;T2: j14&#39;, &#39;T1: f14&#39;, &#39;F1: o26o&#39;, \
+                    &#39;I1: b14&#39;, &#39;I2: n14&#39;, \
+                    &#39;RF1: e14&#39;, &#39;RR1: k14&#39;, \
+                    &#39;B2: m15&#39;, &#39;B1: c15X&#39;, &#39;L4: g15&#39;, &#39;F2: i16&#39;]]
+
+positions2 = fb.create_position(roster, my_setup, &#39;teamAway&#39;)
+
+
+positions = pd.concat([positions, positions2])
+
+fb.create_plot(positions, red_team = &quot;teamAway&quot;, ballpos = &#39;e5&#39;)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_29_0.png" /></p>
+</div>
+<div id="plotting-player-skills-aka-digital-loom-color-bands" class="section level1">
+<h1>Plotting player skills aka “digital loom color bands”</h1>
+<p>Knowing what extra skills players have is often important in analyzing a given board position (what blocks are possible, can we use the Dodge skill or does the opponent has Tackle etc).
+In the FUMBBL client there is a function that allows automatic skill marking using text.
+When playing on tabletop there are various ways to mark / denote what extra skills players have.
+One popular way is to use colored elastic (“loom”) band.
+The most common skills have semi-standardized colors associated with them:</p>
+<ul>
+<li>Guard is green</li>
+<li>Block is blue</li>
+<li>Wrestle is white</li>
+<li>Dodge is yellow</li>
+<li>Leader is purple</li>
+<li>Mighty Blow is red</li>
+<li>Tackle is orange</li>
+</ul>
+<p>At a typical tournament (I checked this for Thrudball 2024) 80% of skills chosen are one of these seven skills.
+Here I decided to make a digital version of the colored elastic band, plotted below the player icon.
+If a player has more than one extra skill (“Skill stacking”), the colored bands are stacked on top of each other.</p>
+<p>Here I will demonstrate by setting up the board for a Shambling Undead team with a set of 6 skills often chosen at tournaments.</p>
+<pre class="python"><code>import fumbbl_replays as fb
+roster = fb.fetch_roster(&quot;Shambling Undead&quot;)
+
+my_setup = [&#39;setup&#39;, [&#39;Z1: g14&#39;, &#39;Z2: h14&#39;, &#39;Z3: i14&#39;, 
+                      &#39;W1: e16&#39;, &#39;W2: k16&#39;, &#39;G1: h16&#39;, &#39;G2: h17&#39;, 
+                      &#39;M1: c16&#39;, &#39;M2: m16&#39;, &#39;Z4: b17&#39;, &#39;Z5: n17&#39;]]
+
+positions = fb.create_position(roster, my_setup)</code></pre>
+<pre class="python"><code>fb.add_skill_to_player(positions, &quot;M1&quot;, &quot;Guard&quot;)
+fb.add_skill_to_player(positions, &quot;M2&quot;, &quot;Guard&quot;)
+fb.add_skill_to_player(positions, &quot;G1&quot;, &quot;Block&quot;)
+fb.add_skill_to_player(positions, &quot;G2&quot;, &quot;Block&quot;)
+fb.add_skill_to_player(positions, &quot;W1&quot;, &quot;Tackle&quot;)
+fb.add_skill_to_player(positions, &quot;W1&quot;, &quot;Mighty Blow&quot;)
+
+fb.create_plot(positions, red_team = &quot;teamAway&quot;, orientation = &#39;H&#39;, skill_bands = True)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_32_0.png" /></p>
+<p>It is also possible to remove a (Gained) skill from a player.</p>
+<pre class="python"><code>fb.remove_skill_from_player(positions, &quot;W1&quot;, &quot;Tackle&quot;)</code></pre>
+<pre class="python"><code>(positions
+ .filter([&#39;short_name&#39;, &#39;positionName&#39;, &#39;skillArrayRoster&#39;, &#39;learned_skills&#39;, &#39;skill_colors&#39;, &#39;boardpos&#39;])
+)
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+short_name
+</th>
+<th>
+positionName
+</th>
+<th>
+skillArrayRoster
+</th>
+<th>
+learned_skills
+</th>
+<th>
+skill_colors
+</th>
+<th>
+boardpos
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+0
+</th>
+<td>
+Z1
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+g14
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+Z2
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+h14
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+Z3
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+i14
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+W1
+</td>
+<td>
+Wight Blitzer
+</td>
+<td>
+[Block, Regeneration]
+</td>
+<td>
+[Mighty Blow]
+</td>
+<td>
+[red]
+</td>
+<td>
+e16
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+W2
+</td>
+<td>
+Wight Blitzer
+</td>
+<td>
+[Block, Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+k16
+</td>
+</tr>
+<tr>
+<th>
+5
+</th>
+<td>
+G1
+</td>
+<td>
+Ghoul Runner
+</td>
+<td>
+[Dodge]
+</td>
+<td>
+[Block]
+</td>
+<td>
+[blue]
+</td>
+<td>
+h16
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+G2
+</td>
+<td>
+Ghoul Runner
+</td>
+<td>
+[Dodge]
+</td>
+<td>
+[Block]
+</td>
+<td>
+[blue]
+</td>
+<td>
+h17
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+M1
+</td>
+<td>
+Mummy
+</td>
+<td>
+[Mighty Blow (+1), Regeneration]
+</td>
+<td>
+[Guard]
+</td>
+<td>
+[lime]
+</td>
+<td>
+c16
+</td>
+</tr>
+<tr>
+<th>
+8
+</th>
+<td>
+M2
+</td>
+<td>
+Mummy
+</td>
+<td>
+[Mighty Blow (+1), Regeneration]
+</td>
+<td>
+[Guard]
+</td>
+<td>
+[lime]
+</td>
+<td>
+m16
+</td>
+</tr>
+<tr>
+<th>
+9
+</th>
+<td>
+Z4
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+b17
+</td>
+</tr>
+<tr>
+<th>
+10
+</th>
+<td>
+Z5
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+n17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="plotting-board-positions-from-fumbbl-replays" class="section level1">
+<h1>Plotting board positions from FUMBBL replays</h1>
+<p>Up until now, we created board positions from scratch, using rosters from FUMBBL and a simple way to describe a board position.</p>
+<p>The package also allows us to plot board positions extracted from FUMBBL replay files.
+At this moment, only the board position right before kick-off can be plotted.
+Suppose we want to plot this position for <a href="https://www.fumbbl.com/p/match?id=4550284">match 4550284</a>.</p>
+<p>We first need to fetch the replay data. The <code>fetch_data()</code> function takes the <code>match_id</code> as argument and returns five objects:
+the <code>match_id</code>, <code>replay_id</code>, a <code>positions</code> object containing the board state right before first kick-off, which team is the <code>receiving_team</code> (i.e. playing offense), and a <code>metadata</code> list (coach names, race names, and match touchdown result).</p>
+<pre class="python"><code>match_id, replay_id, positions, receiving_team, metadata = fb.fetch_data(match_id = 4550284)</code></pre>
+<p>To plot the board state right before kick-off, we can use the <code>create_plot()</code> function in the same way as above.
+We plot the receiving team in red so we can see which team is playing offense and which team is playing defense.</p>
+<pre class="python"><code>fb.create_plot(positions, red_team = receiving_team)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_39_0.png" /></p>
+<pre class="python"><code>(positions.filter([&#39;race&#39;, &#39;home_away&#39;, &#39;short_name&#39;, &#39;positionName&#39;, &#39;playerName&#39;,  &#39;skillArrayRoster&#39;, &#39;learned_skills&#39;, &#39;cost&#39;, &#39;recoveringInjury&#39;])
+                    )</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+race
+</th>
+<th>
+home_away
+</th>
+<th>
+short_name
+</th>
+<th>
+positionName
+</th>
+<th>
+playerName
+</th>
+<th>
+skillArrayRoster
+</th>
+<th>
+learned_skills
+</th>
+<th>
+cost
+</th>
+<th>
+recoveringInjury
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+0
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+T2
+</td>
+<td>
+Altern Forest Treeman
+</td>
+<td>
+Caroline Rigol
+</td>
+<td>
+[Mighty Blow, Stand Firm, Strong Arm, Take Roo…
+</td>
+<td>
+[+MA]
+</td>
+<td>
+120000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+T1
+</td>
+<td>
+Altern Forest Treeman
+</td>
+<td>
+Matthew Ir
+</td>
+<td>
+[Mighty Blow, Stand Firm, Strong Arm, Take Roo…
+</td>
+<td>
+[Pro]
+</td>
+<td>
+120000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+L2
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+Jaiden Netzigon
+</td>
+<td>
+[Jump Up, Right Stuff, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+5
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+B1
+</td>
+<td>
+Gnome Beastmaster
+</td>
+<td>
+Eloise Celorn
+</td>
+<td>
+[Guard, Jump Up, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+55000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+L1
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+Andre Drumma
+</td>
+<td>
+[Jump Up, Right Stuff, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+B2
+</td>
+<td>
+Gnome Beastmaster
+</td>
+<td>
+Sienna Rime
+</td>
+<td>
+[Guard, Jump Up, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+55000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+8
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+L4
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+Melanie Kayce
+</td>
+<td>
+[Jump Up, Right Stuff, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+9
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+L5
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+Eliza Elora
+</td>
+<td>
+[Jump Up, Right Stuff, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+10
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+L7
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+Gabriela Lacspor
+</td>
+<td>
+[Jump Up, Right Stuff, Stunty, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+11
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+I1
+</td>
+<td>
+Gnome Illusionist
+</td>
+<td>
+Brynlee Tror
+</td>
+<td>
+[Jump Up, Stunty, Trickster, Wrestle]
+</td>
+<td>
+[]
+</td>
+<td>
+50000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+12
+</th>
+<td>
+Gnome
+</td>
+<td>
+teamHome
+</td>
+<td>
+L3
+</td>
+<td>
+Gnome Lineman
+</td>
+<td>
+Chase Kavelin
+</td>
+<td>
+[Jump Up, Right Stuff, Stunty, Wrestle]
+</td>
+<td>
+[Sneaky Git]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+14
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+Z3
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+Rylee Dager
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+15
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+Z2
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+Molly Harven
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+16
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+Z1
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+Asher Meridan
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+17
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+M1
+</td>
+<td>
+Mummy
+</td>
+<td>
+Brooklyn Biel
+</td>
+<td>
+[Mighty Blow, Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+125000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+18
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+G1
+</td>
+<td>
+Ghoul Runner
+</td>
+<td>
+Noelle Vythethi
+</td>
+<td>
+[Dodge]
+</td>
+<td>
+[]
+</td>
+<td>
+75000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+19
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+Z5
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+Asher Meegosh
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+20
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+M2
+</td>
+<td>
+Mummy
+</td>
+<td>
+Bailey Fer
+</td>
+<td>
+[Mighty Blow, Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+125000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+21
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+Z4
+</td>
+<td>
+Zombie Lineman
+</td>
+<td>
+Haley Guilomar
+</td>
+<td>
+[Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+40000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+22
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+W1
+</td>
+<td>
+Wight Blitzer
+</td>
+<td>
+Corbin Aleemy
+</td>
+<td>
+[Block, Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+90000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+23
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+W2
+</td>
+<td>
+Wight Blitzer
+</td>
+<td>
+Lucas Mickal
+</td>
+<td>
+[Block, Regeneration]
+</td>
+<td>
+[]
+</td>
+<td>
+90000
+</td>
+<td>
+None
+</td>
+</tr>
+<tr>
+<th>
+24
+</th>
+<td>
+Shambling Undead
+</td>
+<td>
+teamAway
+</td>
+<td>
+G2
+</td>
+<td>
+Ghoul Runner
+</td>
+<td>
+Ivy Farate
+</td>
+<td>
+[Dodge]
+</td>
+<td>
+[]
+</td>
+<td>
+75000
+</td>
+<td>
+None
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Adjusting this board position by moving players one-by-one works also in the same way as above.</p>
+<pre class="python"><code>positions = fb.move_piece(positions, &quot;teamAway&quot;, &quot;Z1&quot;, &quot;b26&quot;)
+positions = fb.move_piece(positions, &quot;teamAway&quot;, &quot;Z2&quot;, &quot;o26&quot;)
+
+fb.create_plot(positions, red_team = receiving_team)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_42_0.png" /></p>
+<p>Suppose we think that this Gnome defensive setup is awesome, and we wish to share this setup with other coaches.
+Here the compact way to describe a setup using player abbreviations and the alphanumeric grid system comes in handy:</p>
+<pre class="python"><code>fb.get_position(positions, home_away = &#39;teamHome&#39;)
+</code></pre>
+<pre><code>[&#39;setup&#39;, [&#39;T2: g13&#39;, &#39;T1: i13&#39;, &#39;L2: h13&#39;, &#39;B1: f10&#39;, &#39;L1: e11&#39;, &#39;B2: j10&#39;, &#39;L4: k11&#39;, &#39;L5: h11&#39;, &#39;L7: i10&#39;, &#39;I1: g10&#39;, &#39;L3: h10&#39;]]</code></pre>
+<p>However, suppose we think this setup is nice, but it would be even better if the illusionist in row <code>g</code> would instead be a Woodland Fox.
+We can take the setup (copy-paste), change the setup slightly, and create a new position, with <code>F1: g10</code>.
+As we now only have a single team, we can rotate the pitch and crop to show only the upper part of it.</p>
+<pre class="python"><code>roster = fb.fetch_roster(&quot;Gnome&quot;)
+
+my_setup = [&#39;setup&#39;, [&#39;T2: g13&#39;, &#39;T1: i13&#39;, &#39;L2: h13&#39;, &#39;B1: f10&#39;, \
+                      &#39;L1: e11&#39;, &#39;B2: j10&#39;, &#39;L4: k11&#39;, &#39;L5: h11&#39;, \
+                        &#39;L7: i10&#39;, &#39;F1: g10&#39;, &#39;L3: h10&#39;]]
+
+positions = fb.create_position(roster, my_setup)
+
+fb.create_plot(positions, orientation= &quot;V&quot;, crop = &quot;upper&quot;)</code></pre>
+<p><img src="/post/2024-08-01_fumbbl_replays_files/fumbbl_replays_46_0.png" /></p>
+</div>
+<div id="working-with-raw-replays-directly" class="section level1">
+<h1>Working with raw replays directly</h1>
+<p>It is also possible to work with the raw FUMBBL replay files directly.
+I made a start with describing the replay file format in <code>doc/fumbbl_replay_file_format.md</code>.
+We can use <code>fetch_replay()</code> to retrieve a replay in JSON format.</p>
+<pre class="python"><code>import fumbbl_replays as fb
+
+my_replay = fb.fetch_replay(match_id = 4447439)</code></pre>
+<p>JSON consists of key-value pairs.
+We can for example query the value of the key <code>gameStatus</code>:</p>
+<pre class="python"><code>my_replay[&#39;gameStatus&#39;]</code></pre>
+<pre><code>&#39;uploaded&#39;</code></pre>
+<p>Or query the <code>rosterName</code>:</p>
+<pre class="python"><code>my_replay[&#39;game&#39;][&#39;teamHome&#39;][&#39;roster&#39;][&#39;rosterName&#39;]</code></pre>
+<pre><code>&#39;Necromantic Horror&#39;</code></pre>
+<p>The replay contains both a game log, as well as full roster information on both teams.
+We can extract the roster information from the replay using the function <code>extract_rosters_from_replay()</code>.</p>
+<pre class="python"><code>import pandas as pd
+pd.set_option(&#39;display.max_colwidth&#39;, None)
+
+df_positions = fb.extract_rosters_from_replay(my_replay)
+(df_positions
+ .query(&quot;home_away == &#39;teamAway&#39;&quot;)
+ .filter([&#39;short_name&#39;, &#39;positionName&#39;, &#39;skillArrayRoster&#39;, &#39;learned_skills&#39;, &#39;skill_colors&#39;])
+)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+short_name
+</th>
+<th>
+positionName
+</th>
+<th>
+skillArrayRoster
+</th>
+<th>
+learned_skills
+</th>
+<th>
+skill_colors
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+14
+</th>
+<td>
+Tr1
+</td>
+<td>
+Loren Forest Treeman
+</td>
+<td>
+[Loner, Mighty Blow, Stand Firm, Strong Arm, Take Root, Thick Skull, Throw Team-Mate]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+</tr>
+<tr>
+<th>
+15
+</th>
+<td>
+W1
+</td>
+<td>
+Wardancer
+</td>
+<td>
+[Block, Dodge, Leap]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+</tr>
+<tr>
+<th>
+16
+</th>
+<td>
+W2
+</td>
+<td>
+Wardancer
+</td>
+<td>
+[Block, Dodge, Leap]
+</td>
+<td>
+[Strip Ball]
+</td>
+<td>
+[deeppink]
+</td>
+</tr>
+<tr>
+<th>
+17
+</th>
+<td>
+T1
+</td>
+<td>
+Thrower
+</td>
+<td>
+[Pass]
+</td>
+<td>
+[Leader]
+</td>
+<td>
+[purple]
+</td>
+</tr>
+<tr>
+<th>
+18
+</th>
+<td>
+C1
+</td>
+<td>
+Catcher
+</td>
+<td>
+[Catch, Dodge]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+</tr>
+<tr>
+<th>
+19
+</th>
+<td>
+C2
+</td>
+<td>
+Catcher
+</td>
+<td>
+[Catch, Dodge]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+</tr>
+<tr>
+<th>
+20
+</th>
+<td>
+L1
+</td>
+<td>
+Wood Elf Lineman
+</td>
+<td>
+[]
+</td>
+<td>
+[Dodge]
+</td>
+<td>
+[yellow]
+</td>
+</tr>
+<tr>
+<th>
+21
+</th>
+<td>
+L2
+</td>
+<td>
+Wood Elf Lineman
+</td>
+<td>
+[]
+</td>
+<td>
+[Dodge]
+</td>
+<td>
+[yellow]
+</td>
+</tr>
+<tr>
+<th>
+22
+</th>
+<td>
+L3
+</td>
+<td>
+Wood Elf Lineman
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+<td>
+[]
+</td>
+</tr>
+<tr>
+<th>
+23
+</th>
+<td>
+L4
+</td>
+<td>
+Wood Elf Lineman
+</td>
+<td>
+[]
+</td>
+<td>
+[Wrestle]
+</td>
+<td>
+[floralwhite]
+</td>
+</tr>
+<tr>
+<th>
+24
+</th>
+<td>
+L5
+</td>
+<td>
+Wood Elf Lineman
+</td>
+<td>
+[]
+</td>
+<td>
+[Wrestle]
+</td>
+<td>
+[floralwhite]
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>I wrote a replay parser that parses the gameLog section of a replay and transforms this into a <code>pandas</code> DataFrame object, i.e. a flat 2D table with rows and columns.</p>
+<pre class="python"><code>df = fb.parse_replay(my_replay)
+(df[0:4]
+ .filter([&#39;commandNr&#39;, &#39;turnNr&#39;, &#39;turnMode&#39;, &#39;Half&#39;, &#39;modelChangeId&#39;, &#39;modelChangeValue&#39;])
+)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+commandNr
+</th>
+<th>
+turnNr
+</th>
+<th>
+turnMode
+</th>
+<th>
+Half
+</th>
+<th>
+modelChangeId
+</th>
+<th>
+modelChangeValue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+0
+</th>
+<td>
+1
+</td>
+<td>
+0
+</td>
+<td>
+startGame
+</td>
+<td>
+0
+</td>
+<td>
+fieldModelAddPlayerMarker
+</td>
+<td>
+{‘playerId’: ‘15440786’, ‘homeText’: ‘B’, ‘awayText’: ‘B’}
+</td>
+</tr>
+<tr>
+<th>
+1
+</th>
+<td>
+1
+</td>
+<td>
+0
+</td>
+<td>
+startGame
+</td>
+<td>
+0
+</td>
+<td>
+fieldModelAddPlayerMarker
+</td>
+<td>
+{‘playerId’: ‘15440787’, ‘homeText’: ‘G’, ‘awayText’: ‘G’}
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+1
+</td>
+<td>
+0
+</td>
+<td>
+startGame
+</td>
+<td>
+0
+</td>
+<td>
+fieldModelAddPlayerMarker
+</td>
+<td>
+{‘playerId’: ‘15440788’, ‘homeText’: ‘G’, ‘awayText’: ‘G’}
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+1
+</td>
+<td>
+0
+</td>
+<td>
+startGame
+</td>
+<td>
+0
+</td>
+<td>
+fieldModelAddPlayerMarker
+</td>
+<td>
+{‘playerId’: ‘15440790’, ‘homeText’: ‘G’, ‘awayText’: ‘G’}
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>We can use the <code>pandas</code> <code>query()</code> function to select rows based on conditions.
+This query selects all “fieldModelSetPlayerCoordinate” commands during setup before turn 1.</p>
+<pre class="python"><code>positions = (df.query(&#39;turnNr == 0 &amp; turnMode == &quot;setup&quot; &amp; Half == 1 &amp; \
+                     modelChangeId == &quot;fieldModelSetPlayerCoordinate&quot;&#39;)
+                     .groupby(&#39;modelChangeKey&#39;)
+                     .tail(1))
+
+(positions[0:4]
+ .filter([&#39;commandNr&#39;, &#39;turnNr&#39;, &#39;turnMode&#39;, &#39;Half&#39;, &#39;modelChangeId&#39;, &#39;modelChangeValue&#39;])
+)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+commandNr
+</th>
+<th>
+turnNr
+</th>
+<th>
+turnMode
+</th>
+<th>
+Half
+</th>
+<th>
+modelChangeId
+</th>
+<th>
+modelChangeValue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+77
+</th>
+<td>
+20
+</td>
+<td>
+0
+</td>
+<td>
+setup
+</td>
+<td>
+1
+</td>
+<td>
+fieldModelSetPlayerCoordinate
+</td>
+<td>
+[12, 6]
+</td>
+</tr>
+<tr>
+<th>
+79
+</th>
+<td>
+21
+</td>
+<td>
+0
+</td>
+<td>
+setup
+</td>
+<td>
+1
+</td>
+<td>
+fieldModelSetPlayerCoordinate
+</td>
+<td>
+[12, 7]
+</td>
+</tr>
+<tr>
+<th>
+81
+</th>
+<td>
+22
+</td>
+<td>
+0
+</td>
+<td>
+setup
+</td>
+<td>
+1
+</td>
+<td>
+fieldModelSetPlayerCoordinate
+</td>
+<td>
+[12, 8]
+</td>
+</tr>
+<tr>
+<th>
+84
+</th>
+<td>
+24
+</td>
+<td>
+0
+</td>
+<td>
+setup
+</td>
+<td>
+1
+</td>
+<td>
+fieldModelSetPlayerCoordinate
+</td>
+<td>
+[10, 4]
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>As I was interested in <strong>defensive</strong> setup formations, I wrote a function <code>determine_receiving_team_at_start()</code> that does exactly what you’d expect given its name :)</p>
+<pre class="python"><code>fb.determine_receiving_team_at_start(df)</code></pre>
+<pre><code>&#39;teamAway&#39;</code></pre>
+</div>
+<div id="towards-ffgn" class="section level1">
+<h1>Towards FFGN</h1>
+<p>Finally, there is a function <code>fumbbl2ffgn()</code> that is very much a work in progress.
+The idea is to take a FUMBBL game log, and systematically strip away all information that is redundant regarding the actual logging of what happened during the game. A minimal game description would consist of all actions taken, all decisions that were made (i.e. to use the dodge skill) and all dice results.
+After we have such a description, we can transform it to a compact annotation that is readable both by humans and machines, and is still a complete description of the game, in that the full game can be reproduced.
+The compact annotation would then be candidate to become the official “Fantasy Football Game Notation”, or FFGN for short.</p>
+<pre class="python"><code>my_game_log = fb.fumbbl2ffgn(match_id = 4447439)
+len(my_game_log)</code></pre>
+<pre><code>866</code></pre>
+<p>This is where it currently stands. A single gamelog is now roughly 1000 lines of text.
+The table below describes the first turn of a Wood Elf team against Necromantic.</p>
+<pre class="python"><code>pd.set_option(&#39;display.max_colwidth&#39;, None)
+
+# Turn 1 for the offensive
+(my_game_log
+ .query(&quot;Half == 1 &amp; turnNr == 1 &amp; commandNr &gt; 88 &amp; commandNr &lt; 211&quot;)
+ .filter([&#39;modelChangeKey&#39;, &#39;modelChangeValue&#39;])
+)</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th>
+</th>
+<th>
+modelChangeKey
+</th>
+<th>
+modelChangeValue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>
+29
+</th>
+<td>
+[‘T1’]
+</td>
+<td>
+[j17, i17, h17, g17, f17, e17]
+</td>
+</tr>
+<tr>
+<th>
+30
+</th>
+<td>
+[‘C1’]
+</td>
+<td>
+[g17, f17, e18, d17, c17, b17]
+</td>
+</tr>
+<tr>
+<th>
+31
+</th>
+<td>
+[‘L1’]
+</td>
+<td>
+[d14, e13, f13]
+</td>
+</tr>
+<tr>
+<th>
+32
+</th>
+<td>
+[‘L4’]
+</td>
+<td>
+Block roll:[‘!’, ‘!’] | block result: ! (POW/PUSH)
+</td>
+</tr>
+<tr>
+<th>
+33
+</th>
+<td>
+[‘L5’]
+</td>
+<td>
+[g12]
+</td>
+</tr>
+<tr>
+<th>
+34
+</th>
+<td>
+[‘L4’]
+</td>
+<td>
+[g13]
+</td>
+</tr>
+<tr>
+<th>
+35
+</th>
+<td>
+0
+</td>
+<td>
+Armour roll: [3, 5] | Armour of [‘L5’] is not broken
+</td>
+</tr>
+<tr>
+<th>
+36
+</th>
+<td>
+[‘Tr1’]
+</td>
+<td>
+Confusion roll: 2 | [‘Tr1’] acts normally
+</td>
+</tr>
+<tr>
+<th>
+37
+</th>
+<td>
+[‘Tr1’]
+</td>
+<td>
+Block roll:[‘&gt;’, ‘%’, ’*’] | block result: * (POW)
+</td>
+</tr>
+<tr>
+<th>
+38
+</th>
+<td>
+[‘L2’]
+</td>
+<td>
+[i12]
+</td>
+</tr>
+<tr>
+<th>
+39
+</th>
+<td>
+[‘Tr1’]
+</td>
+<td>
+[h13]
+</td>
+</tr>
+<tr>
+<th>
+40
+</th>
+<td>
+0
+</td>
+<td>
+Armour roll: [4, 2] | Armour of [‘L2’] is not broken
+</td>
+</tr>
+<tr>
+<th>
+41
+</th>
+<td>
+[‘L5’]
+</td>
+<td>
+Block roll:[‘&gt;’, ‘!’] | block result: ! (POW/PUSH)
+</td>
+</tr>
+<tr>
+<th>
+42
+</th>
+<td>
+[‘L4’]
+</td>
+<td>
+[h12]
+</td>
+</tr>
+<tr>
+<th>
+43
+</th>
+<td>
+0
+</td>
+<td>
+Armour roll: [2, 5] | Armour of [‘L4’] is not broken
+</td>
+</tr>
+<tr>
+<th>
+44
+</th>
+<td>
+[‘L3’]
+</td>
+<td>
+[m16, l16, k16, j16, i16, h16]
+</td>
+</tr>
+<tr>
+<th>
+45
+</th>
+<td>
+[‘L2’]
+</td>
+<td>
+[l15, k15, j15, i15, h15, g15, f15]
+</td>
+</tr>
+<tr>
+<th>
+46
+</th>
+<td>
+[‘C2’]
+</td>
+<td>
+[c15]
+</td>
+</tr>
+<tr>
+<th>
+47
+</th>
+<td>
+[‘W1’]
+</td>
+<td>
+[d16, c16, b16]
+</td>
+</tr>
+<tr>
+<th>
+48
+</th>
+<td>
+[‘W2’]
+</td>
+<td>
+[g18, f18, e18, d18, c18, b18]
+</td>
+</tr>
+<tr>
+<th>
+49
+</th>
+<td>
+[‘W2’]
+</td>
+<td>
+{‘reportId’: ‘pickUpRoll’, ‘playerId’: ‘[’W2’]’, ‘successful’: True, ‘roll’: 4, ‘minimumRoll’: 2, ‘reRolled’: False}
+</td>
+</tr>
+<tr>
+<th>
+50
+</th>
+<td>
+[‘W2’]
+</td>
+<td>
+[c18, d18]
+</td>
+</tr>
+<tr>
+<th>
+51
+</th>
+<td>
+___
+</td>
+<td>
+End of Turn
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Thrower 1 moves. Catcher 1 moves. Lineman 1 moves. Lineman 4 blocks, chooses pow/push, pows Zombie lineman L5 into square g12, follows up, does not break armor.</em>
+<em>Treeman does not take root, does a 3D block on Zombie lineman 2, chooses pow into square i12, follows up to square h13, does not break armor.</em>
+<em>Lineman 5 blocks zombie lineman L4, pows into h12, does not follow up, does not break armor. Then linemen L3, L2, catcher C2 and wardancer W1 all do a move action.</em>
+<em>Finally Wardancer W2 moves, picks up the ball and moves a bit more. End turn.</em></p>
+<p>This blog post describes the basic functionality of the <code>fumbbl_replays</code> Python package. I have a second blog post coming up with three applications that use the <code>fumbbl_replays</code> package to accomplish some Nufflytics goal.</p>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/python/">Python</a>
+  
+  <a class="badge badge-light" href="/tags/pandas/">Pandas</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/fumbbl-replays/&amp;text=Introducing%20the%20fumbbl_replays%20Python%20package%20for%20Blood%20Bowl" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/fumbbl-replays/&amp;t=Introducing%20the%20fumbbl_replays%20Python%20package%20for%20Blood%20Bowl" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Introducing%20the%20fumbbl_replays%20Python%20package%20for%20Blood%20Bowl&amp;body=/post/fumbbl-replays/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/fumbbl-replays/&amp;title=Introducing%20the%20fumbbl_replays%20Python%20package%20for%20Blood%20Bowl" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Introducing%20the%20fumbbl_replays%20Python%20package%20for%20Blood%20Bowl%20/post/fumbbl-replays/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/fumbbl-replays/&amp;title=Introducing%20the%20fumbbl_replays%20Python%20package%20for%20Blood%20Bowl" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hudb6f5a71508eb5317c72df2dc43608d9_19467_250x250_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Gertjan Verhoeven</a></h5>
+      <h6 class="card-subtitle">Data Scientist / Policy Advisor</h6>
+      <p class="card-text">Gertjan Verhoeven is a research scientist currently at the Dutch Healthcare Authority, working on health policy and statistical methods. Follow me on <a href="https://twitter.com/GertjanVerhoev1">Twitter</a> or <a href="https://bayes.club/@gsverhoeven">Mastodon</a> to receive updates on new blog posts. Statistics posts using R are featured on <a href="https://www.r-bloggers.com">R-Bloggers</a>.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="/#contact" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/GertjanVerhoev1" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://bayes.club/@gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-mastodon"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://scholar.google.nl/citations?user=B-tEtToAAAAJ&amp;hl=nl" target="_blank" rel="noopener">
+        <i class="ai ai-google-scholar"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gsverhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://stackoverflow.com/users/10628316/gertjan-verhoeven" target="_blank" rel="noopener">
+        <i class="fab fa-stack-overflow"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/blood-bowl-nufflytics/">Nufflytics: Analyzing Blood Bowl matches from FUMBBL using Python</a></li>
+      
+      <li><a href="/post/blood-bowl-fumbbl-dataset/">Construction of a public dataset of Blood Bowl matches played on FUMBBL.com</a></li>
+      
+      <li><a href="/post/frozenlake-qlearning-convergence/">OpenAI Gym&#39;s FrozenLake: Converging on the true Q-values</a></li>
+      
+      <li><a href="/post/jacks-car-rental-gym/">Jacks Car Rental as a Gym Environment</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.3/mermaid.min.js" integrity="" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/python.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.a0d331bcd05dbe8b31e244f796710f08.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © 2019-2022 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
