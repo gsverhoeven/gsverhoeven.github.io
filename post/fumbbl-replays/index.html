@@ -633,7 +633,7 @@ In addition, it has some functionality to analyze FUMBBL game logs.</p>
 In addition, the API provides up to date roster information.
 To do useful analyses (aka nufflytics) in Python with this data, we need a utility package / library.
 In R, a similar package exists to work with BB2 replays [<a href="https://github.com/nufflytics/nufflytics" class="uri">https://github.com/nufflytics/nufflytics</a>].
-To my knowledge, no work has been done yet on BB3 replay files.</p>
+For BB3 replay files, work is ongoing to process them, with a <a href="https://github.com/tagsemb/bbrdecode">proof-of-concept example C# Github repo available</a>.</p>
 <p>We also need a standard way to describe Blood Bowl games in a compact way, that is both human and machine readable.
 In chess, there is the <strong>Portable Game Notation (PGN)</strong>. PGN has become the de facto standard of describing Chess games.
 For Blood Bowl, already in 2002 some work has been done towards this end. David Morgan-Mar developed a notation for the purpose of sharing Blood Bowl game logs over the internet. [<a href="https://www.dangermouse.net/games/bloodbowl/rules.html" class="uri">https://www.dangermouse.net/games/bloodbowl/rules.html</a>]</p>
@@ -642,7 +642,7 @@ For Blood Bowl, already in 2002 some work has been done towards this end. David 
 <li>It would allow us to interchange data between software</li>
 <li>it would help to train AI engines.</li>
 </ul>
-<p>So the package is being developed with this end goal in mind. As Blood Bowl is a much complexer game than Chess, and I am an amateur programmer, we need some intermediate goals that bring us closer to the end goal. Thus, I started with plotting (new or extracted) board positions using a short hand notation for board pieces (players) and codifying player moves.</p>
+<p>So the package is being developed with this end goal in mind. As Blood Bowl is a much complexer game than Chess, and I am an amateur programmer, we need some intermediate goals that bring us closer to the end goal. Thus, I started with plotting (new or extracted) board positions using a short hand notation for board pieces (players) and codifying player moves. While developing the package, I benefited greatly from discussions and feedback on the <a href="https://discord.gg/MTXMuae">Bot bowl discord forum</a>.</p>
 <pre class="python"><code>%pip install -e . --quiet</code></pre>
 <div id="plotting-blood-bowl-board-positions" class="section level1">
 <h1>Plotting Blood Bowl board positions</h1>
