@@ -51,30 +51,15 @@ for team_id in team_ids:
     res = fb.fetch_team_development_data(team_id)
     fb.make_team_development_plot(res)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;...............&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;float&#34;&gt;
-&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_1.png&#34; alt=&#34;png&#34; /&gt;
-&lt;div class=&#34;figcaption&#34;&gt;png&lt;/div&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_1.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;...............&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;float&#34;&gt;
-&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_3.png&#34; alt=&#34;png&#34; /&gt;
-&lt;div class=&#34;figcaption&#34;&gt;png&lt;/div&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_3.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;...............&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;float&#34;&gt;
-&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_5.png&#34; alt=&#34;png&#34; /&gt;
-&lt;div class=&#34;figcaption&#34;&gt;png&lt;/div&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_5.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;.............&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;float&#34;&gt;
-&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_7.png&#34; alt=&#34;png&#34; /&gt;
-&lt;div class=&#34;figcaption&#34;&gt;png&lt;/div&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_7.png&#34; /&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;...............&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;float&#34;&gt;
-&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_9.png&#34; alt=&#34;png&#34; /&gt;
-&lt;div class=&#34;figcaption&#34;&gt;png&lt;/div&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2025-04-29_application_team_league_development_files/application_team_league_development_2_9.png&#34; /&gt;&lt;/p&gt;
 &lt;div id=&#34;what-can-we-learn-from-how-these-gnome-teams-developed&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;What can we learn from how these Gnome teams developed?&lt;/h1&gt;
 &lt;p&gt;What starting roster is used?
