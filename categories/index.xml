@@ -5,7 +5,7 @@
     <link>/categories/</link>
       <atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     <description>Categories</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2022</copyright><lastBuildDate>Thu, 25 Jul 2024 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2025</copyright><lastBuildDate>Tue, 29 Apr 2025 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Categories</title>
@@ -15,7 +15,7 @@
     <item>
       <title>Blood Bowl</title>
       <link>/categories/blood-bowl/</link>
-      <pubDate>Thu, 25 Jul 2024 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 29 Apr 2025 00:00:00 +0000</pubDate>
       <guid>/categories/blood-bowl/</guid>
       <description></description>
     </item>
@@ -23,7 +23,7 @@
     <item>
       <title>Data science</title>
       <link>/categories/data-science/</link>
-      <pubDate>Thu, 25 Jul 2024 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 29 Apr 2025 00:00:00 +0000</pubDate>
       <guid>/categories/data-science/</guid>
       <description></description>
     </item>
