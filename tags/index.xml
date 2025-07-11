@@ -5,28 +5,12 @@
     <link>/tags/</link>
       <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2025</copyright><lastBuildDate>Tue, 29 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019-2025</copyright><lastBuildDate>Mon, 15 Jan 2024 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
       <link>/tags/</link>
     </image>
-    
-    <item>
-      <title>Pandas</title>
-      <link>/tags/pandas/</link>
-      <pubDate>Tue, 29 Apr 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/pandas/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Python</title>
-      <link>/tags/python/</link>
-      <pubDate>Tue, 29 Apr 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/python/</guid>
-      <description></description>
-    </item>
     
     <item>
       <title>Azure</title>
@@ -49,30 +33,6 @@
       <link>/tags/r/</link>
       <pubDate>Mon, 15 Jan 2024 00:00:00 +0000</pubDate>
       <guid>/tags/r/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>ggplot2</title>
-      <link>/tags/ggplot2/</link>
-      <pubDate>Thu, 21 Sep 2023 00:00:00 +0000</pubDate>
-      <guid>/tags/ggplot2/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>hclust</title>
-      <link>/tags/hclust/</link>
-      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
-      <guid>/tags/hclust/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>heatmap</title>
-      <link>/tags/heatmap/</link>
-      <pubDate>Mon, 27 Feb 2023 00:00:00 +0000</pubDate>
-      <guid>/tags/heatmap/</guid>
       <description></description>
     </item>
     
@@ -129,14 +89,6 @@
       <link>/tags/ubuntu/</link>
       <pubDate>Tue, 04 Jan 2022 00:00:00 +0000</pubDate>
       <guid>/tags/ubuntu/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Beautiful Soup</title>
-      <link>/tags/beautiful-soup/</link>
-      <pubDate>Thu, 30 Dec 2021 00:00:00 +0000</pubDate>
-      <guid>/tags/beautiful-soup/</guid>
       <description></description>
     </item>
     
@@ -209,6 +161,14 @@
       <link>/tags/openai-gym/</link>
       <pubDate>Sun, 07 Mar 2021 00:00:00 +0000</pubDate>
       <guid>/tags/openai-gym/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Python</title>
+      <link>/tags/python/</link>
+      <pubDate>Sun, 07 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>/tags/python/</guid>
       <description></description>
     </item>
     

@@ -3,57 +3,12 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/categories/blood-bowl/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
+    <loc>/tags/azure/</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/categories/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/data-science/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/pandas/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/python/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/fumbbl-league-team-development/</loc>
-    <lastmod>2025-04-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/fumbbl-replays/</loc>
-    <lastmod>2024-07-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/azure/</loc>
     <lastmod>2024-01-15T00:00:00+00:00</lastmod>
   </url>
   
@@ -68,7 +23,17 @@
   </url>
   
   <url>
+    <loc>/</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/linux/</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
     <lastmod>2024-01-15T00:00:00+00:00</lastmod>
   </url>
   
@@ -88,38 +53,8 @@
   </url>
   
   <url>
-    <loc>/tags/ggplot2/</loc>
-    <lastmod>2023-09-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/blood-bowl-super-league/</loc>
-    <lastmod>2023-09-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/clustering/</loc>
-    <lastmod>2023-02-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/hclust/</loc>
-    <lastmod>2023-02-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/heatmap/</loc>
-    <lastmod>2023-02-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/blood-bowl-eurobowl-rosters/</loc>
-    <lastmod>2023-02-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/blood-bowl-cluster-heatmap/</loc>
-    <lastmod>2022-11-01T00:00:00+00:00</lastmod>
+    <loc>/tags/</loc>
+    <lastmod>2024-01-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -158,8 +93,8 @@
   </url>
   
   <url>
-    <loc>/post/blood-bowl-nufflytics/</loc>
-    <lastmod>2022-03-20T00:00:00+00:00</lastmod>
+    <loc>/categories/blood-bowl/</loc>
+    <lastmod>2022-01-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -175,21 +110,6 @@
   <url>
     <loc>/tags/ubuntu/</loc>
     <lastmod>2022-01-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/beautiful-soup/</loc>
-    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/blood-bowl-fumbbl-dataset/</loc>
-    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/data-paper/</loc>
-    <lastmod>2021-12-30T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -209,6 +129,11 @@
   
   <url>
     <loc>/tags/dag/</loc>
+    <lastmod>2021-06-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/data-science/</loc>
     <lastmod>2021-06-06T00:00:00+00:00</lastmod>
   </url>
   
@@ -259,6 +184,11 @@
   
   <url>
     <loc>/post/frozenlake-qlearning-convergence/</loc>
+    <lastmod>2021-03-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/python/</loc>
     <lastmod>2021-03-07T00:00:00+00:00</lastmod>
   </url>
   
